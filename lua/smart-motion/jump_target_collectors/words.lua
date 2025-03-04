@@ -87,19 +87,37 @@ local function word_stream(ctx, cfg, motion_state)
 			search_start = end_pos + 1
 		end
 
-		-- Filter the first line based on cursor position
+		-- First line filtering logic (handling cursor word rules)
 		if line_idx == 1 then
-			if is_after_cursor then
-				-- Drop words that start before the cursor.
-				collected_words = vim.tbl_filter(function(word)
-					return word.start_pos >= ctx.cursor_col
-				end, collected_words)
-			else
-				-- Drop words that end after the cursor.
-				collected_words = vim.tbl_filter(function(word)
-					return word.end_pos <= ctx.cursor_col
-				end, collected_words)
-			end
+			collected_words = vim.tbl_filter(function(word)
+				if is_after_cursor then
+					if motion_state.hint_position == consts.HINT_POSITION.START then
+						-- Exclude the word if cursor is sitting *inside* its start.
+						if word.start_pos == ctx.cursor_col then
+							return false
+						end
+					elseif motion_state.hint_position == consts.HINT_POSITION.END then
+						-- Exclude if cursor is on or past the end of the word.
+						if ctx.cursor_col >= word.end_pos then
+							return false
+						end
+					end
+				else -- BEFORE_CURSOR
+					if motion_state.hint_position == consts.HINT_POSITION.END then
+						-- Exclude the word if cursor is sitting *inside* its end.
+						if word.end_pos == ctx.cursor_col then
+							return false
+						end
+					elseif motion_state.hint_position == consts.HINT_POSITION.START then
+						-- Exclude if cursor is on or before the start of the word.
+						if ctx.cursor_col <= word.start_pos then
+							return false
+						end
+					end
+				end
+
+				return true
+			end, collected_words)
 		end
 
 		-- If BEFORE_CURSOR, reverse the order of words for this line.
@@ -110,7 +128,7 @@ local function word_stream(ctx, cfg, motion_state)
 		-- Yield words (targets) in the desired order.
 		for _, word in ipairs(collected_words) do
 			local target_pos_col = (motion_state.hint_position == consts.HINT_POSITION.START) and word.start_pos
-				or (word.end_pos - 1)
+				or word.end_pos
 
 			local jump_target = {
 				bufnr = ctx.bufnr,
