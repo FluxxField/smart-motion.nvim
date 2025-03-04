@@ -14,12 +14,11 @@
 local consts = require("smart-motion.consts")
 local state = require("smart-motion.core.state")
 local utils = require("smart-motion.utils")
-local highlight = require("smart-motion.core.highlight")
-local targets = require("smart-motion.core.targets")
 local hints = require("smart-motion.core.hints")
 local spam = require("smart-motion.core.spam")
 local lines_module = require("smart-motion.core.lines")
 local selection = require("smart-motion.core.selection")
+local targets = require("smart-motion.core.targets")
 local log = require("smart-motion.core.log")
 
 local M = {}
@@ -42,7 +41,6 @@ function M.hint_words(direction, hint_position, is_spammable)
 	-- Gather Context
 	--
 	local ctx, cfg, motion_state = utils.prepare_motion(direction, hint_position, consts.TARGET_TYPES.WORD)
-
 	if not ctx or not cfg or not motion_state then
 		log.error("hint_words: Failed to prepare motion - aborting")
 
@@ -57,6 +55,26 @@ function M.hint_words(direction, hint_position, is_spammable)
 	utils.reset_motion(ctx, cfg, motion_state)
 
 	--
+	-- Calculate Lines
+	--
+	local lines = lines_module.get_lines_for_motion(ctx, cfg, motion_state)
+	if not lines or #lines == 0 then
+		log.debug("No lines to search - exiting early")
+
+		return
+	end
+
+	--
+	-- Get target generator
+	--
+	local generator = targets.get_jump_target_collector_for_type(motion_state.target_type)
+
+	if not generator then
+		return
+	end
+
+	local collector, first_jump_target = generator(ctx, cfg, motion_state, {})
+	--
 	-- Handle spam detection
 	--
 	local spam_key = direction .. "-" .. hint_position
@@ -70,39 +88,32 @@ function M.hint_words(direction, hint_position, is_spammable)
 	end
 
 	--
-	-- Calculate Lines
-	--
-	local lines = lines_module.get_lines_for_motion(ctx, cfg, motion_state)
-	if not lines or #lines == 0 then
-		log.debug("No lines to search - exiting early")
-
-		return
-	end
-
-	--
 	-- Collect Targets
 	--
-	local jump_targets = targets.get_jump_targets(ctx, cfg, motion_state)
+	local jump_targets = {}
 
-	log.debug(string.format("Found %d jump targets", #jump_targets))
-
-	if #jump_targets == 0 then
-		log.bebug("No valid jump targets found - exiting early")
-
-		return
+	if first_jump_target then
+		table.insert(jump_targets, first_jump_target)
 	end
+
+	while true do
+		local ok, jump_target = coroutine.resume(collector, ctx, cfg, motion_state)
+
+		if not ok or not jump_target then
+			break
+		end
+
+		table.insert(jump_targets, jump_target)
+	end
+
+	motion_state.jump_targets = jump_targets
 
 	state.finalize_motion_state(motion_state)
 
 	--
-	-- Assign Hints
+	-- Assign Hints and Apply Hints
 	--
-	hints.generate_and_assign_labels(ctx, cfg, motion_state)
-
-	--
-	-- Apply Highlights
-	--
-	highlight.apply_hint_labels(ctx, cfg, motion_state)
+	hints.assign_and_apply_labels(ctx, cfg, motion_state)
 
 	--
 	-- Wait for Selection
@@ -118,8 +129,8 @@ function M.hint_words(direction, hint_position, is_spammable)
 		log.debug(
 			string.format(
 				"Jumped to target - line: %d, col: %d",
-				motion_state.selected_jump_target.line,
-				motion_state.selected_jump_target.start_pos
+				motion_state.selected_jump_target.row,
+				motion_state.selected_jump_target.col
 			)
 		)
 	else

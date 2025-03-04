@@ -58,17 +58,17 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 		return nil
 	end
 
-	for target, hint in pairs(motion_state.assigned_hint_labels) do
-		if char == hint then
-			log.debug("User selected hint: " .. hint)
+	local entry = motion_state.assigned_hint_labels[char]
 
-			return target
-		end
+	if entry and entry.jump_target then
+		log.debug("User selected hint: " .. vim.inspect(entry.jump_target))
+
+		return entry.jump_target
+	else
+		log.debug("No matching hint found for input: " .. char)
+
+		return nil
 	end
-
-	log.debug("No matching hint found for input: " .. char)
-
-	return nil
 end
 
 --- Executes the actual cursor movement to the given target.
@@ -76,45 +76,36 @@ end
 ---@param cfg table  Validated configuration (not used here but part of the signature).
 ---@param motion_state table  Current motion state (not used here but part of the signature).
 function M.jump_to_target(ctx, cfg, motion_state)
+	local jump_target = motion_state.selected_jump_target
+
 	log.debug(
 		string.format(
 			"Executing jump to target - line: %d, start_pos: %d, end_pos: %d, hint_position: %s",
-			motion_state.selected_jump_target.line,
-			motion_state.selected_jump_target.start_pos,
-			motion_state.selected_jump_target.end_pos,
-			motion_state.hint_position
+			jump_target.row,
+			jump_target.start_pos.col,
+			jump_target.end_pos.col,
+			jump_target.hint_position
 		)
 	)
 
-	if
-		type(motion_state.selected_jump_target) ~= "table"
-		or not motion_state.selected_jump_target.line
-		or not motion_state.selected_jump_target.start_pos
-		or not motion_state.selected_jump_target.end_pos
-	then
+	if type(jump_target) ~= "table" or not jump_target.row or not jump_target.start_pos or not jump_target.end_pos then
 		log.error("jump_to_target called with invalid target table: " .. vim.inspect(motion_state.selected_jump_target))
 
 		return
 	end
 
-	local pos
-
-	if motion_state.hint_position == consts.HINT_POSITION.START then
-		pos = motion_state.selected_jump_target.start_pos
-	elseif motion_state.hint_position == consts.HINT_POSITION.END then
-		pos = motion_state.selected_jump_target.end_pos - 1
-	else
-		log.error("Invalid motion_state.hint_position provided: " .. tostring(motion_state.hint_position))
-
-		return
+	if jump_target.bufnr ~= vim.api.nvim_get_current_buf() then
+		vim.api.nvim_set_current_buf(jump_target.bufnr)
 	end
 
-	local success, err = pcall(vim.api.nvim_win_set_cursor, 0, { motion_state.selected_jump_target.line + 1, pos })
+	local pos = { jump_target.row + 1, jump_target.col }
+
+	local success, err = pcall(vim.api.nvim_win_set_cursor, jump_target.winid or 0, pos)
 
 	if not success then
 		log.error("Failed to move cursor: " .. tostring(err))
 	else
-		log.debug(string.format("Cursor moved to line %d, col %d", motion_state.selected_jump_target.line + 1, pos))
+		log.debug(string.format("Cursor moved to line %d, col %d", jump_target.row, jump_target.col))
 	end
 end
 

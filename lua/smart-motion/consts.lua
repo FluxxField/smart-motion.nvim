@@ -19,6 +19,12 @@ M.HINT_POSITION = {
 	END = "end",
 }
 
+M.TARGET_TYPES = {
+	WORD = "word",
+	CHAR = "char",
+	LINE = "line",
+}
+
 --
 -- Word Motion constants
 --
@@ -44,12 +50,6 @@ M.word_motion_hint_position = {
 }
 
 M.WORD_PATTERN = [[\k\+]]
-
-M.TARGET_TYPES = {
-	WORD = "word",
-	CHAR = "char",
-	LINE = "line",
-}
 
 M.SELECTION_MODE = {
 	FIRST = "first",

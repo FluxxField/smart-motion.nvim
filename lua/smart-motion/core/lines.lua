@@ -36,8 +36,6 @@ function M.get_lines_for_motion(ctx, cfg, motion_state)
 		log.debug(string.format("Scanning after cursor - max_lines: %d (last_line: %d)", max_lines, last_line))
 
 		lines = vim.api.nvim_buf_get_lines(ctx.bufnr, ctx.cursor_line, ctx.cursor_line + max_lines, false)
-		motion_state.lines = lines
-		return lines
 	elseif motion_state.direction == consts.DIRECTION.BEFORE_CURSOR then
 		-- Fetch from the start of the file (line 0) or max_lines before the cursor to cursor_line (inclusive)
 		local start_line = math.max(ctx.cursor_line - motion_state.max_lines, 0)
@@ -45,11 +43,10 @@ function M.get_lines_for_motion(ctx, cfg, motion_state)
 		log.debug(string.format("Scanning before cursor - start_line: %d", start_line))
 
 		lines = vim.api.nvim_buf_get_lines(ctx.bufnr, start_line, ctx.cursor_line + 1, false)
-		motion_state.lines = lines
-		return lines
-	end
 
-	log.error("invalid motion direction passed: " .. tostring(ctx.direction))
+		-- Reverse the order so first processed is closest to cursor.
+		lines = vim.fn.reverse(lines)
+	end
 
 	motion_state.lines = lines
 	return lines

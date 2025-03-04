@@ -24,61 +24,45 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 	end
 
 	if motion_state.selection_mode == consts.SELECTION_MODE.FIRST then
-		-- Check if it's a single-char match
-		for target, hint in pairs(motion_state.assigned_hint_labels) do
-			if char == hint then
-				log.debug("User selected single-char hint: " .. hint)
+		local entry = motion_state.assigned_hint_labels[char]
 
-				motion_state.selected_jump_target = target
-
+		if entry then
+			if #char == 1 and entry.is_single_prefix then
+				log.debug("User selected single-char hint: " .. char)
+				motion_state.selected_jump_target = entry.jump_target
 				return
 			end
-		end
 
-		-- Check if it's the first character of any double-char hint
-		local has_double_char_hints = false
+			if #char == 1 and entry.is_double_prefix then
+				-- Enter second character selection phase
+				motion_state.selection_mode = consts.SELECTION_MODE.SECOND
+				motion_state.selection_first_char = char
 
-		for _, hint in pairs(motion_state.assigned_hint_labels) do
-			if hint:sub(1, 1) == char and #hint == 2 then
-				has_double_char_hints = true
-				break
+				-- Filter and update highlights to show only matching second chars
+				highlight.filter_double_hints(ctx, cfg, motion_state, char)
+
+				log.debug("Entering double-char mode after selecting first char: " .. char)
+
+				-- Immediately recurse to handle the second char (simpler for caller)
+				return M.wait_for_hint_selection(ctx, cfg, motion_state)
 			end
 		end
 
-		if has_double_char_hints then
-			-- Enter second character selection phase
-			motion_state.selection_mode = consts.SELECTION_MODE.SECOND
-			motion_state.selection_first_char = char
-
-			-- Filter and update highlights to show only matching second chars
-			highlight.filter_double_hints(ctx, cfg, motion_state, char, motion_state.assigned_hint_labels)
-
-			log.debug("Entering double-char mode after selecting first char: " .. char)
-
-			-- Immediately recurse to handle the second char (simpler for caller)
-			return M.wait_for_hint_selection(ctx, cfg, motion_state)
-		else
-			log.debug("No matching single or double-char hint found for input: " .. char)
-
-			return
-		end
+		log.debug("No matching hint found for input: " .. char)
+		return
 	elseif motion_state.selection_mode == consts.SELECTION_MODE.SECOND then
 		local first_char = motion_state.selection_first_char
 		local full_hint = first_char .. char
 
-		-- Find full double-char match
-		for target, hint in pairs(motion_state.assigned_hint_labels) do
-			if hint == full_hint then
-				log.debug("User completed double-char selection: " .. full_hint)
+		local entry = motion_state.assigned_hint_labels[full_hint]
 
-				motion_state.selected_jump_target = target
-
-				return
-			end
+		if entry then
+			log.debug("User completed double-char selection: " .. full_hint)
+			motion_state.selected_jump_target = entry.jump_target
+			return
 		end
 
 		log.debug("No matching double-char hint found for input: " .. full_hint)
-
 		return
 	end
 
