@@ -9,54 +9,62 @@
 
 # SmartMotion.nvim - Home-row powered smart motions for Neovim
 
-## 📖 What is SmartMotion?
+## 📚 What is SmartMotion?
 
-`SmartMotion.nvim` is a motion plugin for Neovim that brings **intuitive, home-row driven navigation** to your code. Forget counting words or characters — SmartMotion instantly highlights jump targets **with dynamic, in-place labels**, allowing you to navigate faster and more naturally.
+`SmartMotion.nvim` brings **intuitive, home-row driven navigation** to Neovim. Forget counting words or characters — SmartMotion instantly highlights jump targets **with dynamic, in-place labels**, letting you move faster and more intuitively.
 
-SmartMotion is part of my personal War on Counting. I believe motions in Neovim should be about intent, not arithmetic. Why count words, characters, or lines when your editor can show you the way? This philosophy drives not only word motions, but my future plans to enhance commands like dt and ct — so instead of typing dt; or dt) and mentally counting, you just jump directly to the desired target.
-
----
-
-## 🚀 Why SmartMotion? (What Makes Us Different)
-
-SmartMotion takes the **best ideas from plugins like Hop.nvim and EasyMotion**, and layers on:
-
-- 🔦 **Smart Label Generation:** Dynamically chooses between single-character and double-character labels based on target density.
-- 🔦 **Dynamic Highlight Feedback:** After selecting the first character in a double hint, SmartMotion dims the first and highlights the second.
-- 🛠️ **Zero Default Mappings:** You control how and when SmartMotion activates — no keybinding conflicts.
-- 🔄 **Expandable Architecture:** Currently being built to support future motions like `f`, `t`, paragraph, line, and operator motions.
+SmartMotion exists to end what I call the **War on Counting**. Why count words or characters when your editor can show you exactly where to jump? This philosophy drives not only word motions, but future plans for commands like `dt`, `ct`, and others.
 
 ---
 
-## 📃 Table of Contents
+## 🚀 Why SmartMotion?
 
-- [Features](#features)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Usage](#usage)
-- [Exposed Methods](#exposed-methods)
-- [Example Mappings](#example-mappings)
-- [Roadmap](#roadmap)
-- [Similar Plugins](#similar-plugins)
-- [Other Plugins By Me](#other-plugins-by-me)
-- [Shameless Plug](#shameless-plug)
+Other motion plugins (like Hop and EasyMotion) are great but often:
+
+- Replace core motions entirely, breaking muscle memory.
+- Make you choose between 'normal' and 'smart' motions.
+- Feel sluggish when you just want to spam `w`, `e`, or `b`.
+
+SmartMotion fixes all of that with **Flow-State Chaining**.
 
 ---
 
-## ✨ Features
+## 🔗 Credits & Inspiration
 
-- Home-row powered jump hints
-- Single & double character label support
-- Dynamic feedback highlighting
-- Multi-line support
-- No default mappings — you are in control
-- Works with `w`, `b`, `e`, `ge` out of the box
-- Smart label generation
-- No dependencies — pure Lua
+SmartMotion builds on the great work from:
+
+- [Hop.nvim](https://github.com/phaazon/hop.nvim) — original home-row hints.
+- [EasyMotion](https://github.com/easymotion/vim-easymotion) — fast jump pioneer.
 
 ---
 
-## 💳 Installation
+## 🔆 Features
+
+🔢 Home-row powered hints  
+🔢 Single & double character labels (adaptive)  
+🔢 Dynamic feedback highlighting  
+🔢 Multi-line support  
+🔢 Works seamlessly with `w`, `b`, `e`, `ge`  
+🔢 Smart label generation  
+🔢 No default mappings (full control)  
+🔢 Pure Lua, no dependencies  
+🔢 Flow-state chaining preserves natural spamming
+
+---
+
+# 🔥 Flow-State & Motion Chaining — SmartMotion's Superpower
+
+SmartMotion is the first motion plugin with **true flow-state chaining**:
+
+- Remap `w`, `b`, `e`, `ge` to SmartMotion.
+- Get smart hints when you pause.
+- Keep native fast-repeat spamming if you hold the key.
+
+This makes SmartMotion feel like a natural upgrade instead of a takeover.
+
+---
+
+## 🗃 Installation
 
 ### lazy.nvim
 
@@ -93,85 +101,28 @@ require("smart-motion").setup({
 
 ---
 
-## 🔹 Important Callout: No Default Mappings
-
-SmartMotion does not register any mappings by default. You must define your own. Example:
+## 📌 Example Mappings (Flow-State in Action)
 
 ```lua
-return {
-  "FluxxField/smart-motion.nvim",
-  lazy = false,
-  config = function()
-    local smart_motion = require "smart-motion"
-    local DIRECTION = smart_motion.consts.DIRECTION
-    local HINT_POSITION = smart_motion.consts.HINT_POSITION
+local smart_motion = require "smart-motion"
+local DIRECTION = smart_motion.consts.DIRECTION
+local HINT_POSITION = smart_motion.consts.HINT_POSITION
 
-    smart_motion.setup {
-      mappings = {
+require("smart-motion").setup {
+    mappings = {
         n = {
-          w = {
-            function() require("smart-motion").hint_words(DIRECTION.AFTER_CURSOR, HINT_POSITION.START, true) end,
-            desc = "smart-motion forward word",
-          },
-          b = {
-            function() require("smart-motion").hint_words(DIRECTION.BEFORE_CURSOR, HINT_POSITION.START, true) end,
-            desc = "smart-motion backward word",
-          },
-          e = {
-            function() require("smart-motion").hint_words(DIRECTION.AFTER_CURSOR, HINT_POSITION.END, true) end,
-            desc = "smart-motion forward to word end",
-          },
-          ge = {
-            function() require("smart-motion").hint_words(DIRECTION.BEFORE_CURSOR, HINT_POSITION.END, true) end,
-            desc = "smart-motion backward to word end",
-          },
+            w = { function() smart_motion.hint_words(DIRECTION.AFTER_CURSOR, HINT_POSITION.START) end },
+            b = { function() smart_motion.hint_words(DIRECTION.BEFORE_CURSOR, HINT_POSITION.START) end },
+            e = { function() smart_motion.hint_words(DIRECTION.AFTER_CURSOR, HINT_POSITION.END) end },
+            ge = { function() smart_motion.hint_words(DIRECTION.BEFORE_CURSOR, HINT_POSITION.END) end },
         },
-        v = {},
-      },
     }
-  end,
 }
 ```
 
 ---
 
-🎨 Important Callout: Flexible Highlight Configuration
-
-You can configure how SmartMotion highlights its hints in two ways:
-
-1️⃣ Reference Existing Highlight Groups (Default)
-
-This is the easiest way — you can point to existing highlight groups (like SmartMotionHint).
-
-```lua
-highlight = {
-    dim = "SmartMotionDim",
-    hint = "SmartMotionHint",
-    first_char = "SmartMotionFirstChar",
-    second_char = "SmartMotionSecondChar",
-    first_char_dim = "SmartMotionFirstCharDim",
-}
-```
-
-2️⃣ Directly Define Colors (Power User Option)
-
-You can also pass highlight definitions directly if you want full control.
-
-```lua
-highlight = {
-    dim = { fg = "#5C6370", bg = "none" },
-    hint = { fg = "#E06C75", bg = "none" },
-    first_char = { fg = "#98C379", bg = "none" },
-    second_char = { fg = "#61AFEF", bg = "none" },
-    first_char_dim = { fg = "#6F8D57", bg = "none" },
-}
-```
-
-This makes SmartMotion extremely flexible and allows it to seamlessly fit into any colorscheme.
-
----
-
-## 🎮 Exposed Methods
+## 🌟 Exposed Methods
 
 | Method                            | Description                      |
 | --------------------------------- | -------------------------------- |
@@ -179,73 +130,30 @@ This makes SmartMotion extremely flexible and allows it to seamlessly fit into a
 
 ---
 
-## 🌆 Roadmap
+## 🔄 Roadmap
 
-- New methods for characters, lines and more
-- Character motions (`f`, `t`, `F`, `T`)
+- Character motions (`f`, `t`, etc.)
 - Operator support (`d`, `c`, `y`)
-- Configurable timeout between double-char hints
+- Timeout tuning for double-char hints
 - Paragraph & block motions
-- Advanced label tuning
+- Advanced label customization
 
 ---
 
-## 🔗 Similar Plugins
+## 📂 License
 
-| Plugin                                            | Notes              |
-| ------------------------------------------------- | ------------------ |
-| [Hop.nvim](https://github.com/phaazon/hop.nvim)   | Big inspiration    |
-| [leap.nvim](https://github.com/ggandor/leap.nvim) | 2-char quick jumps |
-
----
-
-## 🛠️ Other Plugins By Me
-
-| Plugin                                                                   | Description                   |
-| ------------------------------------------------------------------------ | ----------------------------- |
-| [bionic-reading.nvim](https://github.com/FluxxField/bionic-reading.nvim) | Syllable-based bionic reading |
-
----
-
-## 💼 Shameless Plug
-
-I also build custom websites for businesses, startups, and personal brands! If you want:
-
-- Stunning design & performance
-- Modern, SEO-optimized tech
-- Built using Next.js, Astro, or tailored to your stack
-
-Check out:
-
-- [Cornerstone Homes](https://www.cornerstonehomesok.com)
-- [SLP Custom Built](https://www.slpcustombuilt.com)
-
-📧 Contact me at: [keenanjj13@protonmail.com](mailto:keenanjj13@protonmail.com)
-
----
-
-## 🏆 License
-
-GNU GENERAL PUBLIC LICENSE
-Version 3, 29 June 2007
-
-Copyright (C) 2025 FluxxField
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
+Licensed under [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html).
 
 ---
 
 ## ✨ Author
 
 Built with ❤️ by [FluxxField](https://github.com/FluxxField)
+
+I also build custom websites for businesses and brands using Next.js, React, Tailwindcss, Motion, and more. Check out:
+
+- [Cornerstone Homes](https://www.cornerstonehomesok.com)  
+- [SLP Custom Built](https://www.slpcustombuilt.com)
+
+📧 [keenanjj13@protonmail.com](mailto:keenanjj13@protonmail.com)
+
