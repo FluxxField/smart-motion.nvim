@@ -1,4 +1,5 @@
 --- Module for hint generation and assignment.
+local highlight = require("smart-motion.core.highlight")
 local log = require("smart-motion.core.log")
 
 local M = {}
@@ -16,88 +17,89 @@ function M.generate_hint_labels(ctx, cfg, motion_state)
 		return {}
 	end
 
-	if type(motion_state) ~= "table" then
-		log.error("generate_hint_labels received invalid motion_state")
-		return {}
-	end
+	local single_label_count = motion_state.single_label_count
+	local extra_labels_needed = motion_state.extra_labels_needed
 
-	local singles = vim.list_slice(cfg.keys, 1, motion_state.single_label_count)
-	local double_base = vim.list_slice(cfg.keys, motion_state.single_label_count + 1)
-
+	local singles = vim.list_slice(cfg.keys, 1, single_label_count)
 	local doubles = {}
-	local doubles_needed = motion_state.extra_labels_needed
 
-	for _, first in ipairs(double_base) do
-		for _, second in ipairs(double_base) do
-			table.insert(doubles, first .. second)
+	if extra_labels_needed > 0 then
+		local double_base = vim.list_slice(cfg.keys, single_label_count + 1)
 
-			if #doubles >= doubles_needed then
+		for _, first in ipairs(double_base) do
+			for _, second in ipairs(double_base) do
+				table.insert(doubles, first .. second)
+
+				if #doubles >= extra_labels_needed then
+					break
+				end
+			end
+			if #doubles >= extra_labels_needed then
 				break
 			end
 		end
 
-		if #doubles >= doubles_needed then
-			break
+		if #doubles < extra_labels_needed then
+			log.warn(
+				string.format(
+					"Needed %d double labels, but only generated %d! Label pool may be incomplete.",
+					extra_labels_needed,
+					#doubles
+				)
+			)
 		end
 	end
 
 	local final_labels = vim.list_extend(singles, doubles)
 
-	if #final_labels < motion_state.jump_target_count then
-		log.debug(
-			string.format(
-				"Not enough labels for %d targets! Using %d available labels.",
-				motion_state.jump_target_count,
-				#final_labels
-			)
-		)
-	end
-
 	log.debug(string.format("Generated %d labels (singles: %d, doubles: %d)", #final_labels, #singles, #doubles))
+
+	motion_state.hint_labels = final_labels
 
 	return final_labels
 end
 
---- Assigns hint labels to targets.
----@param ctx table Full context (cursor position, buffer, etc.) — not used here, but part of standard signature.
----@param cfg table Validated config — not used directly here, but part of standard signature.
----@param motion_state table Current motion state — not used directly here.
----@return table<table, string> Mapping of target to assigned hint .
-function M.assign_hint_labels(ctx, cfg, motion_state)
-	if #motion_state.jump_targets > #motion_state.hint_labels then
-		log.debug(
-			string.format(
-				"Not enough labels for %d targets! Only assigning labels to the first %d targets.",
-				#motion_state.jump_targets,
-				#motion_state.hint_labels
-			)
-		)
+--- Generates, assigns and applies labels in a single pass.
+---@param ctx table Full context (cursor position, buffer, etc.).
+---@param cfg table Validated config.
+---@param motion_state table Current motion state (holds targets).
+function M.assign_and_apply_labels(ctx, cfg, motion_state)
+	local jump_targets = motion_state.jump_targets or {}
+	local jump_target_count = motion_state.jump_target_count
+
+	if jump_target_count == 0 then
+		log.warn("assign_and_apply_labels: No targets to label")
+		return
 	end
 
-	local hints = {}
+	log.debug(string.format("Assigning and applying labels for %d targets", jump_target_count))
 
-	for i, target in ipairs(motion_state.jump_targets) do
-		if i > #motion_state.hint_labels then
+	local label_pool = M.generate_hint_labels(ctx, cfg, motion_state)
+
+	if jump_target_count > #label_pool then
+		log.debug(string.format("Only %d labels available, but %d targets found", #label_pool, jump_target_count))
+	end
+
+	highlight.dim_background(ctx, cfg, motion_state)
+
+	for index, jump_target in ipairs(jump_targets) do
+		local label = label_pool[index]
+
+		if not label then
 			break
 		end
 
-		hints[target] = motion_state.hint_labels[i]
+		if #label == 1 then
+			highlight.apply_single_hint_label(ctx, cfg, motion_state, jump_target, label)
+			motion_state.assigned_hint_labels[label] = { jump_target = jump_target, is_single_prefix = true }
+		elseif #label == 2 then
+			highlight.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, { dim_first_char = false })
+			motion_state.assigned_hint_labels[label] = { jump_target = jump_target }
+			motion_state.assigned_hint_labels[label:sub(1, 1)] = { is_double_prefix = true }
+		else
+			log.error("Unexpected hint length for label: '" .. label .. "'")
+		end
 	end
-
-	log.debug(string.format("Assigned %d hints to targets", #hints))
-
-	return hints
-end
-
---- Generates and Assigns labels to targets
----@param ctx table Full context (cursor position, buffer, etc.).
----@param cfg table Validated config.
----@param motion_state table Current motion state.
-function M.generate_and_assign_labels(ctx, cfg, motion_state)
-	log.debug(string.format("Generating and assigning labels - needed: %d", motion_state.extra_labels_needed))
-
-	motion_state.hint_labels = M.generate_hint_labels(ctx, cfg, motion_state)
-	motion_state.assigned_hint_labels = M.assign_hint_labels(ctx, cfg, motion_state)
 end
 
 return M
