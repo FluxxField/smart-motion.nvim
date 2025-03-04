@@ -1,5 +1,4 @@
 --- General-purpose utilities.
-local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 local context = require("smart-motion.core.context")
 local state = require("smart-motion.core.state")
@@ -80,15 +79,16 @@ function M.jump_to_target(ctx, cfg, motion_state)
 
 	log.debug(
 		string.format(
-			"Executing jump to target - line: %d, start_pos: %d, end_pos: %d, hint_position: %s",
+			"Executing jump to target - row: %d, col: %d, bufnr: %d, start_col: %d, end_col: %d",
 			jump_target.row,
+			jump_target.col,
+			jump_target.bufnr,
 			jump_target.start_pos.col,
-			jump_target.end_pos.col,
-			jump_target.hint_position
+			jump_target.end_pos.col
 		)
 	)
 
-	if type(jump_target) ~= "table" or not jump_target.row or not jump_target.start_pos or not jump_target.end_pos then
+	if type(jump_target) ~= "table" or not jump_target.row or not jump_target.col then
 		log.error("jump_to_target called with invalid target table: " .. vim.inspect(motion_state.selected_jump_target))
 
 		return
@@ -106,6 +106,8 @@ function M.jump_to_target(ctx, cfg, motion_state)
 		log.error("Failed to move cursor: " .. tostring(err))
 	else
 		log.debug(string.format("Cursor moved to line %d, col %d", jump_target.row, jump_target.col))
+
+		M.reset_motion(ctx, cfg, motion_state)
 	end
 end
 
