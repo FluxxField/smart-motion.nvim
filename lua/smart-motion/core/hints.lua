@@ -43,8 +43,8 @@ function M.generate_hint_labels(ctx, cfg, motion_state)
 			log.warn(
 				string.format(
 					"Needed %d double labels, but only generated %d! Label pool may be incomplete.",
-					extra_labels_needed,
-					#doubles
+					extra_labels_needed or 0,
+					#doubles or 0
 				)
 			)
 		end

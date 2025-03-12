@@ -1,6 +1,8 @@
 local M = {}
 
-local words_collector = require("smart-motion.jump_target_collectors.words")
+local words_collector = require("smart-motion.collectors.words")
+
+--- NOTE: This will be replaced in the future when smart-motions are registered
 
 --- Returns a function that can generate targets when called with context, config, and state.
 ---@param target_type string The type of target to collect (e.g., "word", "char").

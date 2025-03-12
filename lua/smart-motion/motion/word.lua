@@ -15,11 +15,11 @@ local consts = require("smart-motion.consts")
 local state = require("smart-motion.core.state")
 local utils = require("smart-motion.utils")
 local hints = require("smart-motion.core.hints")
-local spam = require("smart-motion.core.spam")
 local lines_module = require("smart-motion.core.lines")
 local selection = require("smart-motion.core.selection")
 local targets = require("smart-motion.core.targets")
 local flow_state = require("smart-motion.core.flow-state")
+local words_extractor = require("smart-motion.extractors.words")
 local log = require("smart-motion.core.log")
 
 local M = {}
@@ -84,28 +84,13 @@ function M.hint_words(direction, hint_position)
 	end
 
 	--
-	-- Collect Targets
+	-- Extract Targets
 	--
-	local jump_targets = {}
-
-	if first_jump_target then
-		table.insert(jump_targets, first_jump_target)
-	end
-
-	while true do
-		local ok, jump_target = coroutine.resume(collector, ctx, cfg, motion_state)
-
-		if not ok or not jump_target then
-			break
-		end
-
-		table.insert(jump_targets, jump_target)
-	end
-
-	-- Update jump targets with the rest of the targets
-	motion_state.jump_targets = jump_targets
+	words_extractor.extract(ctx, cfg, motion_state, collector)
 
 	state.finalize_motion_state(motion_state)
+
+	log.info("motion_state: " .. vim.inspect(motion_state))
 
 	--
 	-- Assign Hints and Apply Hints
