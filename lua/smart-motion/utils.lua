@@ -4,7 +4,6 @@ local context = require("smart-motion.core.context")
 local state = require("smart-motion.core.state")
 local config = require("smart-motion.config")
 local highlight = require("smart-motion.core.highlight")
-local spam = require("smart-motion.core.spam")
 
 local M = {}
 
@@ -163,7 +162,6 @@ function M.reset_motion(ctx, cfg, motion_state)
 	M.close_floating_windows()
 
 	-- Reset spam tracker.
-	spam.reset() -- Assuming you add a reset function in spam module.
 
 	-- Reset dynamic parts of the motion state.
 	motion_state = state.reset(motion_state)

@@ -1,24 +1,12 @@
--- Universal SmartMotion Flow
--- Gather Context - Cursor position, buffer number, direction, etc
--- Initial Cleanup - Clear floating windows and clear highlighting
--- Handle Spam - If a spammable motion, handle it
--- Collect Targets - Call a shared `get_jump_targets()` function (with target type: word, char, line, etc...)
--- Generate Hints - Call a shared `generate_hint_labels()` to compute labels
--- Assign Hints to Targets - Apply the hints (reusing the same logic for all motions)
--- Apply Highlights - Use a unified highlight function that works for any motion type
--- Wait for Selection - Use `getcharstr()` or similar to wait for user selection
--- Execute Jump - Move cursor to selected target
--- Clear Highlights - Remove all hints after action completes
-
 --- Word motion handler.
 local consts = require("smart-motion.consts")
 local state = require("smart-motion.core.state")
 local utils = require("smart-motion.utils")
 local hints = require("smart-motion.core.hints")
-local lines_module = require("smart-motion.core.lines")
 local selection = require("smart-motion.core.selection")
 local targets = require("smart-motion.core.targets")
 local flow_state = require("smart-motion.core.flow-state")
+local lines_collector = require("smart-motion.collectors.lines")
 local words_extractor = require("smart-motion.extractors.words")
 local log = require("smart-motion.core.log")
 
@@ -48,49 +36,40 @@ function M.hint_words(direction, hint_position)
 	utils.reset_motion(ctx, cfg, motion_state)
 
 	--
-	-- Calculate Lines
+	-- Calculate Lines (Streaming)
 	--
-	local lines = lines_module.get_lines_for_motion(ctx, cfg, motion_state)
-	if not lines or #lines == 0 then
+	local lines_generator = lines_collector.init()
+	if not lines_generator then
 		log.debug("No lines to search - exiting early")
-
 		return
 	end
 
 	--
-	-- Get target generator
+	-- Extract Words (Streaming)
 	--
-	local generator = targets.get_jump_target_collector_for_type(motion_state.target_type)
-
-	if not generator then
+	local words_generator = words_extractor.init(lines_generator)
+	if not words_generator then
+		log.debug("No words found in lines - existing early")
 		return
 	end
 
-	local collector, first_jump_target = generator(ctx, cfg, motion_state, {})
+	--
+	-- Build Jump Targets
+	--
+	targets.get_jump_targets(ctx, cfg, motion_state, words_generator)
 
-	if first_jump_target then
-		motion_state.selected_jump_target = first_jump_target
-	end
+	state.finalize_motion_state(motion_state)
 
 	--
 	-- Handle Flow State
 	--
 	if flow_state.evaluate_flow_at_motion_start() then
-		if first_jump_target then
+		if motion_state.selected_jump_target then
 			utils.jump_to_target(ctx, cfg, motion_state)
 			utils.reset_motion(ctx, cfg, motion_state)
 			return
 		end
 	end
-
-	--
-	-- Extract Targets
-	--
-	words_extractor.extract(ctx, cfg, motion_state, collector)
-
-	state.finalize_motion_state(motion_state)
-
-	log.info("motion_state: " .. vim.inspect(motion_state))
 
 	--
 	-- Assign Hints and Apply Hints

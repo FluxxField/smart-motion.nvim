@@ -18,32 +18,33 @@ function M.generate_hint_labels(ctx, cfg, motion_state)
 	end
 
 	local single_label_count = motion_state.single_label_count
-	local extra_labels_needed = motion_state.extra_labels_needed
+	local double_label_count = motion_state.double_label_count
 
 	local singles = vim.list_slice(cfg.keys, 1, single_label_count)
 	local doubles = {}
 
-	if extra_labels_needed > 0 then
+	if double_label_count > 0 then
 		local double_base = vim.list_slice(cfg.keys, single_label_count + 1)
 
 		for _, first in ipairs(double_base) do
 			for _, second in ipairs(double_base) do
 				table.insert(doubles, first .. second)
 
-				if #doubles >= extra_labels_needed then
+				if #doubles >= double_label_count then
 					break
 				end
 			end
-			if #doubles >= extra_labels_needed then
+
+			if #doubles >= double_label_count then
 				break
 			end
 		end
 
-		if #doubles < extra_labels_needed then
-			log.warn(
+		if #doubles < double_label_count then
+			log.debug(
 				string.format(
 					"Needed %d double labels, but only generated %d! Label pool may be incomplete.",
-					extra_labels_needed or 0,
+					double_label_count or 0,
 					#doubles or 0
 				)
 			)
@@ -68,7 +69,7 @@ function M.assign_and_apply_labels(ctx, cfg, motion_state)
 	local jump_target_count = motion_state.jump_target_count
 
 	if jump_target_count == 0 then
-		log.warn("assign_and_apply_labels: No targets to label")
+		log.debug("assign_and_apply_labels: No targets to label")
 		return
 	end
 
