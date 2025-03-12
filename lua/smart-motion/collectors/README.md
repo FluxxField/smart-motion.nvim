@@ -10,7 +10,7 @@ A collector is responsible for gathering raw data that might contain potential j
 
 ---
 
-## Example: lines.lua (Collecting Lines from Buffer)
+## Example: `lines.lua` (Collecting Lines from Buffer)
 
 ```lua
 function collect_lines(ctx, cfg, motion_state)
@@ -23,11 +23,11 @@ function collect_lines(ctx, cfg, motion_state)
 end
 ```
 
-Gathers lines from the buffer but does NOT extract words or targets.
+✅ Gathers lines from the buffer but does NOT extract words or targets.
 
 ---
 
-## Example: treesitter_functions.lua (Collecting Function Definitions)
+## Example: `treesitter_functions.lua` (Collecting Function Definitions)
 
 ```lua
 function collect_treesitter_functions(ctx, cfg, motion_state)
@@ -50,7 +50,7 @@ function collect_treesitter_functions(ctx, cfg, motion_state)
 end
 ```
 
-Finds function definitions using Treesitter but does NOT turn them into jump targets.
+✅ Finds function definitions using Treesitter but does NOT turn them into jump targets.
 
 ---
 
