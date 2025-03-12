@@ -57,6 +57,7 @@ end
 ## When to Use a Collector?
 
 | Use Case | Example Collector |
+| --- | --- |
 | Getting buffer lines | `collect_lines` |
 | Getting function definitions | `collect_treesitter_functions` |
 | Getting LSP diagnostics | `collect_lsp_diagnostics` |

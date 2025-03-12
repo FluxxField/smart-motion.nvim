@@ -57,6 +57,7 @@ end
 ## When to Use an Extractor?
 
 | Use Case |	Example Extractor |
+| --- | --- |
 | Extracting words from lines |	`extract_words` |
 | Extracting function names from Treesitter |	`extract_function_names` |
 | Extracting LSP diagnostics |	`extract_diagnostics` |

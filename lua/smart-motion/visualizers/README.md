@@ -62,6 +62,7 @@ end
 ## When to Use a Visualizer?
 
 | Use Case |	Example Visualizer |
+| --- | --- |
 | Inline hints over words |	inline_hints | 
 | Floating window list |	floating_list |
 | Telescope fuzzy finder |	telescope_picker |

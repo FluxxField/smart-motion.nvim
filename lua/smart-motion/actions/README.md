@@ -37,6 +37,7 @@ end
 ## When to Use an Action?
 
 | Use Case |	Example Action |
+| --- | --- |
 | Jump to a target |	`jump_to_target` |
 | Open LSP definition |	`open_lsp_definition` |
 | Open Telescope for fuzzy finding |	`open_telescope_list` |
