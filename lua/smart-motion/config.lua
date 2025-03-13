@@ -75,9 +75,9 @@ function M.validate(user_config)
 		if type(value) ~= "string" and type(value) ~= "table" then
 			log.error(
 				"`highlight."
-					.. key
-					.. "` must be a string (group name) or a table (color definition), got: "
-					.. type(value)
+				.. key
+				.. "` must be a string (group name) or a table (color definition), got: "
+				.. type(value)
 			)
 			error("smart-motion: `highlight." .. key .. "` must be a string or table")
 		end

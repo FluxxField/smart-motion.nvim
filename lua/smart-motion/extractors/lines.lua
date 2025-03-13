@@ -21,13 +21,18 @@ function M.init(collector)
 				goto continue
 			end
 
+			-- Skip empty lines if ignore_whitespace is true.
+			if motion_state.ignore_whitespace and line_text:match("^%s*$") then
+				goto continue
+			end
+
 			local hint_col
 
 			if motion_state.hint_position == consts.HINT_POSITION.START then
 				if motion_state.ignore_whitespace then
-					hint_col = line_text:find("%S") or 0 -- Find first non-whitespace char
+					hint_col = line_text:find("%S") - 1 or 0 -- Find first non-whitespace char
 				else
-					hint_col = 0 -- Start of the line
+					hint_col = 0                        -- Start of the line
 				end
 			elseif motion_state.hint_position == consts.HINT_POSITION.END then
 				hint_col = #line_text -- End of the line

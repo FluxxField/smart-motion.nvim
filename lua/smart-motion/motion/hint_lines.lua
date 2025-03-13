@@ -17,13 +17,13 @@ local M = {}
 ---@param hint_position "start"|"end"
 ---@param ignore_whitespace boolean
 function M.run(direction, hint_position, ignore_whitespace)
-	log.info(string.format("Highlighting lines - direction: %s, hint_position: %s", direction, hint_position))
+	log.debug(string.format("Highlighting lines - direction: %s, hint_position: %s", direction, hint_position))
 
 	--
 	-- Gather Context
 	--
 	local ctx, cfg, motion_state =
-			utils.prepare_motion(direction, hint_position, consts.TARGET_TYPES.LINE, ignore_whitespace)
+		utils.prepare_motion(direction, hint_position, consts.TARGET_TYPES.LINE, ignore_whitespace)
 	if not ctx or not cfg or not motion_state then
 		log.error("hint_words: Failed to prepare motion - aborting")
 
@@ -100,7 +100,7 @@ function M.run(direction, hint_position, ignore_whitespace)
 		utils.jump_to_target(ctx, cfg, motion_state)
 	else
 		log.debug("User cancelled selection - resetting flow")
-		flow_state.reset()                       -- Cancelled = full flow break
+		flow_state.reset() -- Cancelled = full flow break
 		utils.reset_motion(ctx, cfg, motion_state) -- Always clear extmarks
 	end
 end
