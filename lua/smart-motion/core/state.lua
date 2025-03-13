@@ -37,8 +37,9 @@ end
 ---@param direction string Motion direction ("before_cursor" or "after_cursor")
 ---@param hint_position string Hint position ("start" or "end")
 ---@param target_type string "word", "char", "line"
+---@param ignore_whitespace boolean
 ---@return table motion_state
-function M.create_motion_state(direction, hint_position, target_type)
+function M.create_motion_state(direction, hint_position, target_type, ignore_whitespace)
 	return {
 		total_keys = M.static.total_keys,
 		max_lines = M.static.max_lines,
@@ -48,9 +49,9 @@ function M.create_motion_state(direction, hint_position, target_type)
 		direction = direction,
 		hint_position = hint_position,
 		target_type = target_type,
+		ignore_whitespace = ignore_whitespace,
 
 		-- Motion-specific data (starts empty)
-		lines = {},
 		jump_target_count = 0,
 		jump_targets = {},
 		hint_labels = {},
@@ -58,7 +59,7 @@ function M.create_motion_state(direction, hint_position, target_type)
 
 		-- Label calculations
 		single_label_count = 0,
-		extra_labels_needed = 0,
+		double_label_count = 0,
 		sacrificed_keys_count = 0,
 
 		-- Selection
@@ -87,21 +88,26 @@ function M.finalize_motion_state(motion_state)
 	if jump_target_count <= M.static.total_keys then
 		-- We only need singles
 		motion_state.single_label_count = jump_target_count
-		motion_state.extra_labels_needed = 0
+		motion_state.double_label_count = 0
 		motion_state.sacrificed_keys_count = 0
 	else
-		-- We need doubles
-		motion_state.extra_labels_needed = jump_target_count - motion_state.total_keys
-		motion_state.sacrificed_keys_count = math.ceil(math.sqrt(motion_state.extra_labels_needed))
+		local labels_needed = jump_target_count - motion_state.total_keys
+		local initial_sacrifice = math.ceil(math.sqrt(labels_needed))
+
+		motion_state.double_label_count = labels_needed + initial_sacrifice
+
+		local adjusted_sacrifice = math.ceil(math.sqrt(motion_state.double_label_count))
+
+		motion_state.sacrificed_keys_count = math.max(initial_sacrifice, adjusted_sacrifice)
 		motion_state.single_label_count = motion_state.total_keys - motion_state.sacrificed_keys_count
 	end
 
 	log.debug(
 		string.format(
-			"Motion state finalized - jump_targets: %d, singles: %d, extra_needed: %d, sacrificed_keys: %d",
+			"Motion state finalized - jump_targets: %d, singles: %d, doubles: %d, sacrificed_keys: %d",
 			motion_state.jump_target_count,
 			motion_state.single_label_count,
-			motion_state.extra_labels_needed,
+			motion_state.double_label_count,
 			motion_state.sacrificed_keys_count
 		)
 	)
@@ -109,10 +115,9 @@ end
 
 function M.reset(motion_state)
 	motion_state.single_label_count = 0
-	motion_state.extra_labels_needed = 0
+	motion_state.double_label_count = 0
 	motion_state.sacrificed_keys_count = 0
 
-	motion_state.lines = {}
 	motion_state.jump_target_count = 0
 	motion_state.jump_targets = {}
 	motion_state.hint_labels = {}

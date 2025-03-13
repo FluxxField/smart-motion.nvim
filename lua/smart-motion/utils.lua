@@ -4,7 +4,6 @@ local context = require("smart-motion.core.context")
 local state = require("smart-motion.core.state")
 local config = require("smart-motion.config")
 local highlight = require("smart-motion.core.highlight")
-local spam = require("smart-motion.core.spam")
 
 local M = {}
 
@@ -115,8 +114,9 @@ end
 ---@param direction "before_cursor"|"after_cursor"
 ---@param hint_position "start"|"end"
 ---@param target_type "word"|"char"|"line"
+---@param ignore_whitespace boolean
 ---@return table|nil ctx, table|nil cfg, table|nil motion_state - Returns nils if validation fails.
-function M.prepare_motion(direction, hint_position, target_type)
+function M.prepare_motion(direction, hint_position, target_type, ignore_whitespace)
 	local ctx = context.get()
 
 	if not vim.tbl_contains({ "before_cursor", "after_cursor" }, direction) then
@@ -145,7 +145,7 @@ function M.prepare_motion(direction, hint_position, target_type)
 		return nil, nil, nil
 	end
 
-	local motion_state = state.create_motion_state(direction, hint_position, target_type)
+	local motion_state = state.create_motion_state(direction, hint_position, target_type, ignore_whitespace)
 
 	return ctx, cfg, motion_state
 end
@@ -163,7 +163,6 @@ function M.reset_motion(ctx, cfg, motion_state)
 	M.close_floating_windows()
 
 	-- Reset spam tracker.
-	spam.reset() -- Assuming you add a reset function in spam module.
 
 	-- Reset dynamic parts of the motion state.
 	motion_state = state.reset(motion_state)

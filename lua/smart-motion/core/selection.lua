@@ -15,7 +15,7 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 	log.debug("Waiting for user hint selection (mode: " .. tostring(motion_state.selection_mode) .. ")")
 
 	if type(motion_state.assigned_hint_labels) ~= "table" or vim.tbl_isempty(motion_state.assigned_hint_labels) then
-		log.error("wait_for_hint_selection called with invalid or empty assigned_hint_labels")
+		log.debug("wait_for_hint_selection called with invalid or empty assigned_hint_labels")
 		return false
 	end
 
