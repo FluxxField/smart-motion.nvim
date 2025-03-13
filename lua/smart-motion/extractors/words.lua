@@ -1,5 +1,4 @@
 local consts = require("smart-motion.consts")
-local log = require("smart-motion.core.log")
 
 local M = {}
 
@@ -98,7 +97,7 @@ function M.init(collector)
 					text = word.text,
 					start_pos = { row = line_number, col = word.start_pos },
 					end_pos = { row = line_number, col = word.end_pos },
-					type = "word",
+					type = consts.TARGET_TYPES.WORD,
 				})
 			end
 		end

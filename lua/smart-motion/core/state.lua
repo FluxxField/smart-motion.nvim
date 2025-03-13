@@ -37,8 +37,9 @@ end
 ---@param direction string Motion direction ("before_cursor" or "after_cursor")
 ---@param hint_position string Hint position ("start" or "end")
 ---@param target_type string "word", "char", "line"
+---@param ignore_whitespace boolean
 ---@return table motion_state
-function M.create_motion_state(direction, hint_position, target_type)
+function M.create_motion_state(direction, hint_position, target_type, ignore_whitespace)
 	return {
 		total_keys = M.static.total_keys,
 		max_lines = M.static.max_lines,
@@ -48,6 +49,7 @@ function M.create_motion_state(direction, hint_position, target_type)
 		direction = direction,
 		hint_position = hint_position,
 		target_type = target_type,
+		ignore_whitespace = ignore_whitespace,
 
 		-- Motion-specific data (starts empty)
 		jump_target_count = 0,

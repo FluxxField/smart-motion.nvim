@@ -1,10 +1,11 @@
 --- Main entry point for smart-motion
 local state = require("smart-motion.core.state")
 local config = require("smart-motion.config")
-local word = require("smart-motion.motion.word")
+local hint_words = require("smart-motion.motion.hint_words")
 local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 local highlight_setup = require("smart-motion.highlight_setup")
+local hint_lines = require("smart-motion.motion.hint_lines")
 
 local M = {}
 
@@ -90,7 +91,8 @@ function M.setup(user_config)
 end
 
 --- Expose methods and constants
-M.hint_words = word.hint_words
+M.hint_words = hint_words.run
+M.hint_lines = hint_lines.run
 M.consts = consts
 
 return M

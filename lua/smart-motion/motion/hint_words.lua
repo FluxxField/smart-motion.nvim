@@ -15,13 +15,13 @@ local M = {}
 --- Public method: Hints words from the possible jump targets in a given direction.
 ---@param direction "before_cursor"|"after_cursor"
 ---@param hint_position "start"|"end"
-function M.hint_words(direction, hint_position)
+function M.run(direction, hint_position)
 	log.debug(string.format("Highlighting word - direction: %s, hint_position: %s", direction, hint_position))
 
 	--
 	-- Gather Context
 	--
-	local ctx, cfg, motion_state = utils.prepare_motion(direction, hint_position, consts.TARGET_TYPES.WORD)
+	local ctx, cfg, motion_state = utils.prepare_motion(direction, hint_position, consts.TARGET_TYPES.WORD, true)
 	if not ctx or not cfg or not motion_state then
 		log.error("hint_words: Failed to prepare motion - aborting")
 
@@ -98,7 +98,7 @@ function M.hint_words(direction, hint_position)
 		utils.jump_to_target(ctx, cfg, motion_state)
 	else
 		log.debug("User cancelled selection - resetting flow")
-		flow_state.reset() -- Cancelled = full flow break
+		flow_state.reset()                       -- Cancelled = full flow break
 		utils.reset_motion(ctx, cfg, motion_state) -- Always clear extmarks
 	end
 end
