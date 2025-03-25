@@ -1,0 +1,77 @@
+local log = require("smart-motion.core.log")
+
+return function()
+	local registry = {
+		by_key = {},
+		by_name = {},
+	}
+
+	function registry.register(name, entry)
+		entry.filetypes = entry.filetypes or "*"
+		entry.metadata = entry.metadata or {}
+		entry.metadata.label = entry.metadata.label or name:gsub("^%l", string.upper)
+		entry.metadata.description = entry.metadata.description or ("SmartMotion: " .. entry.metadata.label)
+
+		registry.by_name[name] = entry
+
+		if entry.keys then
+			for _, key in ipairs(entry.keys) do
+				registry.by_key[key] = entry
+			end
+		end
+	end
+
+	function registry.register_many(entries, opts)
+		opts = opts or {}
+
+		for name, entry in pairs(entries) do
+			if not opts.override and registry.by_name[name] then
+				log.warn("Skipping already-registered entry: " .. name)
+			else
+				registry.register(name, entry)
+			end
+		end
+	end
+
+	function registry.get_by_key(key, filetype)
+		local entry = registry.by_key[key]
+
+		if not entry then
+			return nil
+		end
+
+		local ft = filetype or vim.bo.filetype
+
+		if
+			entry.filetypes
+			and not vim.tbl_contains(entry.filetypes, "*")
+			and not vim.tbl_contains(entry.filetypes, ft)
+		then
+			return nil
+		end
+
+		return entry
+	end
+
+	function registry.get_by_name(name, filetype)
+		local entry = registry.by_name[name]
+
+		if not entry then
+			return nil
+		end
+
+		local ft = filetype or vim.bo.filetype
+
+		if
+			entry.filetypes
+			and not vim.tbl_contains(entry.filetypes, "*")
+			and not vim.tbl_contains(entry.filetypes, ft)
+		then
+			return nil
+		end
+
+		return entry
+	end
+
+	return registry
+end

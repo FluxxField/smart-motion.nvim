@@ -55,7 +55,6 @@ function M.get_jump_targets(ctx, cfg, motion_state, extractor)
 
 	motion_state.jump_targets = jump_targets
 	motion_state.selected_jump_target = first_jump_target
-	return jump_targets, first_jump_target
 end
 
 return M

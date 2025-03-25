@@ -17,10 +17,6 @@ M.defaults = {
 	highlight = {},
 	line_limit = nil,
 	multi_line = true,
-	mappings = {
-		n = {}, -- Normal mode mappings
-		v = {}, -- Visual mode mappings (optional)
-	},
 }
 
 M.validated = nil
@@ -53,12 +49,6 @@ function M.validate(user_config)
 	end
 
 	config.keys = split_string(config.keys)
-
-	-- Validate mappings
-	if type(config.mappings) ~= "table" or not config.mappings.n or not config.mappings.v then
-		log.error("`mappings` must be a table with `n` and `v` keys (got: " .. vim.inspect(config.mappings) .. ")")
-		error("smart-motion: `mappings` must be a table with `n` and `v` keys")
-	end
 
 	-- Make highlight optional and defensive
 	config.highlight = config.highlight or {}
