@@ -4,6 +4,7 @@ local dispatcher = require("smart-motion.core.dispatcher")
 local motions = create_registry()
 
 function motions.register_motion(name, motion)
+	motion.name = name
 	motion.trigger_key = motion.trigger_key or name
 	motion.metadata = motion.metadata or {}
 	motion.metadata.label = motion.metadata.label or name:gsub("^%l", string.upper)
@@ -13,12 +14,19 @@ function motions.register_motion(name, motion)
 	motions.by_key[motion.trigger_key] = motion
 
 	if motion.map then
+		local is_action = motion.is_action or false
 		local modes = motion.modes or { "n" }
 		local desc = motion.metadata.label
 
 		for _, mode in ipairs(modes) do
+			local trigger = dispatcher.trigger_motion
+
+			if is_action then
+				trigger = dispatcher.trigger_action
+			end
+
 			local handler = function()
-				dispatcher.trigger_motion(motion.trigger_key)
+				trigger(motion.trigger_key)
 			end
 
 			if package.loaded["which-key"] then
