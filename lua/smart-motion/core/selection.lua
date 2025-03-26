@@ -2,6 +2,7 @@ local log = require("smart-motion.core.log")
 local highlight = require("smart-motion.core.highlight")
 local consts = require("smart-motion.consts")
 local flow_state = require("smart-motion.core.flow-state")
+local targets = require("smart-motion.core.targets")
 
 local M = {}
 
@@ -14,10 +15,39 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 
 	if type(motion_state.assigned_hint_labels) ~= "table" or vim.tbl_isempty(motion_state.assigned_hint_labels) then
 		log.debug("wait_for_hint_selection called with invalid or empty assigned_hint_labels")
-		return false
+		return
 	end
 
+	local timer = vim.loop.new_timer()
+	local user_input_received = false
+
+	-- Timeout handler: fallback to target under cursor
+	-- NOTE: Not the right way to do this...
+	timer:start(vim.o.timeoutlen, 0, function()
+		vim.schedule(function()
+			if not user_input_received then
+				local fallback_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
+
+				if fallback_target then
+					log.debug("Timeout reached, selecting fallback target under cursor")
+					motion_state.selected_jump_target = fallback_target
+				else
+					log.debug("Timeout reached, no valid fallback target under cursor")
+					motion_state.selected_jump_target = nil
+				end
+
+				timer:stop()
+				timer:close()
+				flow_state.exit_flow()
+			end
+		end)
+	end)
+
 	local char = vim.fn.getcharstr()
+	user_input_received = true
+
+	timer:stop()
+	times:close()
 
 	if char == "" or flow_state.should_cancel_on_keypress(char) then
 		log.debug("Selection cancelled by key: " .. char .. " - exiting flow")
