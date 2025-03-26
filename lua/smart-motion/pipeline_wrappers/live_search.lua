@@ -1,5 +1,5 @@
 local highlight = require("smart-motion.core.highlight")
-local log = require("smart-motion.core.log")
+local utils = require("smart-motion.utils")
 
 local M = {}
 
@@ -58,6 +58,7 @@ function M.run(run_pipeline, ctx, cfg, motion_state, action)
 					return true
 				elseif count == 1 then
 					action.run(ctx, cfg, motion_state)
+					utils.reset_motion(ctx, cfg, motion_state)
 					return true
 				end
 			end
