@@ -7,7 +7,6 @@ return function()
 	}
 
 	function registry.register(name, entry)
-		entry.filetypes = entry.filetypes or "*"
 		entry.metadata = entry.metadata or {}
 		entry.metadata.label = entry.metadata.label or name:gsub("^%l", string.upper)
 		entry.metadata.description = entry.metadata.description or ("SmartMotion: " .. entry.metadata.label)
@@ -33,40 +32,20 @@ return function()
 		end
 	end
 
-	function registry.get_by_key(key, filetype)
+	function registry.get_by_key(key)
 		local entry = registry.by_key[key]
 
 		if not entry then
 			return nil
 		end
 
-		local ft = filetype or vim.bo.filetype
-
-		if
-			entry.filetypes
-			and not vim.tbl_contains(entry.filetypes, "*")
-			and not vim.tbl_contains(entry.filetypes, ft)
-		then
-			return nil
-		end
-
 		return entry
 	end
 
-	function registry.get_by_name(name, filetype)
+	function registry.get_by_name(name)
 		local entry = registry.by_name[name]
 
 		if not entry then
-			return nil
-		end
-
-		local ft = filetype or vim.bo.filetype
-
-		if
-			entry.filetypes
-			and not vim.tbl_contains(entry.filetypes, "*")
-			and not vim.tbl_contains(entry.filetypes, ft)
-		then
 			return nil
 		end
 

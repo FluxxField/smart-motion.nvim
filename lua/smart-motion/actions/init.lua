@@ -5,7 +5,6 @@ local actions = create_registry()
 actions.register_many({
 	jump_to_target = {
 		run = jump_to_target.execute,
-		filetypes = { "*" },
 		metadata = {
 			label = "Jump To Target",
 			description = "Executes a jump to selected target hint",

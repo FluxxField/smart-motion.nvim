@@ -5,7 +5,6 @@ local filters = create_registry()
 filters.register_many({
 	default_filter = {
 		run = default_filter,
-		filetypes = { "*" },
 		metadata = {
 			label = "Default Filter",
 			description = "Takes in data and simply returns it. No filtering applied",

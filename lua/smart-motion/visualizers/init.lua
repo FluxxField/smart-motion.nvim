@@ -7,7 +7,6 @@ visualizers.register_many({
 	hint_start = {
 		run = hints.assign_and_apply_labels,
 		hint_position = consts.HINT_POSITION.START,
-		filetypes = { "*" },
 		metadata = {
 			label = "Hint Start Visualizer",
 			description = "Applies hints to the start of targets",
@@ -16,7 +15,6 @@ visualizers.register_many({
 	hint_end = {
 		run = hints.assign_and_apply_labels,
 		hint_position = consts.HINT_POSITION.END,
-		filetypes = { "*" },
 		metadata = {
 			label = "Hint End Visualizer",
 			description = "Applies hints to the end of targets",

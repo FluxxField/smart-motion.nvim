@@ -5,7 +5,6 @@ local wrappers = create_registry()
 wrappers.register_many({
 	default_wrapper = {
 		run = default.run,
-		filetypes = { "*" },
 		metadata = {
 			label = "Default Wrapper",
 			description = "Executes pipeline once without user interaction",

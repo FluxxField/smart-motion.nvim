@@ -7,7 +7,6 @@ extractors.register_many({
 	lines = {
 		keys = { "l" },
 		run = lines.init,
-		filetypes = { "*" },
 		metadata = {
 			label = "Line Extractor",
 			description = "Extracts lines to generate targets from collector",
@@ -16,7 +15,6 @@ extractors.register_many({
 	words = {
 		keys = { "w" },
 		run = words.init,
-		filetypes = { "*" },
 		metadata = {
 			label = "Word Extractor",
 			description = "Extracts words to generate targets from collector",

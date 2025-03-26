@@ -5,7 +5,6 @@ local motions = create_registry()
 
 function motions.register_motion(name, motion)
 	motion.trigger_key = motion.trigger_key or name
-	motion.filetypes = motion.filetypes or { "*" }
 	motion.metadata = motion.metadata or {}
 	motion.metadata.label = motion.metadata.label or name:gsub("^%l", string.upper)
 	motion.metadata.description = motion.metadata.description or ("SmartMotion: " .. motion.metadata.label)
