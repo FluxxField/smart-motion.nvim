@@ -7,6 +7,8 @@ return function()
 	}
 
 	function registry.register(name, entry)
+		entry.name = name
+
 		entry.metadata = entry.metadata or {}
 		entry.metadata.label = entry.metadata.label or name:gsub("^%l", string.upper)
 		entry.metadata.description = entry.metadata.description or ("SmartMotion: " .. entry.metadata.label)
