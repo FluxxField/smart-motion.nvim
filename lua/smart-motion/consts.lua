@@ -20,9 +20,9 @@ M.HINT_POSITION = {
 }
 
 M.TARGET_TYPES = {
-	WORD = "word",
+	WORDS = "words",
 	CHAR = "char",
-	LINE = "line",
+	LINES = "lines",
 	SEARCH = "search",
 }
 
