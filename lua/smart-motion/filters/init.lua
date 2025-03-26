@@ -3,7 +3,7 @@ local create_registry = require("smart-motion.core.registry")
 local filters = create_registry()
 
 filters.register_many({
-	default_filter = {
+	default = {
 		run = default_filter,
 		metadata = {
 			label = "Default Filter",
