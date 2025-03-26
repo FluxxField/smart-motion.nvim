@@ -97,7 +97,7 @@ function M.init(collector)
 					text = word.text,
 					start_pos = { row = line_number, col = word.start_pos },
 					end_pos = { row = line_number, col = word.end_pos },
-					type = consts.TARGET_TYPES.WORD,
+					type = consts.TARGET_TYPES.WORDS,
 				})
 			end
 		end
