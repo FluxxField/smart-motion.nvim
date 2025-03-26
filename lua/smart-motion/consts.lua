@@ -23,6 +23,7 @@ M.TARGET_TYPES = {
 	WORD = "word",
 	CHAR = "char",
 	LINE = "line",
+	SEARCH = "search",
 }
 
 --

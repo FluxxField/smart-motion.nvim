@@ -22,28 +22,32 @@ local registries = {
 	wrappers = wrappers,
 }
 
-local function prepare_pipeline(ctx, cfg, motion_state, collector, extractor)
-	local lines_gen = collector.run()
+local function prepare_pipeline(ctx, cfg, motion_state, collector, extractor, opts)
+	local lines_gen = collector.run(opts)
 	if not lines_gen then
 		return
 	end
 
-	local target_gen = extractor.run(lines_gen)
-	if not target_gen then
+	local extractor_gen = extractor.run(lines_gen, opts)
+	if not extractor_gen then
 		return
 	end
 
-	targets.get_jump_targets(ctx, cfg, motion_state, target_gen)
+	targets.get_jump_targets(ctx, cfg, motion_state, extractor_gen)
 	state.finalize_motion_state(motion_state)
 end
 
 local function build_pipeline(collector, extractor, filter, visualizer)
-	return function(ctx, cfg, motion_state)
-		prepare_pipeline(ctx, cfg, motion_state, collector, extractor)
+	local function run_pipeline(ctx, cfg, motion_state, opts)
+		utils.reset_motion(ctx, cfg, motion_state)
 
-		filter.run(ctx, cfg, motion_state)
-		visualizer.run(ctx, cfg, motion_state)
+		prepare_pipeline(ctx, cfg, motion_state, collector, extractor, opts)
+
+		filter.run(ctx, cfg, motion_state, opts)
+		visualizer.run(ctx, cfg, motion_state, opts)
 	end
+
+	return run_pipeline
 end
 
 local M = {}
@@ -90,7 +94,7 @@ function M.trigger_motion(trigger_key)
 	utils.reset_motion(ctx, cfg, motion_state)
 
 	if flow_state.evaluate_flow_at_motion_start() then
-		prepare_pipeline(ctx, cfg, motion_state, collector, extractor)
+		prepare_pipeline(ctx, cfg, motion_state, collector, extractor, {})
 
 		if motion_state.selected_jump_target then
 			action.run(ctx, cfg, motion_state)
@@ -101,13 +105,18 @@ function M.trigger_motion(trigger_key)
 	end
 
 	-- Validate the Wrapper, fallback to default
-	local wrapper = wrappers.get_by_name(motion.pipeline_wrapper or "default_wrapper")
+	local wrapper = wrappers.get_by_name(motion.pipeline_wrapper or "default")
 	if not wrapper or not wrapper.run then
-		wrapper = wrappers.get_by_name("default_wrapper")
+		wrapper = wrappers.get_by_name("default")
 	end
 
 	local run_pipeline = build_pipeline(collector, extractor, filter, visualizer)
-	wrapper.run(run_pipeline, ctx, cfg, motion_state)
+	local exit = wrapper.run(run_pipeline, ctx, cfg, motion_state, action)
+
+	if exit then
+		utils.reset_motion(ctx, cfg, motion_state)
+		return
+	end
 
 	selection.wait_for_hint_selection(ctx, cfg, motion_state)
 
