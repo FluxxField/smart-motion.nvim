@@ -5,6 +5,7 @@ local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 local highlight_setup = require("smart-motion.highlight_setup")
 local motions = require("smart-motion.motions")
+local presets = require("smart-motion.presets")
 
 -- Core module registries
 local collectors = require("smart-motion.collectors")
@@ -39,6 +40,8 @@ end
 
 -- Constants for config
 M.consts = consts
+
+M.presets = presets
 
 -- Motion registration
 M.register_motion = motions.register_motion
