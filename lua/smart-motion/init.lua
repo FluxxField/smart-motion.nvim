@@ -4,16 +4,20 @@ local config = require("smart-motion.config")
 local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 local highlight_setup = require("smart-motion.highlight_setup")
-local motions = require("smart-motion.motions")
 local presets = require("smart-motion.presets")
+local registries_module = require("smart-motion.core.registries")
 
--- Core module registries
-local collectors = require("smart-motion.collectors")
-local extractors = require("smart-motion.extractors")
-local filters = require("smart-motion.filters")
-local visualizers = require("smart-motion.visualizers")
-local actions = require("smart-motion.actions")
-local pipeline_wrappers = require("smart-motion.pipeline_wrappers")
+registries_module:init({
+	collectors = require("smart-motion.collectors"),
+	extractors = require("smart-motion.extractors"),
+	filters = require("smart-motion.filters"),
+	visualizers = require("smart-motion.visualizers"),
+	actions = require("smart-motion.actions"),
+	pipeline_wrappers = require("smart-motion.pipeline_wrappers"),
+	motions = require("smart-motion.motions"),
+})
+
+local registries = registries_module:get()
 
 local M = {}
 
@@ -38,44 +42,42 @@ function M.setup(user_config)
 	log.debug("SmartMotion setup complete")
 end
 
--- Constants for config
 M.consts = consts
-
 M.presets = presets
 
--- Motion registration
-M.register_motion = motions.register_motion
-M.register_many_motions = motions.register_many_motions
+-- Motion registration (user-friendly APIs)
+M.register_motion = registries.motions.register_motion
+M.register_many_motions = registries.motions.register_many_motions
 
--- Module registration per type
+-- Module registration APIs (for extending functionality)
 M.collectors = {
-	register = collectors.register,
-	register_many = collectors.register_many,
+	register = registries.collectors.register,
+	register_many = registries.collectors.register_many,
 }
 
 M.extractors = {
-	register = extractors.register,
-	register_many = extractors.register_many,
+	register = registries.extractors.register,
+	register_many = registries.extractors.register_many,
 }
 
 M.filters = {
-	register = filters.register,
-	register_many = filters.register_many,
+	register = registries.filters.register,
+	register_many = registries.filters.register_many,
 }
 
 M.visualizers = {
-	register = visualizers.register,
-	register_many = visualizers.register_many,
+	register = registries.visualizers.register,
+	register_many = registries.visualizers.register_many,
 }
 
 M.actions = {
-	register = actions.register,
-	register_many = actions.register_many,
+	register = registries.actions.register,
+	register_many = registries.actions.register_many,
 }
 
 M.pipeline_wrappers = {
-	register = pipeline_wrappers.register,
-	register_many = pipeline_wrappers.register_many,
+	register = registries.pipeline_wrappers.register,
+	register_many = registries.pipeline_wrappers.register_many,
 }
 
 return M
