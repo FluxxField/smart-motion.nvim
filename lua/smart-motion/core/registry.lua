@@ -1,14 +1,38 @@
 local log = require("smart-motion.core.log")
+local utils = require("smart-motion.utils")
 
-return function()
+return function(module_type)
 	local registry = {
 		by_key = {},
 		by_name = {},
+		module_type = module_type,
 	}
 
-	function registry.register(name, entry)
-		entry.name = name
+	local error_label = "[" .. registry.module_type .. " registry] "
 
+	function registry._validate_module_entry(name, entry)
+		local error_name = "Module '" .. name .. "': "
+
+		if not utils.is_non_empty_string(name) then
+			log.error(error_label .. error_name .. "Module must have a non-empty name.")
+			return false
+		end
+
+		if not entry or type(entry.run) ~= "function" then
+			log.error(error_label .. error_name .. "Module must have a 'run' function.")
+			return false
+		end
+
+		return true
+	end
+
+	function registry.register(name, entry)
+		if not registry._validate_module_entry(name, entry) then
+			log.error(error_label .. " Registration aborted: " .. name)
+			return
+		end
+
+		entry.name = name
 		entry.metadata = entry.metadata or {}
 		entry.metadata.label = entry.metadata.label or name:gsub("^%l", string.upper)
 		entry.metadata.description = entry.metadata.description or ("SmartMotion: " .. entry.metadata.label)

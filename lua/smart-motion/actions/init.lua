@@ -4,8 +4,7 @@ local jump = require("smart-motion.actions.jump")
 local restore = require("smart-motion.actions.restore")
 local yank = require("smart-motion.actions.yank")
 local action_utils = require("smart-motion.actions.utils")
-local create_registry = require("smart-motion.core.registry")
-local actions = create_registry()
+local actions = require("smart-motion.core.registry")("actions")
 
 actions.register_many({
 	jump = {

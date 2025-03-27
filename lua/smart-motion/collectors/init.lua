@@ -1,6 +1,5 @@
 local lines = require("smart-motion.collectors.lines")
-local create_registry = require("smart-motion.core.registry")
-local collectors = create_registry()
+local collectors = require("smart-motion.core.registry")("collectors")
 
 collectors.register_many({
 	lines = {

@@ -125,4 +125,8 @@ function M.reset_motion(ctx, cfg, motion_state)
 	motion_state = state.reset(motion_state)
 end
 
+local function is_non_empty_string(s)
+	return type(s) == "string" and s:gsub("%s+", "") ~= ""
+end
+
 return M

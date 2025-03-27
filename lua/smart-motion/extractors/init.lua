@@ -1,8 +1,7 @@
 local lines = require("smart-motion.extractors.lines")
 local words = require("smart-motion.extractors.words")
 local text_search = require("smart-motion.extractors.text-search")
-local create_registry = require("smart-motion.core.registry")
-local extractors = create_registry()
+local extractors = require("smart-motion.core.registry")("extractors")
 
 extractors.register_many({
 	lines = {

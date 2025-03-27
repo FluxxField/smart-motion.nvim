@@ -1,6 +1,5 @@
 local default_filter = require("smart-motion.filters.default")
-local create_registry = require("smart-motion.core.registry")
-local filters = create_registry()
+local filters = require("smart-motion.core.registry")("filters")
 
 filters.register_many({
 	default = {

@@ -1,9 +1,33 @@
-local create_registry = require("smart-motion.core.registry")
+local motions = require("smart-motion.core.registry")("motions")
 local dispatcher = require("smart-motion.core.dispatcher")
+local utils = require("smart-motion.utils")
+local log = require("smart-motion.core.log")
 
-local motions = create_registry()
+local REQUIRED_PIPELINE_FIELDS = { "collector", "visualizer" }
+local error_label = "[Motion Registry] "
+
+function motions._validate_motion_entry(name, motion)
+	local error_name = "Module '" .. name .. "': "
+
+	if not utils.is_non_empty_string(name) then
+		log.error(error_label .. error_name .. "Motion must have a non-empty name.")
+		return false
+	end
+
+	if not motion.pipeline or type(motion.pipeline) ~= "table" then
+		log.error(error_label .. error_name .. "Motion is missing a valid pipeline.")
+		return false
+	end
+
+	return true
+end
 
 function motions.register_motion(name, motion)
+	if not motions._validate_module_entry(name, motion) then
+		log.error(error_label .. " Registration aborted: " .. name)
+		return
+	end
+
 	motion.name = name
 	motion.trigger_key = motion.trigger_key or name
 	motion.metadata = motion.metadata or {}

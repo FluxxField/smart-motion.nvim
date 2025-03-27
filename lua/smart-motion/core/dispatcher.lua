@@ -5,23 +5,7 @@ local targets = require("smart-motion.core.targets")
 local state = require("smart-motion.core.state")
 local flow_state = require("smart-motion.core.flow-state")
 local selection = require("smart-motion.core.selection")
-local validation = require("smart-motion.core.validation")
-
-local collectors = require("smart-motion.collectors")
-local extractors = require("smart-motion.extractors")
-local filters = require("smart-motion.filters")
-local visualizers = require("smart-motion.visualizers")
-local wrappers = require("smart-motion.pipeline_wrappers")
-local actions = require("smart-motion.actions")
-
-local registries = {
-	actions = actions,
-	collectors = collectors,
-	extractors = extractors,
-	filters = filters,
-	visualizers = visualizers,
-	wrappers = wrappers,
-}
+local registries = require("smart-motion.core.registries"):get()
 
 local M = {}
 
@@ -35,23 +19,12 @@ function M.trigger_motion(trigger_key)
 		return
 	end
 
-	-- Validate the pipeline
-	if not validation.validate_pipeline(motion, trigger_key, registries) then
-		return
-	end
-
 	local pipeline = motion.pipeline
 	local collector = registries.collectors.get_by_name(pipeline.collector)
 	local extractor = registries.extractors.get_by_name(pipeline.extractor)
 	local visualizer = registries.visualizers.get_by_name(pipeline.visualizer)
 
-	-- Validate the action
-	local action = actions.get_by_name(motion.action)
-	if not validation.validate_module("action", action, trigger_key) then
-		return
-	end
-
-	-- Validate the filter, fallback to default
+	-- Check if filter needs fallback
 	local filter = registries.filters.get_by_name(pipeline.filter or "default")
 	if not filter or not filter.run then
 		filter = registries.filters.get_by_name("default")
@@ -63,7 +36,7 @@ function M.trigger_motion(trigger_key)
 	local ctx, cfg, motion_state = utils.prepare_motion(direction, hint_position, extractor.name, true)
 
 	if not ctx or not cfg or not motion_state then
-		log.error("Failde to prepare motion - aborting")
+		log.error("Failed to prepare motion - aborting")
 		return
 	end
 
@@ -80,7 +53,7 @@ function M.trigger_motion(trigger_key)
 		end
 	end
 
-	-- Validate the Wrapper, fallback to default
+	-- Check if wrapper needs fallback
 	local wrapper = registries.wrappers.get_by_name(motion.pipeline_wrapper or "default")
 	if not wrapper or not wrapper.run then
 		wrapper = registries.wrappers.get_by_name("default")
@@ -109,9 +82,6 @@ end
 function M.trigger_action(trigger_key)
 	local motion = require("smart-motion.motions").get_by_key(trigger_key)
 	local action = registries.actions.get_by_key(trigger_key)
-	if not validation.validate_module("action", action, trigger_key) then
-		return
-	end
 
 	local ok, motion_char = pcall(vim.fn.getchar)
 	if not ok then
@@ -122,8 +92,9 @@ function M.trigger_action(trigger_key)
 	local motion_key = vim.fn.nr2char(motion_char)
 	local extractor = extractors.get_by_key(motion_key)
 
+	-- Fallback to native behavior if no extractor exists
 	if not extractor then
-		log.warn("No extractor mapped for key: " .. motion_key)
+		vim.api.nvim_feedkeys(trigger_key .. motion_key, "n", false)
 		return
 	end
 
@@ -131,7 +102,7 @@ function M.trigger_action(trigger_key)
 	local collector = registries.collectors.get_by_name(pipeline.collector)
 	local visualizer = registries.visualizers.get_by_name(pipeline.visualizer)
 
-	-- Validate the filter, fallback to default
+	-- Check if filter needs a fallback
 	local filter = registries.filters.get_by_name(pipeline.filter or "default")
 	if not filter or not filter.run then
 		filter = registries.filters.get_by_name("default")
@@ -155,12 +126,11 @@ function M.trigger_action(trigger_key)
 		if motion_state.selected_jump_target then
 			action.run(ctx, cfg, motion_state, {})
 			utils.reset_motion(ctx, cfg, motion_state)
-
 			return
 		end
 	end
 
-	-- Validate the Wrapper, fallback to default
+	-- Check if wrapper needs fallback
 	local wrapper = registries.wrappers.get_by_name(motion.pipeline_wrapper or "default")
 	if not wrapper or not wrapper.run then
 		wrapper = registries.wrappers.get_by_name("default")

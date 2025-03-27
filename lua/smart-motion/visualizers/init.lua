@@ -1,7 +1,6 @@
 local consts = require("smart-motion.consts")
 local hints = require("smart-motion.visualizers.hints")
-local create_registry = require("smart-motion.core.registry")
-local visualizers = create_registry()
+local visualizers = require("smart-motion.core.registry")("visualizers")
 
 visualizers.register_many({
 	hint_start = {
