@@ -1,1 +1,1 @@
-require("smart-motion").setup()
+

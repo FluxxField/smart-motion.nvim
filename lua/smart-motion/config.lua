@@ -15,12 +15,7 @@ local default_highlight_groups = {
 M.defaults = {
 	keys = "fjdksleirughtynm",
 	highlight = {},
-	line_limit = nil,
-	multi_line = true,
-	mappings = {
-		n = {}, -- Normal mode mappings
-		v = {}, -- Visual mode mappings (optional)
-	},
+	presets = {},
 }
 
 M.validated = nil
@@ -54,12 +49,6 @@ function M.validate(user_config)
 
 	config.keys = split_string(config.keys)
 
-	-- Validate mappings
-	if type(config.mappings) ~= "table" or not config.mappings.n or not config.mappings.v then
-		log.error("`mappings` must be a table with `n` and `v` keys (got: " .. vim.inspect(config.mappings) .. ")")
-		error("smart-motion: `mappings` must be a table with `n` and `v` keys")
-	end
-
 	-- Make highlight optional and defensive
 	config.highlight = config.highlight or {}
 
@@ -83,20 +72,44 @@ function M.validate(user_config)
 		end
 	end
 
-	-- Validate line_limit
-	if config.line_limit ~= nil and (type(config.line_limit) ~= "number" or config.line_limit < 0) then
-		log.error("`line_limit` must be a positive integer or nil (got: " .. tostring(config.line_limit) .. ")")
-		error("smart-motion: `line_limit` must be a positive integer or nil")
+	--
+	-- Validate presets
+	--
+	if config.presets ~= nil and type(config.presets) ~= "table" then
+		log.error("`presets` must be a table with named keys, got: " .. type(config.presets))
+		error("smart-motion: `presets` must be a table")
 	end
 
-	-- Validate multi_line
-	if type(config.multi_line) ~= "boolean" then
-		log.error("`multi_line` must be a boolean (got: " .. type(config.multi_line) .. ")")
-		error("smart-motion: `multi_line` must be true or false")
+	for preset_name, value in pairs(config.presets or {}) do
+		if type(value) ~= "boolean" and type(value) ~= "table" then
+			log.error(
+				"Preset '"
+					.. preset_name
+					.. "' must be true, false, or a table (list of keys to exclude), got: "
+					.. type(value)
+			)
+			error("smart-motion: Invalid value for preset '" .. preset_name .. "'")
+		end
+
+		if type(value) == "table" then
+			for i, excluded_key in ipairs(value) do
+				if type(excluded_key) ~= "string" then
+					log.error(
+						"Preset '"
+							.. preset_name
+							.. "' has an invalid exclude key at index "
+							.. i
+							.. ": expected string, got "
+							.. type(excluded_key)
+					)
+					error("smart-motion: All excluded keys for preset '" .. preset_name .. "' must be strings")
+				end
+			end
+		end
 	end
 
-	log.debug("Configuration validated successfully")
 	M.validated = config
+
 	return config
 end
 

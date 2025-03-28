@@ -83,11 +83,6 @@ require("smart-motion").setup({
         second_char = "SmartMotionSecondChar",
         first_char_dim = "SmartMotionFirstCharDim",
     },
-    multi_line = true,
-    mappings = {
-        n = {},
-        v = {}
-    },
 })
 ```
 

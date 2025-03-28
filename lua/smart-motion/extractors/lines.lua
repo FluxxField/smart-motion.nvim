@@ -30,12 +30,14 @@ function M.init(collector)
 
 			if motion_state.hint_position == consts.HINT_POSITION.START then
 				if motion_state.ignore_whitespace then
-					hint_col = line_text:find("%S") - 1 or 0 -- Find first non-whitespace char
+					local first_non_ws = line_text:find("%S")
+
+					hint_col = first_non_ws and (first_non_ws - 1) or 0
 				else
-					hint_col = 0                        -- Start of the line
+					hint_col = 0
 				end
 			elseif motion_state.hint_position == consts.HINT_POSITION.END then
-				hint_col = #line_text -- End of the line
+				hint_col = #line_text
 			end
 
 			-- Yield the jump target.
@@ -45,7 +47,7 @@ function M.init(collector)
 				text = line_text,
 				start_pos = { row = line_number, col = 0 },
 				end_pos = { row = line_number, col = #line_text },
-				type = consts.TARGET_TYPES.LINE,
+				type = consts.TARGET_TYPES.LINES,
 			})
 
 			::continue::
