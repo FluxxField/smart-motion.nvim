@@ -7,6 +7,7 @@ local REQUIRED_PIPELINE_FIELDS = { "collector", "visualizer" }
 local error_label = "[Motion Registry] "
 
 function motions._validate_motion_entry(name, motion)
+	local registries = require("smart-motion.core.registries"):get()
 	local error_name = "Module '" .. name .. "': "
 
 	if not utils.is_non_empty_string(name) then
@@ -19,11 +20,27 @@ function motions._validate_motion_entry(name, motion)
 		return false
 	end
 
+	for _, field in ipairs(REQUIRED_PIPELINE_FIELDS) do
+		local module_name = motion.pipeline[field]
+		if not utils.is_non_empty_string(module_name) then
+			log.error("[Motion Registry] Motion '" .. name .. "' pipeline must specify '" .. field .. "'.")
+			return false
+		end
+
+		local registry = registries[field .. "s"]
+		if not registry.get_by_name(module_name) then
+			log.error(
+				"[Motion Registry] Motion '" .. name .. "' references unknown " .. field .. ": '" .. module_name .. "'"
+			)
+			return false
+		end
+	end
+
 	return true
 end
 
 function motions.register_motion(name, motion)
-	if not motions._validate_module_entry(name, motion) then
+	if not motions._validate_motion_entry(name, motion) then
 		log.error(error_label .. " Registration aborted: " .. name)
 		return
 	end

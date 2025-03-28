@@ -61,9 +61,9 @@ function M.get_jump_targets(ctx, cfg, motion_state, extractor)
 end
 
 function M.get_target_under_cursor(ctx, cfg, motion_state)
-	local bufid = ctx.bufid
+	local bufnr = ctx.bufnr
 	local cursor_line, cursor_col = ctx.cursor_line, ctx.cursor_col
-	local line_content = vim.api.nvim_buf_get_lines(bufid, cursor_line, cursor_line + 1, false)[1]
+	local line_content = vim.api.nvim_buf_get_lines(bufnr, cursor_line, cursor_line + 1, false)[1]
 
 	if not line_content then
 		return nil

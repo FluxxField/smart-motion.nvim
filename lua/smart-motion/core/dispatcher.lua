@@ -5,7 +5,6 @@ local targets = require("smart-motion.core.targets")
 local state = require("smart-motion.core.state")
 local flow_state = require("smart-motion.core.flow-state")
 local selection = require("smart-motion.core.selection")
-local registries = require("smart-motion.core.registries"):get()
 
 local M = {}
 
@@ -13,6 +12,7 @@ local M = {}
 -- Trigger Motion
 --
 function M.trigger_motion(trigger_key)
+	local registries = require("smart-motion.core.registries"):get()
 	local motion = require("smart-motion.motions").get_by_key(trigger_key)
 	if not motion then
 		log.warn("No motion found for key: " .. trigger_key)
@@ -80,21 +80,13 @@ end
 -- Trigger Action
 --
 function M.trigger_action(trigger_key)
+	local registries = require("smart-motion.core.registries"):get()
 	local motion = require("smart-motion.motions").get_by_key(trigger_key)
 	local action = registries.actions.get_by_key(trigger_key)
 
 	local ok, motion_char = pcall(vim.fn.getchar)
 	if not ok then
 		log.warn("Failed to get motion character")
-		return
-	end
-
-	local motion_key = vim.fn.nr2char(motion_char)
-	local extractor = extractors.get_by_key(motion_key)
-
-	-- Fallback to native behavior if no extractor exists
-	if not extractor then
-		vim.api.nvim_feedkeys(trigger_key .. motion_key, "n", false)
 		return
 	end
 
@@ -111,7 +103,8 @@ function M.trigger_action(trigger_key)
 	local direction = motion.direction or consts.DIRECTION.AFTER_CURSOR
 	local hint_position = (visualizer and visualizer.hint_position) or consts.HINT_POSITION.START
 
-	local ctx, cfg, motion_state = utils.prepare_motion(direction, hint_position, extractor.name, true)
+	local ctx, cfg, motion_state =
+		utils.prepare_motion(direction, hint_position, consts.TARGET_TYPES_BY_KEY[trigger_key] or "", true)
 
 	if not ctx or not cfg or not motion_state then
 		log.error("Failde to prepare motion - aborting")
@@ -119,6 +112,34 @@ function M.trigger_action(trigger_key)
 	end
 
 	utils.reset_motion(ctx, cfg, motion_state)
+
+	-- Get motion_key
+	local motion_key = vim.fn.nr2char(motion_char)
+	local extractor = registries.extractors.get_by_key(motion_key)
+
+	-- Fallback to native behavior if no extractor exists
+	if not extractor or not extractor.run then
+		-- Is this a short-curcit double key?
+		if motion_key == trigger_key then
+			local line_action = registries.actions.get_by_name(action.name .. "_line")
+
+			if not line_action or not line_action.run then
+				vim.api.nvim_feedkeys(trigger_key .. motion_key, "n", false)
+				return
+			end
+
+			motion_state.selected_jump_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
+
+			if motion_state.selected_jump_target then
+				line_action.run(ctx, cfg, motion_state, {})
+			end
+
+			return
+		end
+
+		vim.api.nvim_feedkeys(trigger_key .. motion_key, "n", false)
+		return
+	end
 
 	if flow_state.evaluate_flow_at_motion_start() then
 		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, {})

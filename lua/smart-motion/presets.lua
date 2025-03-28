@@ -1,4 +1,3 @@
-local motions = require("smart-motion.motions")
 local DIRECTION = require("smart-motion.consts").DIRECTION
 
 local presets = {}
@@ -187,7 +186,7 @@ function presets.yank(exclude)
 			is_action = true,
 			pipeline = {
 				collector = "lines",
-				extractor = "words",
+				visualizer = "hint_start",
 			},
 			direction = DIRECTION.AFTER_CURSOR,
 			map = true,
@@ -252,10 +251,11 @@ function presets.change(exclude)
 end
 
 function presets._register(motions_list, exclude)
+	local registries = require("smart-motion.core.registries"):get()
 	exclude = exclude or {}
 
 	if #exclude == 0 then
-		motions.register_many_motions(motions_list)
+		registries.motions.register_many_motions(motions_list)
 		return
 	end
 
@@ -267,7 +267,7 @@ function presets._register(motions_list, exclude)
 		end
 	end
 
-	motions.register_many_motions(filtered_motions)
+	registries.motions.register_many_motions(filtered_motions)
 end
 
 return presets

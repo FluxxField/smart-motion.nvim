@@ -1,7 +1,6 @@
 local default = require("smart-motion.pipeline_wrappers.default")
-local create_registry = require("smart-motion.core.registry")
+local wrappers = require("smart-motion.core.registry")("wrappers")
 local live_search = require("smart-motion.pipeline_wrappers.live_search")
-local wrappers = create_registry()
 
 wrappers.register_many({
 	default = {

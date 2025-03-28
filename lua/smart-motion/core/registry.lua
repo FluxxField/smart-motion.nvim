@@ -5,7 +5,7 @@ return function(module_type)
 	local registry = {
 		by_key = {},
 		by_name = {},
-		module_type = module_type,
+		module_type = module_type or "",
 	}
 
 	local error_label = "[" .. registry.module_type .. " registry] "

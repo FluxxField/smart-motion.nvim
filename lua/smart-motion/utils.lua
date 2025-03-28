@@ -72,7 +72,7 @@ end
 --- Prepares the motion by gathering context, config, and initializing state.
 ---@param direction "before_cursor"|"after_cursor"
 ---@param hint_position "start"|"end"
----@param target_type "word"|"char"|"line"
+---@param target_type string
 ---@param ignore_whitespace boolean
 ---@return table|nil ctx, table|nil cfg, table|nil motion_state - Returns nils if validation fails.
 function M.prepare_motion(direction, hint_position, target_type, ignore_whitespace)
@@ -125,7 +125,7 @@ function M.reset_motion(ctx, cfg, motion_state)
 	motion_state = state.reset(motion_state)
 end
 
-local function is_non_empty_string(s)
+function M.is_non_empty_string(s)
 	return type(s) == "string" and s:gsub("%s+", "") ~= ""
 end
 
