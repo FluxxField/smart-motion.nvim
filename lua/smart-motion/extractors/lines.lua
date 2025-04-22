@@ -1,12 +1,22 @@
 local consts = require("smart-motion.consts")
+local log = require("smart-motion.core.log")
 
+---@type SmartMotionExtractorModuleEntry
 local M = {}
 
 --- Extracts valid line jump targets from the given lines collector.
----@param collector thread The lines collector (yields line data).
----@return thread A coroutine generator yielding line jump targets.
-function M.init(collector)
+--- @param collector thread
+--- @param opts table Arbitrary options passed through the pipeline
+--- @return thread Coroutine yielding SmartMotionJumpTarget
+function M.run(collector, opts)
 	return coroutine.create(function(ctx, cfg, motion_state)
+		---@type SmartMotionContext
+		ctx = ctx
+		---@type SmartMotionConfig
+		cfg = cfg
+		---@type SmartMotionMotionState
+		motion_state = motion_state
+
 		while true do
 			local ok, line_data = coroutine.resume(collector, ctx, cfg, motion_state)
 
@@ -35,15 +45,17 @@ function M.init(collector)
 				hint_col = #line_text
 			end
 
-			-- Yield the jump target.
-			coroutine.yield({
+			---@type SmartMotionJumpTarget
+			local target = {
 				row = line_number,
 				col = hint_col,
 				text = line_text,
 				start_pos = { row = line_number, col = 0 },
 				end_pos = { row = line_number, col = #line_text },
 				type = consts.TARGET_TYPES.LINES,
-			})
+			}
+
+			coroutine.yield(target)
 
 			::continue::
 		end

@@ -6,9 +6,9 @@ local flow_state = require("smart-motion.core.flow-state")
 local M = {}
 
 --- Waits for the user to press a hint key and handles both single and double character hints.
----@param ctx table Motion context (bufnr, etc.)
----@param cfg table Validated configuration
----@param motion_state table Current motion state (holds assigned hints)
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
 function M.wait_for_hint_selection(ctx, cfg, motion_state)
 	log.debug("Waiting for user hint selection (mode: " .. tostring(motion_state.selection_mode) .. ")")
 
@@ -27,7 +27,7 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 		return
 	end
 
-	if flow_state.evaluate_flow_at_selection() then
+	if flow_state.evaluate_flow_at_selection() and motion_state.selection_mode ~= consts.SELECTION_MODE.SECOND then
 		log.debug("Selection is jumping early")
 		return
 	end

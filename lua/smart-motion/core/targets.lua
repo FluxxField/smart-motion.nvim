@@ -1,14 +1,27 @@
 local consts = require("smart-motion.consts")
+local log = require("smart-motion.core.log")
+
 local TARGET_TYPES = consts.TARGET_TYPES
 
 local M = {}
 
+--- @class JumpTarget
+--- @field bufnr integer
+--- @field winid integer
+--- @field row integer
+--- @field col integer
+--- @field text? string
+--- @field start_pos { row: integer, col: integer }
+--- @field end_pos { row: integer, col: integer }
+--- @field type string
+--- @field metadata? table
+
 --- Formats a jump target to ensure consistent structure.
----@param ctx table The motion context.
----@param cfg table The motion config.
----@param motion_state table The current motion state.
----@param raw_data table The raw extracted data.
----@return table A formatted jump target.
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
+---@param raw_data table
+---@return JumpTarget
 function M.format_jump_target(ctx, cfg, motion_state, raw_data)
 	return {
 		bufnr = ctx.bufnr,
@@ -24,12 +37,12 @@ function M.format_jump_target(ctx, cfg, motion_state, raw_data)
 end
 
 --- Extracts and formats jump targets using the provided extractor.
----@param ctx table The motion context.
----@param cfg table The motion config.
----@param motion_state table The current motion state.
----@param extractor thread The coroutine-based extractor function.
----@return table[] jump_targets A list of formatted jump targets
----@return table|nil first_jump_target The first valid jump target, or nil.
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
+---@param extractor thread
+---@return JumpTarget[] jump_targets
+---@return JumpTarget? first_jump_target
 function M.get_jump_targets(ctx, cfg, motion_state, extractor)
 	local jump_targets = {}
 	local first_jump_target = nil
@@ -40,13 +53,18 @@ function M.get_jump_targets(ctx, cfg, motion_state, extractor)
 	end
 
 	while true do
-		local ok, data = coroutine.resume(extractor, ctx, cfg, motion_state)
+		local ok, data_or_error = coroutine.resume(extractor, ctx, cfg, motion_state)
 
-		if not ok or not data then
+		if not ok then
+			log.error("Coroutine error: " .. tostring(data_or_error))
 			break
 		end
 
-		local formatted_jump_target = M.format_jump_target(ctx, cfg, motion_state, data)
+		if not data_or_error then
+			break
+		end
+
+		local formatted_jump_target = M.format_jump_target(ctx, cfg, motion_state, data_or_error)
 
 		table.insert(jump_targets, formatted_jump_target)
 
@@ -60,6 +78,11 @@ function M.get_jump_targets(ctx, cfg, motion_state, extractor)
 	motion_state.selected_jump_target = first_jump_target
 end
 
+--- Gets a synthetic jump target directly under the cursor.
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
+---@return JumpTarget|nil
 function M.get_target_under_cursor(ctx, cfg, motion_state)
 	local bufnr = ctx.bufnr
 	local cursor_line, cursor_col = ctx.cursor_line, ctx.cursor_col

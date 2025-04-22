@@ -1,10 +1,21 @@
 local consts = require("smart-motion.consts")
 
+---@type SmartMotionExtractorModuleEntry
 local M = {}
 
---- Extracts searched text from given collector
-function M.init(collector, opts)
+--- Extracts searched text from given collector.
+--- @param collector thread
+--- @param opts table<{ text: string }>
+--- @return thread Coroutine yielding SmartMotionJumpTarget
+function M.run(collector, opts)
 	return coroutine.create(function(ctx, cfg, motion_state)
+		---@type SmartMotionContext
+		ctx = ctx
+		---@type SmartMotionConfig
+		cfg = cfg
+		---@type SmartMotionMotionState
+		motion_state = motion_state
+
 		local is_after_cursor = (motion_state.direction == consts.DIRECTION.AFTER_CURSOR)
 		local search_text = opts.text
 
@@ -77,16 +88,18 @@ function M.init(collector, opts)
 				collected_matches = vim.fn.reverse(collected_matches)
 			end
 
-			-- Yield the match in the desired order.
 			for _, match in ipairs(collected_matches) do
-				coroutine.yield({
+				---@type SmartMotionJumpTarget
+				local target = {
 					row = line_number,
 					col = match.start_pos,
 					text = match.text,
 					start_pos = { row = line_number, col = match.start_pos },
 					end_pos = { row = line_number, col = match.end_pos },
 					type = consts.TARGET_TYPES.SEARCH,
-				})
+				}
+
+				coroutine.yield(target)
 			end
 		end
 	end)

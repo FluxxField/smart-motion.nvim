@@ -1,9 +1,18 @@
 local highlight = require("smart-motion.core.highlight")
 local utils = require("smart-motion.utils")
+local log = require("smart-motion.core.log")
 
+--- @type SmartMotionPipelineWrapperModule
 local M = {}
 
-function M.run(run_pipeline, ctx, cfg, motion_state, action)
+--- Runs a pipeline interactively while the user types search text.
+--- @param run_pipeline fun(ctx: SmartMotionContext, cfg: SmartMotionConfig, state: SmartMotionMotionState, opts: table): nil
+--- @param ctx SmartMotionContext
+--- @param cfg SmartMotionConfig
+--- @param motion_state SmartMotionMotionState
+--- @param opts table
+--- @return boolean? Return true to exit early, false to continue
+function M.run(run_pipeline, ctx, cfg, motion_state, opts)
 	local timeoutlen = 1000
 	local start_time = nil
 	local search_text = ""
@@ -32,6 +41,8 @@ function M.run(run_pipeline, ctx, cfg, motion_state, action)
 
 			char = type(char) == "number" and vim.fn.nr2char(char) or char
 
+			vim.api.nvim_feedkeys("", "")
+
 			if char == "\027" then -- ESC
 				return true
 			elseif char == "\r" then -- ENTER
@@ -41,6 +52,14 @@ function M.run(run_pipeline, ctx, cfg, motion_state, action)
 				search_text = search_text:sub(1, -2)
 			else
 				search_text = search_text .. char
+			end
+
+			-- Check if typed char matches a single-char jump target
+			local entry = motion_state.assigned_hint_labels and motion_state.assigned_hint_labels[char]
+			if entry and entry.is_single_prefix and entry.jump_target then
+				motion_state.selected_jump_target = entry.jump_target
+				opts.action.run(ctx, cfg, motion_state)
+				return true
 			end
 
 			if search_text ~= last_search_text and search_text ~= "" then
@@ -57,8 +76,7 @@ function M.run(run_pipeline, ctx, cfg, motion_state, action)
 				if count == 0 then
 					return true
 				elseif count == 1 then
-					action.run(ctx, cfg, motion_state)
-					utils.reset_motion(ctx, cfg, motion_state)
+					opts.action.run(ctx, cfg, motion_state)
 					return true
 				end
 			end

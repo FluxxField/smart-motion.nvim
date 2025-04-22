@@ -6,11 +6,11 @@ local state = require("smart-motion.core.state")
 local flow_state = require("smart-motion.core.flow-state")
 local selection = require("smart-motion.core.selection")
 
+--- @class Dispatcher
 local M = {}
 
---
--- Trigger Motion
---
+--- Triggers a motion by its trigger key.
+--- @param trigger_key string
 function M.trigger_motion(trigger_key)
 	local registries = require("smart-motion.core.registries"):get()
 	local motion = require("smart-motion.motions").get_by_key(trigger_key)
@@ -23,6 +23,7 @@ function M.trigger_motion(trigger_key)
 	local collector = registries.collectors.get_by_name(pipeline.collector)
 	local extractor = registries.extractors.get_by_name(pipeline.extractor)
 	local visualizer = registries.visualizers.get_by_name(pipeline.visualizer)
+	local action = registries.actions.get_by_name(motion.action)
 
 	-- Check if filter needs fallback
 	local filter = registries.filters.get_by_name(pipeline.filter or "default")
@@ -30,10 +31,22 @@ function M.trigger_motion(trigger_key)
 		filter = registries.filters.get_by_name("default")
 	end
 
-	local direction = motion.direction or consts.DIRECTION.AFTER_CURSOR
-	local hint_position = (visualizer and visualizer.hint_position) or consts.HINT_POSITION.START
+	local direction = consts.DIRECTION.AFTER_CURSOR
+	if motion.state and motion.state.direction ~= nil then
+		direction = motion.state.direction
+	end
 
-	local ctx, cfg, motion_state = utils.prepare_motion(direction, hint_position, extractor.name, true)
+	local hint_position = consts.HINT_POSITION.START
+	if motion.state and motion.state.hint_position ~= nil then
+		hint_position = motion.state.hint_position
+	end
+
+	local ignore_whitespace = true
+	if motion.state and motion.state.ignore_whitespace ~= nil then
+		ignore_whitespace = motion.state.ignore_whitespace
+	end
+
+	local ctx, cfg, motion_state = utils.prepare_motion(direction, hint_position, extractor.name, ignore_whitespace)
 
 	if not ctx or not cfg or not motion_state then
 		log.error("Failed to prepare motion - aborting")
@@ -54,13 +67,13 @@ function M.trigger_motion(trigger_key)
 	end
 
 	-- Check if wrapper needs fallback
-	local wrapper = registries.wrappers.get_by_name(motion.pipeline_wrapper or "default")
-	if not wrapper or not wrapper.run then
-		wrapper = registries.wrappers.get_by_name("default")
+	local pipeline_wrapper = registries.pipeline_wrappers.get_by_name(motion.pipeline_wrapper or "default")
+	if not pipeline_wrapper or not pipeline_wrapper.run then
+		pipeline_wrapper = registries.pipeline_wrappers.get_by_name("default")
 	end
 
 	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
-	local exit = wrapper.run(run_pipeline, ctx, cfg, motion_state, action)
+	local exit = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, action)
 
 	if exit then
 		utils.reset_motion(ctx, cfg, motion_state)
@@ -76,13 +89,16 @@ function M.trigger_motion(trigger_key)
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 
---
--- Trigger Action
---
+--- Triggers an action-type motion with secondary key input.
+--- @param trigger_key string
 function M.trigger_action(trigger_key)
 	local registries = require("smart-motion.core.registries"):get()
 	local motion = require("smart-motion.motions").get_by_key(trigger_key)
-	local action = registries.actions.get_by_key(trigger_key)
+	local action = registries.actions.get_by_name(motion.action)
+
+	if motion.is_action then
+		local action = registries.actions.get_by_key(trigger_key)
+	end
 
 	local ok, motion_char = pcall(vim.fn.getchar)
 	if not ok then
@@ -100,11 +116,22 @@ function M.trigger_action(trigger_key)
 		filter = registries.filters.get_by_name("default")
 	end
 
-	local direction = motion.direction or consts.DIRECTION.AFTER_CURSOR
-	local hint_position = (visualizer and visualizer.hint_position) or consts.HINT_POSITION.START
+	local direction = consts.DIRECTION.AFTER_CURSOR
+	if motion.state and motion.state.direction ~= nil then
+		direction = motion.state.direction
+	end
 
-	local ctx, cfg, motion_state =
-		utils.prepare_motion(direction, hint_position, consts.TARGET_TYPES_BY_KEY[trigger_key] or "", true)
+	local hint_position = consts.HINT_POSITION.START
+	if motion.state and motion.state.hint_position ~= nil then
+		hint_position = motion.state.hint_position
+	end
+
+	local ignore_whitespace = true
+	if motion.state and motion.state.ignore_whitespace ~= nil then
+		ignore_whitespace = motion.state.ignore_whitespace
+	end
+
+	local ctx, cfg, motion_state = utils.prepare_motion(direction, hint_position, "", ignore_whitespace)
 
 	if not ctx or not cfg or not motion_state then
 		log.error("Failde to prepare motion - aborting")
@@ -117,10 +144,14 @@ function M.trigger_action(trigger_key)
 	local motion_key = vim.fn.nr2char(motion_char)
 	local extractor = registries.extractors.get_by_key(motion_key)
 
+	motion_state.target_type = consts.TARGET_TYPES_BY_KEY[motion_key] or ""
+
 	-- Fallback to native behavior if no extractor exists
 	if not extractor or not extractor.run then
 		-- Is this a short-curcit double key?
 		if motion_key == trigger_key then
+			motion_state.target_type = "lines"
+
 			local line_action = registries.actions.get_by_name(action.name .. "_line")
 
 			if not line_action or not line_action.run then
@@ -152,13 +183,14 @@ function M.trigger_action(trigger_key)
 	end
 
 	-- Check if wrapper needs fallback
-	local wrapper = registries.wrappers.get_by_name(motion.pipeline_wrapper or "default")
-	if not wrapper or not wrapper.run then
-		wrapper = registries.wrappers.get_by_name("default")
+	local pipeline_wrapper = registries.pipeline_wrappers.get_by_name(motion.pipeline_wrapper or "default")
+	if not pipeline_wrapper or not pipeline_wrapper.run then
+		pipeline_wrapper = registries.pipeline_wrappers.get_by_name("default")
 	end
 
 	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
-	local exit = wrapper.run(run_pipeline, ctx, cfg, motion_state, action)
+	local exit = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, { action })
+
 	if exit then
 		utils.reset_motion(ctx, cfg, motion_state)
 		return
@@ -173,9 +205,13 @@ function M.trigger_action(trigger_key)
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 
---
--- _prepare_pipeline
---
+--- Prepares the pipeline by collecting and extracting motion targets.
+--- @param ctx SmartMotionContext
+--- @param cfg SmartMotionConfig
+--- @param motion_state SmartMotionMotionState
+--- @param collector SmartMotionCollectorModuleEntry
+--- @param extractor SmartMotionExtractorModuleEntry
+--- @param opts table
 function M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, opts)
 	local lines_gen = collector.run(opts)
 	if not lines_gen then
@@ -191,9 +227,12 @@ function M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, opts)
 	state.finalize_motion_state(motion_state)
 end
 
---
--- _build_pipeline
---
+--- Builds the pipeline runner function
+--- @param collector SmartMotionCollectorModuleEntry
+--- @param extractor SmartMotionExtractorModuleEntry
+--- @param filter SmartMotionFilterModuleEntry
+--- @param visualizer SmartMotionVisualizerModuleEntry
+--- @return fun(ctx: SmartMotionContext, cfg: SmartMotionConfig, motion_state: SmartMotionMotionState, opts: table): nil
 function M._build_pipeline(collector, extractor, filter, visualizer)
 	local function run_pipeline(ctx, cfg, motion_state, opts)
 		utils.reset_motion(ctx, cfg, motion_state)

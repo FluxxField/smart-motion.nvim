@@ -11,13 +11,14 @@ local default_highlight_groups = {
 	dim = "SmartMotionDim",
 }
 
---- Default Configuration
+---@type SmartMotionConfig
 M.defaults = {
 	keys = "fjdksleirughtynm",
 	highlight = {},
 	presets = {},
 }
 
+---@type SmartMotionConfig
 M.validated = nil
 
 local function split_string(str)
@@ -29,8 +30,8 @@ local function split_string(str)
 end
 
 --- Validates user configuration and applies defaults where needed.
----@param user_config table|nil
----@return table final_config
+---@param user_config? SmartMotionConfig
+---@return SmartMotionConfig
 function M.validate(user_config)
 	log.debug("Validating SmartMotion configuration")
 

@@ -1,7 +1,10 @@
 local DIRECTION = require("smart-motion.consts").DIRECTION
+local HINT_POSITION = require("smart-motion.consts").HINT_POSITION
 
+---@type SmartMotionPresetsModule
 local presets = {}
 
+--- @param exclude? SmartMotionPresetKey.Words[]
 function presets.words(exclude)
 	presets._register({
 		w = {
@@ -12,7 +15,10 @@ function presets.words(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "jump",
-			direction = DIRECTION.AFTER_CURSOR,
+			state = {
+				direction = DIRECTION.AFTER_CURSOR,
+				hint_position = HINT_POSITION.START,
+			},
 			map = true,
 			modes = { "n", "v" },
 			metadata = {
@@ -28,7 +34,10 @@ function presets.words(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "jump",
-			direction = DIRECTION.BEFORE_CURSOR,
+			state = {
+				direction = DIRECTION.BEFORE_CURSOR,
+				hint_position = HINT_POSITION.START,
+			},
 			map = true,
 			modes = { "n", "v" },
 			metadata = {
@@ -44,7 +53,10 @@ function presets.words(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "jump",
-			direction = DIRECTION.AFTER_CURSOR,
+			state = {
+				direction = DIRECTION.AFTER_CURSOR,
+				hint_position = HINT_POSITION.END,
+			},
 			map = true,
 			modes = { "n", "v" },
 			metadata = {
@@ -60,7 +72,10 @@ function presets.words(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "jump",
-			direction = DIRECTION.BEFORE_CURSOR,
+			state = {
+				direction = DIRECTION.BEFORE_CURSOR,
+				hint_position = HINT_POSITION.END,
+			},
 			map = true,
 			modes = { "n", "v" },
 			metadata = {
@@ -71,6 +86,7 @@ function presets.words(exclude)
 	}, exclude)
 end
 
+--- @param exclude? SmartMotionPresetKey.Lines[]
 function presets.lines(exclude)
 	presets._register({
 		j = {
@@ -81,7 +97,9 @@ function presets.lines(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "jump",
-			direction = DIRECTION.AFTER_CURSOR,
+			state = {
+				direction = DIRECTION.AFTER_CURSOR,
+			},
 			map = true,
 			modes = { "n", "v" },
 			metadata = {
@@ -97,7 +115,9 @@ function presets.lines(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "jump",
-			direction = DIRECTION.BEFORE_CURSOR,
+			state = {
+				direction = DIRECTION.BEFORE_CURSOR,
+			},
 			map = true,
 			modes = { "n", "v" },
 			metadata = {
@@ -108,6 +128,7 @@ function presets.lines(exclude)
 	}, exclude)
 end
 
+--- @param exclude? SmartMotionPresetKey.Search[]
 function presets.search(exclude)
 	presets._register({
 		s = {
@@ -118,17 +139,20 @@ function presets.search(exclude)
 			},
 			pipeline_wrapper = "search",
 			action = "jump",
-			direction = DIRECTION.AFTER_CURSOR,
+			state = {
+				direction = DIRECTION.BOTH,
+			},
 			map = true,
 			modes = { "n", "v" },
 			metadata = {
 				label = "Jump to Searched Text",
-				description = "Jumps to the start of the searched for text after the cursor",
+				description = "Jumps to the start of the searched for text",
 			},
 		},
 	}, exclude)
 end
 
+--- @param exclude? SmartMotionPresetKey.Delete[]
 function presets.delete(exclude)
 	presets._register({
 		d = {
@@ -137,7 +161,9 @@ function presets.delete(exclude)
 				collector = "lines",
 				visualizer = "hint_start",
 			},
-			direction = DIRECTION.AFTER_CURSOR,
+			state = {
+				direction = DIRECTION.BOTH,
+			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -153,7 +179,9 @@ function presets.delete(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "remote_delete",
-			direction = DIRECTION.AFTER_CURSOR,
+			state = {
+				direction = DIRECTION.BOTH,
+			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -169,7 +197,9 @@ function presets.delete(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "remote_delete",
-			direction = DIRECTION.AFTER_CURSOR,
+			state = {
+				direction = DIRECTION.BOTH,
+			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -180,6 +210,7 @@ function presets.delete(exclude)
 	}, exclude)
 end
 
+--- @param exclude? SmartMotionPresetKey.Yank[]
 function presets.yank(exclude)
 	presets._register({
 		y = {
@@ -188,7 +219,9 @@ function presets.yank(exclude)
 				collector = "lines",
 				visualizer = "hint_start",
 			},
-			direction = DIRECTION.AFTER_CURSOR,
+			state = {
+				direction = DIRECTION.BOTH,
+			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -204,7 +237,9 @@ function presets.yank(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "remote_yank",
-			direction = DIRECTION.AFTER_CURSOR,
+			state = {
+				direction = DIRECTION.BOTH,
+			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -220,7 +255,9 @@ function presets.yank(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "remote_yank",
-			direction = DIRECTION.AFTER_CURSOR,
+			state = {
+				direction = DIRECTION.BOTH,
+			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -231,6 +268,7 @@ function presets.yank(exclude)
 	}, exclude)
 end
 
+--- @param exclude? SmartMotionPresetKey.Change[]
 function presets.change(exclude)
 	presets._register({
 		c = {
@@ -239,7 +277,9 @@ function presets.change(exclude)
 				collector = "lines",
 				visualizer = "hint_start",
 			},
-			direction = DIRECTION.AFTER_CURSOR,
+			state = {
+				direction = DIRECTION.BOTH,
+			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -250,6 +290,9 @@ function presets.change(exclude)
 	}, exclude)
 end
 
+--- Internal registration logic with optional filtering.
+--- @param motions_list table<string, SmartMotionModule>
+--- @param exclude? string[]
 function presets._register(motions_list, exclude)
 	local registries = require("smart-motion.core.registries"):get()
 	exclude = exclude or {}

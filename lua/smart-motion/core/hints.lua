@@ -2,15 +2,21 @@
 local highlight = require("smart-motion.core.highlight")
 local log = require("smart-motion.core.log")
 
+--- @class HintEntry
+--- @field jump_target? JumpTarget
+--- @field is_single_prefix? boolean
+--- @field is_double_prefix? boolean
+
 local M = {}
 
 --- Generates hint labels based on motion state.
--- Uses single-character labels first, and double-character labels if needed.
--- If there are more targets than labels, uses all available labels (graceful fallback).
----@param ctx table Full context (cursor position, buffer, etc.) — not used here, but part of standard signature.
----@param cfg table Validated config (keys, highlights, etc.) — needed for base_keys.
----@param motion_state table Current motion state (labels needed, direction, etc.)
----@return string[] Final ordered list of hint labels.
+--- Uses single-character labels first, and double-character labels if needed.
+--- If there are more targets than labels, uses all available labels (graceful fallback).
+---
+--- @param ctx SmartMotionContext
+--- @param cfg SmartMotionConfig
+--- @param motion_state SmartMotionMotionState
+--- @return string[] Final ordered list of hint labels.
 function M.generate_hint_labels(ctx, cfg, motion_state)
 	if type(cfg.keys) ~= "table" or #cfg.keys == 0 then
 		log.error("generate_hint_labels received invalid base_keys in cfg")
@@ -60,10 +66,12 @@ function M.generate_hint_labels(ctx, cfg, motion_state)
 	return final_labels
 end
 
---- Generates, assigns and applies labels in a single pass.
----@param ctx table Full context (cursor position, buffer, etc.).
----@param cfg table Validated config.
----@param motion_state table Current motion state (holds targets).
+--- Assigns and applies labels to each target.
+--- Updates `motion_state.assigned_hint_labels` with metadata for selection handling.
+---
+--- @param ctx SmartMotionContext
+--- @param cfg SmartMotionConfig
+--- @param motion_state SmartMotionMotionState
 function M.assign_and_apply_labels(ctx, cfg, motion_state)
 	local jump_targets = motion_state.jump_targets or {}
 	local jump_target_count = motion_state.jump_target_count

@@ -1,8 +1,11 @@
 local default = require("smart-motion.pipeline_wrappers.default")
-local wrappers = require("smart-motion.core.registry")("wrappers")
 local live_search = require("smart-motion.pipeline_wrappers.live_search")
 
-wrappers.register_many({
+---@type SmartMotionRegistry<SmartMotionPipelineWrapperModuleEntry>
+local pipeline_wrappers = require("smart-motion.core.registry")("pipeline_wrappers")
+
+--- @type table<string, SmartMotionPipelineWrapperModuleEntry>
+local pipeline_wrapper_entries = {
 	default = {
 		run = default.run,
 		metadata = {
@@ -17,6 +20,8 @@ wrappers.register_many({
 			description = "Executes pipeline while the user searches for text",
 		},
 	},
-})
+}
 
-return wrappers
+pipeline_wrappers.register_many(pipeline_wrapper_entries)
+
+return pipeline_wrappers

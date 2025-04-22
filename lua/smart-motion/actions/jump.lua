@@ -1,11 +1,12 @@
 local log = require("smart-motion.core.log")
 
+---@type SmartMotionActionModuleEntry
 local M = {}
 
 --- Executes the actual cursor movement to the given target.
----@param ctx table  Motion context (must include bufnr).
----@param cfg table  Validated configuration (not used here but part of the signature).
----@param motion_state table  Current motion state (not used here but part of the signature).
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
 function M.run(ctx, cfg, motion_state, opts)
 	local jump_target = motion_state.selected_jump_target
 

@@ -7,9 +7,12 @@ local restore = require("smart-motion.actions.restore")
 local yank = require("smart-motion.actions.yank")
 local yank_line = require("smart-motion.actions.yank-line")
 local action_utils = require("smart-motion.actions.utils")
+
+---@type SmartMotionRegistry<SmartMotionActionModuleEntry>
 local actions = require("smart-motion.core.registry")("actions")
 
-actions.register_many({
+--- @type table<string, SmartMotionActionModuleEntry>
+local action_entries = {
 	jump = {
 		keys = { "j" },
 		run = jump.run,
@@ -117,6 +120,8 @@ actions.register_many({
 			description = "Executes yank line at target without moving the cursor",
 		},
 	},
-})
+}
+
+actions.register_many(action_entries)
 
 return actions

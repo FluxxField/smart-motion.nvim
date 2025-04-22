@@ -1,6 +1,8 @@
 local log = require("smart-motion.core.log")
 local utils = require("smart-motion.utils")
 
+---@param module_type? string
+---@return SmartMotionRegistryRegistry
 return function(module_type)
 	local registry = {
 		by_key = {},
@@ -26,6 +28,7 @@ return function(module_type)
 		return true
 	end
 
+	--- Registers a module by name.
 	function registry.register(name, entry)
 		if not registry._validate_module_entry(name, entry) then
 			log.error(error_label .. " Registration aborted: " .. name)
@@ -46,6 +49,7 @@ return function(module_type)
 		end
 	end
 
+	--- Registers many modules.
 	function registry.register_many(entries, opts)
 		opts = opts or {}
 
@@ -58,6 +62,7 @@ return function(module_type)
 		end
 	end
 
+	--- Gets a module by key.
 	function registry.get_by_key(key)
 		local entry = registry.by_key[key]
 
@@ -68,6 +73,7 @@ return function(module_type)
 		return entry
 	end
 
+	--- Gets a module by name.
 	function registry.get_by_name(name)
 		local entry = registry.by_name[name]
 
