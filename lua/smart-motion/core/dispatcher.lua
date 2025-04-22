@@ -189,7 +189,7 @@ function M.trigger_action(trigger_key)
 	end
 
 	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
-	local exit = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, { action })
+	local exit = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, { action = action })
 
 	if exit then
 		utils.reset_motion(ctx, cfg, motion_state)
