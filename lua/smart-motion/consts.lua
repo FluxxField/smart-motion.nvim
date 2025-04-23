@@ -2,6 +2,7 @@
 --- @alias HintPosition "start" | "end"
 --- @alias TargetType "words" | "lines" | "search"
 --- @alias SelectionMode "first" | "second"
+--- @alias SearchExitType "early_exit" | "direct_hint" | "auto_select" | "continue_to_selection"
 
 local M = {}
 
@@ -47,6 +48,13 @@ M.WORD_PATTERN = [[\k\+]]
 M.SELECTION_MODE = {
 	FIRST = "first",
 	SECOND = "second",
+}
+
+M.SEARCH_EXIT_TYPE = {
+	EARLY_EXIT = "early_exit",
+	DIRECT_HINT = "direct_hint",
+	AUTO_SELECT = "auto_select",
+	CONTINUE_TO_SELECTION = "continue_to_selection",
 }
 
 return M
