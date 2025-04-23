@@ -15,6 +15,12 @@ function M.run(ctx, cfg, motion_state)
 		vim.cmd("normal! y`>")
 	end
 
+	vim.highlight.on_yank({
+		higroup = "IncSearch",
+		timeout = 150,
+		on_visual = false,
+	})
+
 	-- Clear mark
 	vim.api.nvim_buf_del_mark(target.bufnr, ">")
 end

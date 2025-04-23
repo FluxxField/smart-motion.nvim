@@ -9,11 +9,13 @@ function M.run(ctx, cfg, motion_state)
 	local row = target.end_pos.row
 	local bufnr = target.bufnr
 
-	-- Get the line content
-	local line = vim.api.nvim_buf_get_lines(bufnr, row, row + 1, false)
+	vim.cmd("normal! Y")
 
-	-- Yank the line to default register
-	vim.fn.setreg('"', line[1] .. "\n")
+	vim.highlight.on_yank({
+		higroup = "IncSearch",
+		timeout = 150,
+		on_visual = false,
+	})
 end
 
 return M
