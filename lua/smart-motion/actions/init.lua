@@ -7,6 +7,7 @@ local restore = require("smart-motion.actions.restore")
 local yank = require("smart-motion.actions.yank")
 local yank_line = require("smart-motion.actions.yank-line")
 local action_utils = require("smart-motion.actions.utils")
+local until_action = require("smart-motion.actions.until")
 
 ---@type SmartMotionRegistry<SmartMotionActionModuleEntry>
 local actions = require("smart-motion.core.registry")("actions")
@@ -16,65 +17,51 @@ local action_entries = {
 	jump = {
 		keys = { "j" },
 		run = jump.run,
-		metadata = {
-			label = "Jump To Target",
-			description = "Executes a jump to selected target hint",
-		},
 	},
 	change = {
 		keys = { "c" },
+		run = action_utils.merge({ change }),
+	},
+	change_jump = {
 		run = action_utils.merge({ jump, change }),
-		metadata = {
-			label = "Change Target",
-			description = "Moves cursor to target, deletes it, and puts you in insert mode",
-		},
 	},
 	change_line = {
 		keys = { "C" },
 		run = action_utils.merge({ jump, change_line }),
-		metadata = {
-			label = "Change Line at Target",
-			description = "Moves cursor to target, deletes the line, and puts you in insert mode",
-		},
+	},
+	change_until = {
+		run = action_utils.merge({ until_action, change }),
 	},
 	delete = {
 		keys = { "d" },
+		run = action_utils.merge({ delete }),
+	},
+	delete_jump = {
 		run = action_utils.merge({ jump, delete }),
-		metadata = {
-			label = "Delete Target",
-			description = "Moves cursor to target and deletes",
-		},
 	},
 	delete_line = {
 		keys = { "D" },
 		run = action_utils.merge({ jump, delete_line }),
-		metadata = {
-			label = "Delete Line at Target",
-			description = "Moves cursor to target and deletes the line",
-		},
+	},
+	delete_until = {
+		run = action_utils.merge({ until_action, delete }),
 	},
 	yank = {
 		keys = { "y" },
+		run = action_utils.merge({ yank }),
+	},
+	yank_jump = {
 		run = action_utils.merge({ jump, yank }),
-		metadata = {
-			label = "Yank Target",
-			description = "Moves cursor to target and yanks",
-		},
 	},
 	yank_line = {
 		keys = { "Y" },
 		run = action_utils.merge({ jump, yank_line }),
-		metadata = {
-			label = "Yank Line at Target",
-			description = "Moves cursor to target and yanks the line",
-		},
+	},
+	yank_until = {
+		run = action_utils.merge({ until_action, yank }),
 	},
 	restore = {
 		run = restore.run,
-		metadata = {
-			label = "Restore Cursor",
-			description = "Moves Cursor back to its original position before the jump",
-		},
 	},
 	remote_delete = {
 		run = action_utils.merge({
@@ -82,10 +69,6 @@ local action_entries = {
 			delete,
 			restore,
 		}),
-		metadata = {
-			label = "Remote Delete",
-			description = "Executes delete on target without moving the cursor",
-		},
 	},
 	remote_delete_line = {
 		run = action_utils.merge({
@@ -93,10 +76,6 @@ local action_entries = {
 			delete_line,
 			restore,
 		}),
-		metadata = {
-			label = "Remote Delete Line at Target",
-			description = "Executes delete line at target without moving the cursor",
-		},
 	},
 	remote_yank = {
 		run = action_utils.merge({
@@ -104,10 +83,6 @@ local action_entries = {
 			yank,
 			restore,
 		}),
-		metadata = {
-			label = "Remote Yank",
-			description = "Executes yank on target without moving the cursor",
-		},
 	},
 	remote_yank_line = {
 		run = action_utils.merge({
@@ -115,10 +90,6 @@ local action_entries = {
 			yank_line,
 			restore,
 		}),
-		metadata = {
-			label = "Remote Yank Line at Target",
-			description = "Executes yank line at target without moving the cursor",
-		},
 	},
 }
 
