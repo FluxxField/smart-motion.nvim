@@ -138,16 +138,79 @@ function presets.search(exclude)
 				filter = "filter_visible_lines",
 				visualizer = "hint_start",
 			},
-			pipeline_wrapper = "search",
+			pipeline_wrapper = "live_search",
 			action = "jump",
 			state = {
-				direction = DIRECTION.BOTH,
+				direction = DIRECTION.AFTER_CURSOR,
 			},
 			map = true,
-			modes = { "n", "v" },
+			modes = { "n" },
 			metadata = {
-				label = "Jump to Searched Text",
+				label = "Jump to Searched Text After Cursor",
 				description = "Jumps to the start of the searched for text",
+			},
+		},
+		S = {
+			pipeline = {
+				collector = "lines",
+				extractor = "text_search",
+				filter = "filter_visible_lines",
+				visualizer = "hint_start",
+			},
+			pipeline_wrapper = "live_search",
+			action = "jump",
+			state = {
+				direction = DIRECTION.BEFORE_CURSOR,
+			},
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Jump to Searched Text After Cursor",
+				description = "Jumps to the start of the searched for text",
+			},
+		},
+		f = {
+			pipeline = {
+				collector = "lines",
+				extractor = "text_search",
+				filter = "filter_visible_lines",
+				visualizer = "hint_start",
+			},
+			pipeline_wrapper = "text_search",
+			action = "jump",
+			state = {
+				direction = DIRECTION.AFTER_CURSOR,
+			},
+			opts = {
+				num_of_char = 2,
+			},
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "2 Character Find After Cursor",
+				description = "Labels 2 Character Searches and jump to target",
+			},
+		},
+		F = {
+			pipeline = {
+				collector = "lines",
+				extractor = "text_search",
+				filter = "filter_visible_lines",
+				visualizer = "hint_start",
+			},
+			pipeline_wrapper = "text_search",
+			action = "jump",
+			state = {
+				direction = DIRECTION.BEFORE_CURSOR,
+			},
+			opts = {
+				num_of_char = 2,
+			},
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "2 Character Find Before Cursor",
+				description = "Labels 2 Character Searches and jump to target",
 			},
 		},
 	}, exclude)
@@ -170,6 +233,50 @@ function presets.delete(exclude)
 			metadata = {
 				label = "Delete Action",
 				description = "Deletes based on motion provided",
+			},
+		},
+		dt = {
+			pipeline = {
+				collector = "lines",
+				extractor = "text_search",
+				filter = "filter_visible_lines",
+				visualizer = "hint_start",
+			},
+			pipeline_wrapper = "text_search",
+			action = "delete_until",
+			state = {
+				direction = DIRECTION.AFTER_CURSOR,
+			},
+			opts = {
+				num_of_char = 1,
+			},
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Delete Until Searched Text",
+				description = "Deletes until the searched for text",
+			},
+		},
+		dT = {
+			pipeline = {
+				collector = "lines",
+				extractor = "text_search",
+				filter = "filter_visible_lines",
+				visualizer = "hint_start",
+			},
+			pipeline_wrapper = "text_search",
+			action = "delete_until",
+			state = {
+				direction = DIRECTION.BEFORE_CURSOR,
+			},
+			opts = {
+				num_of_char = 1,
+			},
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Delete Until Searched Text",
+				description = "Deletes until the searched for text",
 			},
 		},
 		rdw = {
@@ -230,6 +337,50 @@ function presets.yank(exclude)
 				description = "Yanks based on the motion provided",
 			},
 		},
+		yt = {
+			pipeline = {
+				collector = "lines",
+				extractor = "text_search",
+				filter = "filter_visible_lines",
+				visualizer = "hint_start",
+			},
+			pipeline_wrapper = "text_search",
+			action = "yank_until",
+			state = {
+				direction = DIRECTION.AFTER_CURSOR,
+			},
+			opts = {
+				num_of_char = 1,
+			},
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Yank Until Searched Text After Cursor",
+				description = "Yank until the searched for text",
+			},
+		},
+		yT = {
+			pipeline = {
+				collector = "lines",
+				extractor = "text_search",
+				filter = "filter_visible_lines",
+				visualizer = "hint_start",
+			},
+			pipeline_wrapper = "text_search",
+			action = "yank_until",
+			state = {
+				direction = DIRECTION.BEFORE_CURSOR,
+			},
+			opts = {
+				num_of_char = 1,
+			},
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Yank Until Searched Text Before Cursor",
+				description = "Yank until the searched for text",
+			},
+		},
 		ryw = {
 			pipeline = {
 				collector = "lines",
@@ -286,6 +437,50 @@ function presets.change(exclude)
 			metadata = {
 				label = "Change Word",
 				description = "Deletes the selected word and goes into insert mode",
+			},
+		},
+		ct = {
+			pipeline = {
+				collector = "lines",
+				extractor = "text_search",
+				filter = "filter_visible_lines",
+				visualizer = "hint_start",
+			},
+			pipeline_wrapper = "text_search",
+			action = "change_until",
+			state = {
+				direction = DIRECTION.AFTER_CURSOR,
+			},
+			opts = {
+				num_of_char = 1,
+			},
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Change Until Searched Text After Cursor",
+				description = "Change until the searched for text",
+			},
+		},
+		cT = {
+			pipeline = {
+				collector = "lines",
+				extractor = "text_search",
+				filter = "filter_visible_lines",
+				visualizer = "hint_start",
+			},
+			pipeline_wrapper = "text_search",
+			action = "change_until",
+			state = {
+				direction = DIRECTION.BEFORE_CURSOR,
+			},
+			opts = {
+				num_of_char = 1,
+			},
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Change Until Searched Text Before Cursor",
+				description = "Change until the searched for text",
 			},
 		},
 	}, exclude)

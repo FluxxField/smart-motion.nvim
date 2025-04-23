@@ -113,14 +113,14 @@ function M.get_target_under_cursor(ctx, cfg, motion_state)
 			end
 
 			if cursor_col >= match_start and cursor_col < match_end then
-				return {
+				return M.format_jump_target(ctx, cfg, motion_state, {
 					row = cursor_line,
 					col = match_start,
 					start_pos = { row = cursor_line, col = match_start },
-					end_pos = { row = cursor_line, col = match_end - 1 },
+					end_pos = { row = cursor_line, col = match_end },
 					text = matched_text,
 					type = motion_state.target_type,
-				}
+				})
 			end
 
 			search_start = match_end
