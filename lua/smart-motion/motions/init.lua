@@ -61,6 +61,8 @@ function motions.register_motion(name, motion)
 	motion.metadata = motion.metadata or {}
 	motion.metadata.label = motion.metadata.label or name:gsub("^%l", string.upper)
 	motion.metadata.description = motion.metadata.description or ("SmartMotion: " .. motion.metadata.label)
+	motion.state = motion.state or {}
+	motion.opts = motion.opts or {}
 
 	motions.by_name[name] = motion
 	motions.by_key[motion.trigger_key] = motion

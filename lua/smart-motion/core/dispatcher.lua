@@ -58,10 +58,10 @@ function M.trigger_motion(trigger_key)
 	utils.reset_motion(ctx, cfg, motion_state)
 
 	if flow_state.evaluate_flow_at_motion_start() then
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, {})
+		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, motion.opts)
 
 		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, {})
+			action.run(ctx, cfg, motion_state, motion.opts)
 			utils.reset_motion(ctx, cfg, motion_state)
 
 			return
@@ -75,7 +75,7 @@ function M.trigger_motion(trigger_key)
 	end
 
 	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
-	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, {})
+	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, motion.opts)
 
 	if exit_type == SEARCH_EXIT_TYPE.EARLY_EXIT then
 		utils.reset_motion(ctx, cfg, motion_state)
@@ -84,7 +84,7 @@ function M.trigger_motion(trigger_key)
 
 	if exit_type == SEARCH_EXIT_TYPE.DIRECT_HINT or exit_type == SEARCH_EXIT_TYPE.AUTO_SELECT then
 		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, {})
+			action.run(ctx, cfg, motion_state, motion.opts)
 		end
 	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
 		-- Rerun the visualizer to makes sure that the hints are not dimmed
@@ -92,7 +92,7 @@ function M.trigger_motion(trigger_key)
 		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 
 		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, {})
+			action.run(ctx, cfg, motion_state, motion.opts)
 		end
 	end
 
@@ -172,7 +172,7 @@ function M.trigger_action(trigger_key)
 			motion_state.selected_jump_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
 
 			if motion_state.selected_jump_target then
-				line_action.run(ctx, cfg, motion_state, {})
+				line_action.run(ctx, cfg, motion_state, motion.opts)
 			end
 
 			return
@@ -182,11 +182,20 @@ function M.trigger_action(trigger_key)
 		return
 	end
 
+	local under_cursor_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
+
+	if under_cursor_target then
+		motion_state.selected_jump_target = under_cursor_target
+		action.run(ctx, cfg, motion_state, motion.opts)
+		utils.reset_motion(ctx, cfg, motion_state)
+		return
+	end
+
 	if flow_state.evaluate_flow_at_motion_start() then
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, {})
+		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, motion.opts)
 
 		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, {})
+			action.run(ctx, cfg, motion_state, motion.opts)
 			utils.reset_motion(ctx, cfg, motion_state)
 			return
 		end
@@ -199,7 +208,7 @@ function M.trigger_action(trigger_key)
 	end
 
 	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
-	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, {})
+	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, motion.opts)
 
 	if exit_type == SEARCH_EXIT_TYPE.EARLY_EXIT then
 		utils.reset_motion(ctx, cfg, motion_state)
@@ -208,7 +217,7 @@ function M.trigger_action(trigger_key)
 
 	if exit_type == SEARCH_EXIT_TYPE.DIRECT_HINT or exit_type == SEARCH_EXIT_TYPE.AUTO_SELECT then
 		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, {})
+			action.run(ctx, cfg, motion_state, motion.opts)
 		end
 	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
 		-- Rerun the visualizer to makes sure that the hints are not dimmed
@@ -216,7 +225,7 @@ function M.trigger_action(trigger_key)
 		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 
 		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, {})
+			action.run(ctx, cfg, motion_state, motion.opts)
 		end
 	end
 
