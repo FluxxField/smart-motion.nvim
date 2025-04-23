@@ -91,7 +91,7 @@ function M.run(opts)
 				coroutine.yield(data)
 			end
 		elseif motion_state.direction == consts.DIRECTION.BOTH then
-			local before = collect_lines_before_cursor(ctx, cfg, motion_state)
+			local before = collect_lines_before_cursor(ctx, cfg, motion_state, true)
 			local after = collect_lines_after_cursor(ctx, cfg, motion_state)
 
 			local combined = vim.list_extend(before, after, 1)
