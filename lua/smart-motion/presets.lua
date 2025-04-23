@@ -135,6 +135,7 @@ function presets.search(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
+				filter = "filter_visible_lines",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "search",
