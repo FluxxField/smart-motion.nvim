@@ -97,7 +97,7 @@ function M.get_target_under_cursor(ctx, cfg, motion_state)
 			row = cursor_line,
 			col = 0,
 			start_pos = { row = cursor_line, col = 0 },
-			end_pos = { row = cursor_line, #line_content },
+			end_pos = { row = cursor_line, col = #line_content },
 			text = line_content,
 			type = motion_state.target_type,
 		})
