@@ -6,6 +6,8 @@ local state = require("smart-motion.core.state")
 local flow_state = require("smart-motion.core.flow-state")
 local selection = require("smart-motion.core.selection")
 
+local SEARCH_EXIT_TYPE = consts.SEARCH_EXIT_TYPE
+
 --- @class Dispatcher
 local M = {}
 
@@ -73,17 +75,25 @@ function M.trigger_motion(trigger_key)
 	end
 
 	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
-	local exit = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, action)
+	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, {})
 
-	if exit then
+	if exit_type == SEARCH_EXIT_TYPE.EARLY_EXIT then
 		utils.reset_motion(ctx, cfg, motion_state)
 		return
 	end
 
-	selection.wait_for_hint_selection(ctx, cfg, motion_state)
+	if exit_type == SEARCH_EXIT_TYPE.DIRECT_HINT or exit_type == SEARCH_EXIT_TYPE.AUTO_SELECT then
+		if motion_state.selected_jump_target then
+			action.run(ctx, cfg, motion_state, {})
+		end
+	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
+		-- Rerun the visualizer to makes sure that the hints are not dimmed
+		visualizer.run(ctx, cfg, motion_state, { is_search_mode = false })
+		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 
-	if motion_state.selected_jump_target then
-		action.run(ctx, cfg, motion_state, opts)
+		if motion_state.selected_jump_target then
+			action.run(ctx, cfg, motion_state, {})
+		end
 	end
 
 	utils.reset_motion(ctx, cfg, motion_state)
@@ -97,7 +107,7 @@ function M.trigger_action(trigger_key)
 	local action = registries.actions.get_by_name(motion.action)
 
 	if motion.is_action then
-		local action = registries.actions.get_by_key(trigger_key)
+		action = registries.actions.get_by_key(trigger_key)
 	end
 
 	local ok, motion_char = pcall(vim.fn.getchar)
@@ -189,17 +199,25 @@ function M.trigger_action(trigger_key)
 	end
 
 	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
-	local exit = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, { action = action })
+	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, {})
 
-	if exit then
+	if exit_type == SEARCH_EXIT_TYPE.EARLY_EXIT then
 		utils.reset_motion(ctx, cfg, motion_state)
 		return
 	end
 
-	selection.wait_for_hint_selection(ctx, cfg, motion_state)
+	if exit_type == SEARCH_EXIT_TYPE.DIRECT_HINT or exit_type == SEARCH_EXIT_TYPE.AUTO_SELECT then
+		if motion_state.selected_jump_target then
+			action.run(ctx, cfg, motion_state, {})
+		end
+	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
+		-- Rerun the visualizer to makes sure that the hints are not dimmed
+		visualizer.run(ctx, cfg, motion_state, { is_search_mode = false })
+		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 
-	if motion_state.selected_jump_target then
-		action.run(ctx, cfg, motion_state, {})
+		if motion_state.selected_jump_target then
+			action.run(ctx, cfg, motion_state, {})
+		end
 	end
 
 	utils.reset_motion(ctx, cfg, motion_state)
