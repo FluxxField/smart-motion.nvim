@@ -83,6 +83,7 @@ function M.run(ctx, cfg, motion_state, opts)
 		log.debug(string.format("Only %d labels available, but %d targets found", #label_pool, jump_target_count))
 	end
 
+	highlight.clear(ctx, cfg, motion_state)
 	highlight.dim_background(ctx, cfg, motion_state)
 
 	local is_search_mode = opts.is_search_mode == true

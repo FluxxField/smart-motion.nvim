@@ -76,6 +76,8 @@ function M.run(run_pipeline, ctx, cfg, motion_state, opts)
 			end
 		end
 	end
+
+	return SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION
 end
 
 return M
