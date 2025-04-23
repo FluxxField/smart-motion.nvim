@@ -5,47 +5,42 @@ local consts = require("smart-motion.consts")
 
 local SEARCH_EXIT_TYPE = consts.SEARCH_EXIT_TYPE
 
---- @type SmartMotionPipelineWrapperModule
+---@type SmartMotionPipelineWrapperModule
 local M = {}
 
---- Runs a pipeline interactively while the user types search text.
---- @param run_pipeline fun(ctx: SmartMotionContext, cfg: SmartMotionConfig, state: SmartMotionMotionState, opts: table): nil
---- @param ctx SmartMotionContext
---- @param cfg SmartMotionConfig
---- @param motion_state SmartMotionMotionState
---- @param opts table
---- @return SearchExitType
+---@param run_pipeline fun(ctx: SmartMotionContext, cfg: SmartMotionConfig, state: SmartMotionMotionState, opts: table): nil
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
+---@param opts table
+---@return SearchExitType
 function M.run(run_pipeline, ctx, cfg, motion_state, opts)
-	local early_exit_timeout = 2000
-	local continue_timeout = 500
-	local start_time = vim.fn.reltime()
+	local num_of_char = opts.num_of_char or 1
+	local timeout_ms = 2000
 	local search_text = ""
+	local start_time = vim.fn.reltime()
 
 	highlight.dim_background(ctx, cfg, motion_state)
 
-	while true do
+	while #search_text < num_of_char do
 		local last_search_text = ""
-		local elapsed = vim.fn.reltimefloat(vim.fn.reltime(start_time)) * 1000
 
-		if elapsed > (search_text == "" and early_exit_timeout or continue_timeout) then
-			if search_text == "" then
-				return SEARCH_EXIT_TYPE.EARLY_EXIT
-			else
-				return SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION
-			end
+		-- Cancel after timeout if no input yet
+		local elapsed = vim.fn.reltimefloat(vim.fn.reltime(start_time)) * 1000
+		if #search_text == 0 and elapsed > timeout_ms then
+			return SEARCH_EXIT_TYPE.EARLY_EXIT
 		end
 
+		-- Wait for input
 		if vim.fn.getchar(1) == 0 then
 			vim.cmd("sleep 10m")
 		else
 			local char = vim.fn.getchar()
 			char = type(char) == "number" and vim.fn.nr2char(char) or char
-			vim.api.nvim_feedkeys("", "n", false)
+			vim.api.nvim_feedkeys("", "n", false) -- flush pending operators
 
 			if char == "\027" then -- ESC
 				return SEARCH_EXIT_TYPE.EARLY_EXIT
-			elseif char == "\r" then -- ENTER
-				return SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION
 			elseif char == "\b" or char == vim.api.nvim_replace_termcodes("<BS>", true, false, true) then
 				-- Backspace: Remove last char
 				search_text = search_text:sub(1, -2)
@@ -53,17 +48,16 @@ function M.run(run_pipeline, ctx, cfg, motion_state, opts)
 				search_text = search_text .. char
 			end
 
-			if search_text ~= last_search_text and search_text ~= "" then
-				-- Run the pipeline with the current input
+			if search_text ~= last_search_text and #search_text > 0 then
+				start_time = nil -- stop timeout tracking
+
+				-- Run the pipeline once we hit the desired char count
 				local merged_opts = vim.tbl_extend(
 					"force",
 					opts,
-					{ text = utils.escape_lua_pattern(search_text), is_search_mode = #search_text > 1 }
+					{ text = utils.escape_lua_pattern(search_text), is_search_mode = num_of_char > 1 }
 				)
 				run_pipeline(ctx, cfg, motion_state, merged_opts)
-
-				start_time = vim.fn.reltime()
-				last_search_text = search_text
 
 				local count = motion_state.jump_target_count
 					or (motion_state.jump_targets and #motion_state.jump_targets or 0)
@@ -76,6 +70,8 @@ function M.run(run_pipeline, ctx, cfg, motion_state, opts)
 			end
 		end
 	end
+
+	return SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION
 end
 
 return M
