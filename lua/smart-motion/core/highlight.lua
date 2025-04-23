@@ -20,18 +20,26 @@ end
 ---@param motion_state SmartMotionMotionState
 ---@param jump_target JumpTarget
 ---@param label string
-function M.apply_single_hint_label(ctx, cfg, motion_state, jump_target, label)
+---@param options HintOptions
+function M.apply_single_hint_label(ctx, cfg, motion_state, jump_target, label, options)
 	log.debug(string.format("Applying single hint '%s' at line %d, col %d", label, jump_target.row, jump_target.col))
 
+	local hint = cfg.highlight.hint or "SmartMotionHint"
+
+	if options.dim_first_char then
+		hint = cfg.highlight.hint_dim or "SmartMotionHintDim"
+	end
+
 	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, jump_target.row, jump_target.col, {
-		virt_text = { { label, cfg.highlight.hint or "SmartMotionHint" } },
+		virt_text = { { label, hint } },
 		virt_text_pos = "overlay",
 		hl_mode = "combine",
 	})
 end
 
---- @class DoubleHintOptions
+--- @class HintOptions
 --- @field dim_first_char? boolean
+--- @field dim_second_char? boolean
 
 --- Applies a double-character hint label at a given position.
 ---@param ctx SmartMotionContext
@@ -39,7 +47,7 @@ end
 ---@param motion_state SmartMotionMotionState
 ---@param jump_target JumpTarget
 ---@param label string
----@param options DoubleHintOptions
+---@param options HintOptions
 function M.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, options)
 	options = options or {}
 
@@ -49,8 +57,14 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, o
 
 	local first_hl = options.dim_first_char and (cfg.highlight.first_char_dim or "SmartMotionFirstCharDim")
 		or (cfg.highlight.first_char or "SmartMotionFirstChar")
-	local second_hl = options.dim_first_char and (cfg.highlight.first_char or "SmartMotionFirstChar")
+	local second_hl = options.dim_second_char and (cfg.highlight.second_char_dim or "SmartMotionSecondCharDim")
 		or (cfg.highlight.second_char or "SmartMotionSecondChar")
+
+	local hint = cfg.highlight.hint or "SmartMotionHint"
+
+	if faded then
+		hint = cfg.highlight.hint_faded or "SmartMotionHintFaded"
+	end
 
 	log.debug(
 		string.format(

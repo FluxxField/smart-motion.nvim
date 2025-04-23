@@ -5,9 +5,11 @@ local M = {}
 -- Default highlight group names
 local default_highlight_groups = {
 	hint = "SmartMotionHint",
+	hint_dim = "SmartMotionHintFaded",
 	first_char = "SmartMotionFirstChar",
-	second_char = "SmartMotionSecondChar",
 	first_char_dim = "SmartMotionFirstCharDim",
+	second_char = "SmartMotionSecondChar",
+	second_char_dim = "SmartMotionSecondCharDim",
 	dim = "SmartMotionDim",
 }
 

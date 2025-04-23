@@ -65,7 +65,8 @@ end
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
-function M.run(ctx, cfg, motion_state)
+---@param opts table data passed around through the pipeline
+function M.run(ctx, cfg, motion_state, opts)
 	local jump_targets = motion_state.jump_targets or {}
 	local jump_target_count = motion_state.jump_target_count
 
@@ -84,6 +85,8 @@ function M.run(ctx, cfg, motion_state)
 
 	highlight.dim_background(ctx, cfg, motion_state)
 
+	local is_search_mode = opts.is_search_mode == true
+
 	for index, jump_target in ipairs(jump_targets) do
 		local label = label_pool[index]
 
@@ -92,10 +95,24 @@ function M.run(ctx, cfg, motion_state)
 		end
 
 		if #label == 1 then
-			highlight.apply_single_hint_label(ctx, cfg, motion_state, jump_target, label)
+			highlight.apply_single_hint_label(
+				ctx,
+				cfg,
+				motion_state,
+				jump_target,
+				label,
+				{ dim_first_char = is_search_mode }
+			)
 			motion_state.assigned_hint_labels[label] = { jump_target = jump_target, is_single_prefix = true }
 		elseif #label == 2 then
-			highlight.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, { dim_first_char = false })
+			highlight.apply_double_hint_label(
+				ctx,
+				cfg,
+				motion_state,
+				jump_target,
+				label,
+				{ dim_first_char = is_search_mode, dim_second_char = is_search_mode }
+			)
 			motion_state.assigned_hint_labels[label] = { jump_target = jump_target }
 			motion_state.assigned_hint_labels[label:sub(1, 1)] = { is_double_prefix = true }
 		else
