@@ -171,6 +171,20 @@ action = merge({ "jump", "yank" })
 
 ---
 
+## 🙏 Acknowledgments
+
+This plugin is only made possible by standing on the shoulders of giants. Inspiration and foundational ideas come from the incredible projects like:
+
+- [`hop.nvim`](https://github.com/phaazon/hop.nvim)
+- [`flash.nvim`](https://github.com/folke/flash.nvim)
+- [`lightspeed.nvim`](https://github.com/ggandor/lightspeed.nvim)
+- [`leap.nvim`](https://github.com/ggandor/leap.nvim)
+- [`mini.jump`](https://github.com/echasnovski/mini.nvim#mini.jump)
+
+The original concepts are all theirs - my hope is to bring their brilliant ideas together into one cohesive, extensible system.
+
+---
+
 ## 📜 License
 
 Licensed under [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html).
