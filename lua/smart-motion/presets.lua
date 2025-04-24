@@ -1,4 +1,3 @@
-local DIRECTION = require("smart-motion.consts").DIRECTION
 local HINT_POSITION = require("smart-motion.consts").HINT_POSITION
 
 ---@type SmartMotionPresetsModule
@@ -11,12 +10,12 @@ function presets.words(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "words",
+				filter = "filter_words_after_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
 			action = "jump",
 			state = {
-				direction = DIRECTION.AFTER_CURSOR,
 				hint_position = HINT_POSITION.START,
 			},
 			map = true,
@@ -30,12 +29,12 @@ function presets.words(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "words",
+				filter = "filter_words_before_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
 			action = "jump",
 			state = {
-				direction = DIRECTION.BEFORE_CURSOR,
 				hint_position = HINT_POSITION.START,
 			},
 			map = true,
@@ -49,12 +48,12 @@ function presets.words(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "words",
+				filter = "filter_words_after_cursor",
 				visualizer = "hint_end",
 			},
 			pipeline_wrapper = "default",
 			action = "jump",
 			state = {
-				direction = DIRECTION.AFTER_CURSOR,
 				hint_position = HINT_POSITION.END,
 			},
 			map = true,
@@ -68,12 +67,12 @@ function presets.words(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "words",
+				filter = "filter_words_before_cursor",
 				visualizer = "hint_end",
 			},
 			pipeline_wrapper = "default",
 			action = "jump",
 			state = {
-				direction = DIRECTION.BEFORE_CURSOR,
 				hint_position = HINT_POSITION.END,
 			},
 			map = true,
@@ -93,12 +92,13 @@ function presets.lines(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "lines",
+				filter = "filter_lines_after_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
-			action = "jump",
+			action = "jump_centered",
 			state = {
-				direction = DIRECTION.AFTER_CURSOR,
+				hint_position = HINT_POSITION.START,
 			},
 			map = true,
 			modes = { "n", "v" },
@@ -111,12 +111,13 @@ function presets.lines(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "lines",
+				filter = "filter_lines_before_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
-			action = "jump",
+			action = "jump_centered",
 			state = {
-				direction = DIRECTION.BEFORE_CURSOR,
+				hint_position = HINT_POSITION.START,
 			},
 			map = true,
 			modes = { "n", "v" },
@@ -135,13 +136,13 @@ function presets.search(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_visible_lines",
+				filter = "filter_words_after_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "live_search",
 			action = "jump",
 			state = {
-				direction = DIRECTION.AFTER_CURSOR,
+				hint_position = HINT_POSITION.START,
 			},
 			map = true,
 			modes = { "n" },
@@ -154,13 +155,13 @@ function presets.search(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_visible_lines",
+				filter = "filter_words_before_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "live_search",
 			action = "jump",
 			state = {
-				direction = DIRECTION.BEFORE_CURSOR,
+				hint_position = HINT_POSITION.START,
 			},
 			map = true,
 			modes = { "n" },
@@ -173,13 +174,13 @@ function presets.search(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_visible_lines",
+				filter = "filter_words_after_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "text_search",
 			action = "jump",
 			state = {
-				direction = DIRECTION.AFTER_CURSOR,
+				hint_position = HINT_POSITION.START,
 			},
 			opts = {
 				num_of_char = 2,
@@ -195,13 +196,13 @@ function presets.search(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_visible_lines",
+				filter = "filter_words_before_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "text_search",
 			action = "jump",
 			state = {
-				direction = DIRECTION.BEFORE_CURSOR,
+				hint_position = HINT_POSITION.START,
 			},
 			opts = {
 				num_of_char = 2,
@@ -223,13 +224,14 @@ function presets.delete(exclude)
 			is_action = true,
 			pipeline = {
 				collector = "lines",
+				filter = "default",
 				visualizer = "hint_start",
-			},
-			state = {
-				direction = DIRECTION.BOTH,
 			},
 			map = true,
 			modes = { "n" },
+			state = {
+				hint_position = HINT_POSITION.START,
+			},
 			metadata = {
 				label = "Delete Action",
 				description = "Deletes based on motion provided",
@@ -239,13 +241,13 @@ function presets.delete(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_visible_lines",
+				filter = "filter_words_after_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "text_search",
 			action = "delete_until",
 			state = {
-				direction = DIRECTION.AFTER_CURSOR,
+				hint_position = HINT_POSITION.START,
 			},
 			opts = {
 				num_of_char = 1,
@@ -261,13 +263,13 @@ function presets.delete(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_visible_lines",
+				filter = "filter_words_before_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "text_search",
 			action = "delete_until",
 			state = {
-				direction = DIRECTION.BEFORE_CURSOR,
+				hint_position = HINT_POSITION.START,
 			},
 			opts = {
 				num_of_char = 1,
@@ -283,12 +285,13 @@ function presets.delete(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "words",
+				filter = "default",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
 			action = "remote_delete",
 			state = {
-				direction = DIRECTION.BOTH,
+				hint_position = HINT_POSITION.START,
 			},
 			map = true,
 			modes = { "n" },
@@ -301,12 +304,13 @@ function presets.delete(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "lines",
+				filter = "default",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
 			action = "remote_delete",
 			state = {
-				direction = DIRECTION.BOTH,
+				hint_position = HINT_POSITION.START,
 			},
 			map = true,
 			modes = { "n" },
@@ -325,10 +329,11 @@ function presets.yank(exclude)
 			is_action = true,
 			pipeline = {
 				collector = "lines",
+				filter = "default",
 				visualizer = "hint_start",
 			},
 			state = {
-				direction = DIRECTION.BOTH,
+				hint_position = HINT_POSITION.START,
 			},
 			map = true,
 			modes = { "n" },
@@ -341,13 +346,13 @@ function presets.yank(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_visible_lines",
+				filter = "filter_words_after_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "text_search",
 			action = "yank_until",
 			state = {
-				direction = DIRECTION.AFTER_CURSOR,
+				hint_position = HINT_POSITION.START,
 			},
 			opts = {
 				num_of_char = 1,
@@ -363,13 +368,13 @@ function presets.yank(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_visible_lines",
+				filter = "filter_words_before_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "text_search",
 			action = "yank_until",
 			state = {
-				direction = DIRECTION.BEFORE_CURSOR,
+				hint_position = HINT_POSITION.START,
 			},
 			opts = {
 				num_of_char = 1,
@@ -385,12 +390,13 @@ function presets.yank(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "words",
+				filter = "default",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
 			action = "remote_yank",
 			state = {
-				direction = DIRECTION.BOTH,
+				hint_position = HINT_POSITION.START,
 			},
 			map = true,
 			modes = { "n" },
@@ -403,12 +409,13 @@ function presets.yank(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "lines",
+				filter = "default",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
 			action = "remote_yank",
 			state = {
-				direction = DIRECTION.BOTH,
+				hint_position = HINT_POSITION.START,
 			},
 			map = true,
 			modes = { "n" },
@@ -427,10 +434,11 @@ function presets.change(exclude)
 			is_action = true,
 			pipeline = {
 				collector = "lines",
+				filter = "default",
 				visualizer = "hint_start",
 			},
 			state = {
-				direction = DIRECTION.BOTH,
+				hint_position = HINT_POSITION.START,
 			},
 			map = true,
 			modes = { "n" },
@@ -443,13 +451,13 @@ function presets.change(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_visible_lines",
+				filter = "filter_words_after_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "text_search",
 			action = "change_until",
 			state = {
-				direction = DIRECTION.AFTER_CURSOR,
+				hint_position = HINT_POSITION.START,
 			},
 			opts = {
 				num_of_char = 1,
@@ -465,13 +473,13 @@ function presets.change(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_visible_lines",
+				filter = "filter_words_before_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "text_search",
 			action = "change_until",
 			state = {
-				direction = DIRECTION.BEFORE_CURSOR,
+				hint_position = HINT_POSITION.START,
 			},
 			opts = {
 				num_of_char = 1,
