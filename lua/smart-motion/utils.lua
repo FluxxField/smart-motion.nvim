@@ -135,7 +135,7 @@ function M.is_non_empty_string(s)
 end
 
 function M.escape_lua_pattern(str)
-	return str:gsub("([^%w])", "%%%1")
+	return str:gsub("([%(%)%.%%%+%-%*%?%[%^%$])", "%%%1")
 end
 
 return M
