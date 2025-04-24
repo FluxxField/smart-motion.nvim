@@ -1,5 +1,4 @@
-local default_filter = require("smart-motion.filters.default")
-local filter_visible_lines = require("smart-motion.filters.filter_visible_lines")
+local merge_filters = require("smart-motion.filters.utils")
 
 ---@type SmartMotionRegistry<SmartMotionFilterModuleEntry>
 local filters = require("smart-motion.core.registry")("filters")
@@ -7,17 +6,57 @@ local filters = require("smart-motion.core.registry")("filters")
 ---@type table<string, SmartMotionFilterModuleEntry>
 local filter_entries = {
 	default = {
-		run = default_filter.run,
+		run = require("smart-motion.filters.filter_visible_lines").run,
 		metadata = {
-			label = "Default Filter",
-			description = "Takes in data and simply returns it. No filtering applied",
+			label = "Visible Only",
+			description = "Applies dimming and hides off-screen targets.",
 		},
 	},
-	filter_visible_lines = {
-		run = filter_visible_lines.run,
+	filter_visible = {
+		run = require("smart-motion.filters.filter_visible_lines").run,
 		metadata = {
-			label = "Filter Only Visible Lines",
-			description = "Filters out any targets that are not visible",
+			label = "Visible Only",
+			description = "Same as default, kept for clarity.",
+		},
+	},
+	filter_lines_after_cursor = {
+		run = merge_filters(
+			require("smart-motion.filters.filter_visible_lines").run,
+			require("smart-motion.filters.filter_lines_after_cursor").run
+		),
+		metadata = {
+			label = "Lines After Cursor",
+			description = "Visible lines after the cursor.",
+		},
+	},
+	filter_lines_before_cursor = {
+		run = merge_filters(
+			require("smart-motion.filters.filter_visible_lines").run,
+			require("smart-motion.filters.filter_lines_before_cursor").run
+		),
+		metadata = {
+			label = "Lines Before Cursor",
+			description = "Visible lines before the cursor.",
+		},
+	},
+	filter_words_after_cursor = {
+		run = merge_filters(
+			require("smart-motion.filters.filter_visible_lines").run,
+			require("smart-motion.filters.filter_words_after_cursor").run
+		),
+		metadata = {
+			label = "Words After Cursor",
+			description = "Visible words after the cursor using hint_position.",
+		},
+	},
+	filter_words_before_cursor = {
+		run = merge_filters(
+			require("smart-motion.filters.filter_visible_lines").run,
+			require("smart-motion.filters.filter_words_before_cursor").run
+		),
+		metadata = {
+			label = "Words Before Cursor",
+			description = "Visible words before the cursor using hint_position.",
 		},
 	},
 }
