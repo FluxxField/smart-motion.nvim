@@ -93,6 +93,9 @@ SmartMotion revolves around modular **pipelines**. Each motion consists of:
 
 ### ?? Presets in Your Config
 
+> [!NOTE]
+> Please view the [presets.md](docs/presets.md) docs for a full list of the presets and their mappings
+
 Presets are fully configurable:
 
 ```lua
