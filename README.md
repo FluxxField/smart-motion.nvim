@@ -23,7 +23,8 @@ With SmartMotion, you build exactly what _you_ need - using composable modules, 
 
 For deep dives into modules, flow state, action merging, or highlight customization, see the [docs folder](./docs).
 
-> [!WARNING] > **Early Stage Warning:** This plugin is under active development. Breaking changes are expected as it matures.
+> [!WARNING]
+> **Early Stage Warning:** This plugin is under active development. Breaking changes are expected as it matures.
 
 ---
 
