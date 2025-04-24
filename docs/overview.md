@@ -4,7 +4,7 @@ Welcome to the SmartMotion documentation! This plugin is built around the idea t
 
 Below is a high-level summary of what each document covers and how it fits into the ecosystem.
 
-⸻
+---
 
 ## 📦 registering.md
 
@@ -16,9 +16,9 @@ Covers:
 	•	is_action behavior for supporting native-style operations (like dw, ciw)
 	•	Metadata and mapping options
 
-➡️ View registering.md
+➡️ View [registering.md](registering.md)
 
-⸻
+---
 
 ## ⚙️ presets.md
 
@@ -29,9 +29,9 @@ Covers:
 	•	Enabling or excluding mappings
 	•	Linking to the Presets Reference
 
-➡️ View presets.md
+➡️ View [presets.md](presets.md)
 
-⸻
+---
 
 ## 🧱 collectors.md
 
@@ -42,9 +42,9 @@ Covers:
 	•	Built-in collector options like lines
 	•	Future ideas (e.g., multi-buffer collection)
 
-➡️ View collectors.md
+➡️ View [collectors.md](collectors.md)
 
-⸻
+---
 
 ## 🔎 extractors.md
 
@@ -54,9 +54,9 @@ Covers:
 	•	Built-in extractors like words, chars, text_search
 	•	Example use cases
 
-➡️ View extractors.md
+➡️ View [extractors.md](extractors.md)
 
-⸻
+---
 
 ## 🧹 filters.md
 
@@ -67,9 +67,9 @@ Covers:
 	•	Built-ins like default and filter_visible_lines
 	•	Future support for direction-based filtering (e.g., AFTER_CURSOR)
 
-➡️ View filters.md
+➡️ View [filters.md](filters.md)
 
-⸻
+---
 
 ## 🎨 visualizers.md
 
@@ -80,9 +80,9 @@ Covers:
 	•	Smart dimming behavior
 	•	Customization options
 
-➡️ View visualizers.md
+➡️ View [visualizers.md](visualizers.md)
 
-⸻
+---
 
 ## 🧠 actions.md
 
@@ -93,9 +93,9 @@ Covers:
 	•	Using merge() to combine actions
 	•	Creating custom actions
 
-➡️ View actions.md
+➡️ View [actions.md](actions.md)
 
-⸻
+---
 
 ## 🧪 pipeline_wrappers.md
 
@@ -106,9 +106,9 @@ Covers:
 	•	When and why to use each
 	•	How wrappers control user interaction and reactivity
 
-➡️ View pipeline_wrappers.md
+➡️ View [pipeline_wrappers.md](pipeline_wrappers.md)
 
-⸻
+---
 
 ## ✨ custom_motion.md
 
@@ -119,9 +119,9 @@ Covers:
 	•	Optional filters and wrappers
 	•	Registering it all together
 
-➡️ View custom_motion.md
+➡️ View [custom_motion.md](custom_motion.md)
 
-⸻
+---
 
 ## 🚀 advanced.md
 
@@ -132,9 +132,9 @@ Covers:
 	•	Multi-target actions
 	•	History and chaining logic
 
-➡️ View advanced.md
+➡️ View [advanced.md](advanced.md)
 
-⸻
+---
 
 ## ⚙️ config.md
 
@@ -144,9 +144,9 @@ Covers:
 	•	Global config like keys, highlight, presets
 	•	How to override highlight groups or provide custom colors
 
-➡️ View config.md
+➡️ View [config.md](config.md)
 
-⸻
+---
 
 ## 🐞 debugging.md
 
@@ -157,8 +157,8 @@ Covers:
 	•	Logging with core.log
 	•	Inspecting motion state manually
 
-➡️ View debugging.md
+➡️ View [debugging.md](debugging.md)
 
-⸻
+---
 
 Happy motion building!
