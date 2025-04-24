@@ -1,4 +1,5 @@
 local consts = require("smart-motion.consts")
+local log = require("smart-motion.core.log")
 
 ---@type SmartMotionExtractorModuleEntry
 local M = {}
@@ -46,7 +47,7 @@ function M.run(collector, opts)
 
 			-- Collect all targets, left-to-right from the current line
 			while true do
-				local match_data = vim.fn.matchstrpos(line_text, search_text, search_start_col)
+				local match_data = vim.fn.matchstrpos(line_text, "\\V" .. search_text, search_start_col)
 				local match_text, start_pos, end_pos = match_data[1], match_data[2], match_data[3]
 
 				-- If no matches, move to the next line
