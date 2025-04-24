@@ -180,4 +180,23 @@ This shows the anatomy of a full motion declaration using SmartMotion's modular 
 
 ---
 
+## 📂 License
+
+Licensed under [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html).
+
+---
+
+## ✨ Author
+
+Built with ❤️ by [FluxxField](https://github.com/FluxxField)
+
+I also build custom websites for businesses and brands using Next.js, React, Tailwindcss, Motion, and more. Check out:
+
+- [Cornerstone Homes](https://www.cornerstonehomesok.com)  
+- [SLP Custom Built](https://www.slpcustombuilt.com)
+
+📧 [keenanjj13@protonmail.com](mailto:keenanjj13@protonmail.com)
+
+---
+
 For full documentation and how to create your own modules or motion presets, check out the [docs/](./docs) directory.
