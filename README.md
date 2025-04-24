@@ -28,6 +28,10 @@ For deep dives into modules, flow state, action merging, or highlight customizat
 
 ---
 
+![demo gif](assets/smart-motion-showcase.mp4)
+
+---
+
 ## Configuration
 
 SmartMotion comes with no default mappings -- everything is opt-in. Here's a quick-start example with presets and highlight customization:
