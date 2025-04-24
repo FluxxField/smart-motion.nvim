@@ -16,7 +16,15 @@ local default_highlight_groups = {
 ---@type SmartMotionConfig
 M.defaults = {
 	keys = "fjdksleirughtynm",
-	highlight = {},
+	highlight = {
+		hint = "SmartMotionHint",
+		hint_dim = "SmartMotionHintFaded",
+		first_char = "SmartMotionFirstChar",
+		first_char_dim = "SmartMotionFirstCharDim",
+		second_char = "SmartMotionSecondChar",
+		second_char_dim = "SmartMotionSecondCharDim",
+		dim = "SmartMotionDim",
+	},
 	presets = {},
 }
 
