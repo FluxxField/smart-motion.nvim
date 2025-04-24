@@ -7,7 +7,7 @@ SmartMotion allows you to register new motions and actions using a flexible and 
 	•	How to register multiple motions at once
 	•	How presets work under the hood
 
-⸻
+---
 
 ## 🔧 Basic Motion Registration
 
