@@ -1,0 +1,182 @@
+---@meta
+
+---@class SmartMotionPlugin
+---@field setup fun(user_config: SmartMotionConfig | nil)
+---@field register_motion fun(name: string, motion: SmartMotionMotionEntry)
+---@field register_many_motions fun(tbl: table<string, SmartMotionMotionEntry>, opts?: { override?: boolean })
+---@field collectors { register: fun(name: string, mod: SmartMotionCollectorModuleEntry), register_many: fun(tbl: table<string, SmartMotionCollectorModule>, opts?: { override?: boolean }) }
+---@field extractors { register: fun(name: string, mod: SmartMotionExtractorModuleEntry), register_many: fun(tbl: table<string, SmartMotionExtractorModule>, opts?: { override?: boolean }) }
+---@field filters { register: fun(name: string, mod: SmartMotionFilterModuleEntry), register_many: fun(tbl: table<string, SmartMotionFilterModule>, opts?: { override?: boolean }) }
+---@field visualizers { register: fun(name: string, mod: SmartMotionVisualizerModuleEntry), register_many: fun(tbl: table<string, SmartMotionVisualizerModule>, opts?: { override?: boolean }) }
+---@field actions { register: fun(name: string, mod: SmartMotionActionModuleEntry), register_many: fun(tbl: table<string, SmartMotionActionModule>, opts?: { override?: boolean }) }
+---@field pipeline_wrappers { register: fun(name: string, mod: SmartMotionPipelineWrapperModuleEntry), register_many: fun(tbl: table<string, SmartMotionPipelineWrapperModule>, opts?: { override?: boolean }) }
+---@field consts table  -- optional: you could also type consts more specifically later
+
+---@class SmartMotionConfig
+---@field keys string[]
+---@field highlight table<string, string | table>
+---@field presets SmartMotionPresets
+
+---@class SmartMotionPresets
+---@field words? true | SmartMotionPresetKey.Words[]
+---@field lines? true | SmartMotionPresetKey.Lines[]
+---@field search? true | SmartMotionPresetKey.Search[]
+---@field delete? true | SmartMotionPresetKey.Delete[]
+---@field yank? true | SmartMotionPresetKey.Yank[]
+---@field change? true | SmartMotionPresetKey.Change[]
+---@field [string] boolean | string[]
+
+---@alias SmartMotionPresetKey.Words "w" | "b" | "e" | "ge"
+---@alias SmartMotionPresetKey.Lines "j" | "k"
+---@alias SmartMotionPresetKey.Search "s" | "S" | "f" | "F"
+---@alias SmartMotionPresetKey.Delete "d" | "dt" | "dT" | "rdw" | "rdl"
+---@alias SmartMotionPresetKey.Yank "y" | "yt" | "yT" | "ryw" | "ryl"
+---@alias SmartMotionPresetKey.Change "c" | "ct" | "cT"
+
+---@class SmartMotionPresetsModule
+---@field words fun(exclude?: SmartMotionPresetKey.Words[])
+---@field lines fun(exclude?: SmartMotionPresetKey.Lines[])
+---@field search fun(exclude?: SmartMotionPresetKey.Search[])
+---@field delete fun(exclude?: SmartMotionPresetKey.Delete[])
+---@field yank fun(exclude?: SmartMotionPresetKey.Yank[])
+---@field change fun(exclude?: SmartMotionPresetKey.Change[])
+---@field _register fun(motions_list: table<string, SmartMotionModule>, exclude?: string[])
+
+---@class SmartMotionContext
+---@field bufnr integer
+---@field winid integer
+---@field cursor_line integer
+---@field cursor_col integer
+---@field last_line integer
+
+---@class SmartMotionMotionState
+---@field total_keys integer
+---@field max_lines integer
+---@field max_labels integer
+---@field direction Direction
+---@field hint_position HintPosition
+---@field target_type TargetType
+---@field ignore_whitespace boolean
+---@field jump_target_count integer
+---@field jump_targets SmartMotionJumpTarget[]
+---@field selected_jump_target? SmartMotionJumpTarget
+---@field hint_labels string[]
+---@field assigned_hint_labels table<string, SmartMotionHintEntry>
+---@field single_label_count integer
+---@field double_label_count integer
+---@field sacrificed_keys_count integer
+---@field selection_mode SelectionMode
+---@field selection_first_char? string
+
+---@class SmartMotionJumpTarget
+---@field bufnr integer
+---@field winid integer
+---@field row integer
+---@field col integer
+---@field text string
+---@field start_pos { row: integer, col: integer }
+---@field end_pos { row: integer, col: integer }
+---@field type string
+---@field metadata? table
+
+---@class SmartMotionHintEntry
+---@field jump_target? SmartMotionJumpTarget
+---@field is_single_prefix? boolean
+---@field is_double_prefix? boolean
+
+---@generic T
+---@class SmartMotionModuleEntry<T>
+---@field run T
+---@field keys? string[]
+---@field name? string
+---@field state? SmartMotionMotionState
+---@field metadata? { label?: string, description?: string }
+
+---@alias SmartMotionCollectorModuleEntry SmartMotionModuleEntry<fun(opts: table): thread>
+
+---@alias SmartMotionExtractorModuleEntry SmartMotionModuleEntry<fun(generator: thread, opts: table): thread>
+
+---@alias SmartMotionActionModuleEntry SmartMotionModuleEntry<fun(
+  ctx: SmartSmartMotionContext,
+  cfg: SmartMotionConfig,
+  state: SmartMotionMotionState,
+  opts: table
+): nil>
+
+---@alias SmartMotionVisualizerModuleEntry SmartMotionModuleEntry<fun(
+  ctx: SmartSmartMotionContext,
+  cfg: SmartMotionConfig,
+  state: SmartMotionMotionState
+    opts: table
+): nil>
+
+---@alias SmartMotionFilterModuleEntry SmartMotionModuleEntry<fun(
+  ctx: SmartSmartMotionContext,
+  cfg: SmartMotionConfig,
+  state: SmartMotionMotionState
+  opts: table
+): nil>
+
+---@alias SmartMotionPipelineWrapperModuleEntry SmartMotionModuleEntry<fun(
+  pipeline: fun(
+    ctx: SmartSmartMotionContext,
+    cfg: SmartMotionConfig,
+    state: SmartMotionMotionState,
+    opts: table
+  ): nil,
+  ctx: SmartSmartMotionContext,
+  cfg: SmartMotionConfig,
+  state: SmartMotionMotionState,
+  action: SmartMotionActionModule
+): boolean?>
+
+---@class SmartMotionMotionEntry
+---@field trigger_key? string
+---@field is_action? boolean
+---@field pipeline { collector: string, extractor: string, visualizer: string, filter?: string }
+---@field pipeline_wrapper? string
+---@field action string
+---@field state? SmartMotionMotionState
+---@field map? boolean
+---@field modes? string[]
+---@field name? string
+---@field metadata? { label?: string, description?: string }
+
+---@alias SmartMotionRegistryType
+  | "collectors"
+  | "extractors"
+  | "filters"
+  | "visualizers"
+  | "actions"
+  | "pipeline_wrappers"
+  | "motions"
+
+---@generic T
+---@class SmartMotionRegistry<T>
+---@field by_key table<string, T>
+---@field by_name table<string, T>
+---@field module_type string
+---@field register fun(name: string, entry: T): nil
+---@field register_many fun(entries: table<string, T>, opts?: { override?: boolean }): nil
+---@field get_by_key fun(key: string): T|nil
+---@field get_by_name fun(name: string): T|nil
+---@field _validate_module_entry fun(name: string, entry: T): boolean
+
+---@class SmartMotionRegistryMap
+---@field collectors SmartMotionRegistry<SmartMotionCollectorModule>
+---@field extractors SmartMotionRegistry<SmartMotionExtractorModule>
+---@field filters SmartMotionRegistry<SmartMotionFilterModule>
+---@field visualizers SmartMotionRegistry<SmartMotionVisualizerModule>
+---@field actions SmartMotionRegistry<SmartMotionActionModule>
+---@field pipeline_wrappers SmartMotionRegistry<SmartMotionPipelineWrapperModule>
+---@field motions SmartMotionRegistry<SmartMotionMotionModule>
+
+---@class SmartMotionRegistryManager
+---@field registries? SmartMotionRegistryMap
+---@field init fun(self: SmartMotionRegistryManager, registry_table: SmartMotionRegistryMap)
+---@field get fun(self: SmartMotionRegistryManager): SmartMotionRegistryMap
+
+--- @class SmartMotionMotionRegistry : SmartMotionRegistry<SmartMotionMotionEntry>
+--- @field _validate_motion_entry fun(name: string, motion: SmartMotionMotionEntry): boolean
+--- @field register_motion fun(name: string, motion: SmartMotionMotionEntry): nil
+--- @field register_many_motions fun(tbl: table<string, SmartMotionMotionEntry>, opts?: { override?: boolean }): nil

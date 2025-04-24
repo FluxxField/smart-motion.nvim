@@ -5,9 +5,9 @@ local log = require("smart-motion.core.log")
 local M = {}
 
 --- Clears all SmartMotion highlights in the current buffer.
----@param ctx table  Motion context (must include bufnr).
----@param cfg table  Validated config (unused here, but part of the signature).
----@param motion_state table  Current motion state (unused here, but part of the signature).
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
 function M.clear(ctx, cfg, motion_state)
 	log.debug("Clearing all highlights in buffer " .. ctx.bufnr)
 
@@ -15,28 +15,39 @@ function M.clear(ctx, cfg, motion_state)
 end
 
 --- Applies a single-character hint label at a given position.
----@param ctx table  Motion context (must include bufnr).
----@param cfg table  Validated config.
----@param motion_state table  Current motion state.
----@param jump_target table The jump target we are highlighting.
----@param label string The single-character label.
-function M.apply_single_hint_label(ctx, cfg, motion_state, jump_target, label)
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
+---@param jump_target JumpTarget
+---@param label string
+---@param options HintOptions
+function M.apply_single_hint_label(ctx, cfg, motion_state, jump_target, label, options)
 	log.debug(string.format("Applying single hint '%s' at line %d, col %d", label, jump_target.row, jump_target.col))
 
+	local hint = cfg.highlight.hint or "SmartMotionHint"
+
+	if options.dim_first_char then
+		hint = cfg.highlight.hint_dim or "SmartMotionHintDim"
+	end
+
 	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, jump_target.row, jump_target.col, {
-		virt_text = { { label, cfg.highlight.hint or "SmartMotionHint" } },
+		virt_text = { { label, hint } },
 		virt_text_pos = "overlay",
 		hl_mode = "combine",
 	})
 end
 
+--- @class HintOptions
+--- @field dim_first_char? boolean
+--- @field dim_second_char? boolean
+
 --- Applies a double-character hint label at a given position.
----@param ctx table  Motion context (must include bufnr).
----@param cfg table  Validated config.
----@param motion_state table  Current motion state.
----@param jump_target table THe jump_target we are highlighting.
----@param label string The double-character label.
----@param options table Used to set which char is dimmed
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
+---@param jump_target JumpTarget
+---@param label string
+---@param options HintOptions
 function M.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, options)
 	options = options or {}
 
@@ -46,8 +57,14 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, o
 
 	local first_hl = options.dim_first_char and (cfg.highlight.first_char_dim or "SmartMotionFirstCharDim")
 		or (cfg.highlight.first_char or "SmartMotionFirstChar")
-	local second_hl = options.dim_first_char and (cfg.highlight.first_char or "SmartMotionFirstChar")
+	local second_hl = options.dim_second_char and (cfg.highlight.second_char_dim or "SmartMotionSecondCharDim")
 		or (cfg.highlight.second_char or "SmartMotionSecondChar")
+
+	local hint = cfg.highlight.hint or "SmartMotionHint"
+
+	if faded then
+		hint = cfg.highlight.hint_faded or "SmartMotionHintFaded"
+	end
 
 	log.debug(
 		string.format(
@@ -69,10 +86,10 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, o
 	})
 end
 
---- Dims background
----@param ctx table  Motion context (must include bufnr).
----@param cfg table  Validated config.
----@param motion_state table  Current motion state.
+--- Dims the background for the entire buffer.
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
 function M.dim_background(ctx, cfg, motion_state)
 	local total_lines = vim.api.nvim_buf_line_count(ctx.bufnr)
 
@@ -80,13 +97,15 @@ function M.dim_background(ctx, cfg, motion_state)
 	for line = 0, total_lines - 1 do
 		vim.api.nvim_buf_add_highlight(ctx.bufnr, consts.ns_id, cfg.highlight.dim or "SmartMotionDim", line, 0, -1)
 	end
+
+	vim.cmd("redraw")
 end
 
 --- Filters double-character hints to only show those matching the active prefix.
----@param ctx table  Motion context (must include bufnr).
----@param cfg table  Validated config.
----@param motion_state table  Current motion state.
----@param active_prefix string  The active prefix used for filtering.
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
+---@param active_prefix string
 function M.filter_double_hints(ctx, cfg, motion_state, active_prefix)
 	log.debug("Filtering double hints with prefix: " .. active_prefix)
 
@@ -106,6 +125,8 @@ function M.filter_double_hints(ctx, cfg, motion_state, active_prefix)
 			::continue::
 		end
 	end
+
+	vim.cmd("redraw")
 end
 
 return M

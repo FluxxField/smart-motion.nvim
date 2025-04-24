@@ -1,142 +1,182 @@
-```
-   _____                      __  __  ___      __  _                          _         
-  / ___/____ ___  ____ ______/ /_/  |/  /___  / /_(_)___  ____    ____ _   __(_)___ ___ 
-  \__ \/ __ `__ \/ __ `/ ___/ __/ /|_/ / __ \/ __/ / __ \/ __ \  / __ \ | / / / __ `__ \
- ___/ / / / / / / /_/ / /  / /_/ /  / / /_/ / /_/ / /_/ / / / / / / / / |/ / / / / / / /
-/____/_/ /_/ /_/\__,_/_/   \__/_/  /_/\____/\__/_/\____/_/ /_(_)_/ /_/|___/_/_/ /_/ /_/ 
-                                                                                        
-```
-
 # SmartMotion.nvim - Home-row powered smart motions for Neovim
 
-## 📚 What is SmartMotion?
+```
+   _____                      __  __  ___      __  _                          _
+  / ___/____ ___  ____ ______/ /_/  |/  /___  / /_(_)___  ____    ____ _   __(_)___ ___
+  \__ \/ __ `__ \/ __ `/ ___/ __/ /|_/ / __ \/ __/ / __ \/ __ \  / __ \ | / / / __ `__ \
+ ___/ / / / / / / /_/ / /  / /_/ /  / / /_/ / /_/ / /_/ / / / / / / / / |/ / / / / / / /
+/____/_/ /_/ /_/\__,_/_/   \__/_/  /_/\____/\__/_/\____/_/ /_(_)__/ /_/|___/_/_/ /_/ /_/
 
-`SmartMotion.nvim` brings **intuitive, home-row driven navigation** to Neovim. Forget counting words or characters — SmartMotion instantly highlights jump targets **with dynamic, in-place labels**, letting you move faster and more intuitively.
+```
 
-SmartMotion exists to end what I call the **War on Counting**. Why count words or characters when your editor can show you exactly where to jump? This philosophy drives not only word motions, but future plans for commands like `dt`, `ct`, and others.
+## ?? What is SmartMotion?
 
----
+`SmartMotion.nvim` is a **next-generation motion engine for Neovim**, designed to unify the fragmented ecosystem of motion plugins under one **modular, powerful, and extensible system**.
 
-## 🚀 Why SmartMotion?
+Forget juggling multiple plugins like `hop.nvim`, `leap.nvim`, `flash.nvim`, `pounce.nvim`, and `sneak.nvim` - SmartMotion is designed to **replace them all**.
 
-Other motion plugins (like Hop and EasyMotion) are great but often:
+- Want hop-style line jumps? ?
+- Want leap-style double character targeting? ?
+- Want flash-style search overlays? ?
+- Want dt/ct motions with visual jump targeting? ?
 
-- Replace core motions entirely, breaking muscle memory.
-- Make you choose between 'normal' and 'smart' motions.
-- Feel sluggish when you just want to spam `w`, `e`, or `b`.
+With SmartMotion, you build what _you_ need.
 
-SmartMotion fixes all of that with **Flow-State Chaining**.
+It includes intelligent label generation, dynamic feedback, and no default mappings - you get presets, not assumptions.
 
----
-
-## 🔗 Credits & Inspiration
-
-SmartMotion builds on the great work from:
-
-- [Hop.nvim](https://github.com/phaazon/hop.nvim) — original home-row hints.
-- [EasyMotion](https://github.com/easymotion/vim-easymotion) — fast jump pioneer.
-
----
-
-## 🔆 Features
-
-🔢 Home-row powered hints  
-🔢 Single & double character labels (adaptive)  
-🔢 Dynamic feedback highlighting  
-🔢 Multi-line support  
-🔢 Works seamlessly with `w`, `b`, `e`, `ge`  
-🔢 Smart label generation  
-🔢 No default mappings (full control)  
-🔢 Pure Lua, no dependencies  
-🔢 Flow-state chaining preserves natural spamming
+> [!WARNING]
+> SmartMotion is still evolving. Some modules and behaviors are subject to change as we refine the system. Expect breaking changes during early versions.
 
 ---
 
-# 🔥 Flow-State & Motion Chaining — SmartMotion's Superpower
+## ?? Flow State: Native Feel, Smarter Feedback
 
-SmartMotion is the first motion plugin with **true flow-state chaining**:
+SmartMotion introduces **Flow State**, a game-changing concept:
 
-- Remap `w`, `b`, `e`, `ge` to SmartMotion.
-- Get smart hints when you pause.
-- Keep native fast-repeat spamming if you hold the key.
+Flow can only be entered **during the target selection stage** of a motion.
+Here's how it works:
 
-This makes SmartMotion feel like a natural upgrade instead of a takeover.
+- On the **first motion keypress** (e.g., `w`), SmartMotion shows labels.
+- If **another key is pressed within 300ms**, even if that key is itself a valid label, SmartMotion **skips label selection** and executes the motion's action on the **first target**.
+- You are now in **flow**.
+- While in flow, subsequent SmartMotion invocations of the same type (e.g., `w`, `b`, `e`) **skip label display entirely** and act immediately on the next valid target.
+
+### Example:
+
+```
+w     show labels
+ww    jump to first target (within 300ms)
+www   jump to second target (still in flow)
+wwb   switch motion mid-flow (now use 'b' type)
+```
+
+This gives you a **native Vim feel** when moving fast, and **precision when you need it**. No other motion plugin does this - it's SmartMotion's killer feature.
+
+> [!NOTE]
+> When we say "jump" we mean "run the action on the next target". That could be a jump, delete, yank, change, etc.
 
 ---
 
-## 🗃 Installation
+## ?? Why SmartMotion?
 
-### lazy.nvim
+SmartMotion stands out because it:
+
+- ?? **Unifies the Motion Ecosystem:** Replace 5+ plugins with a single, well-designed system.
+- ?? **Smart Label Generation:** Auto-detects density and selects optimal label size (1 or 2 chars).
+- ?? **Dynamic Highlight Feedback:** Visually reacts as you interact - dims background, changes hint intensity.
+- ?? **Composable Pipelines:** Collectors, extractors, filters, visualizers, and actions can be composed and reused.
+- ?? **Flow-State Friendly:** Chain motions naturally, like native word hopping (`w`, `b`, `e`) but with label feedback.
+- ?? **Zero Default Mappings:** No keybinding conflicts. Presets are opt-in, fully overridable.
+- ?? **Register Anything:** Want `dw` with smart labels? `ciw`? `yap`? Build it with `action = merge({ jump, delete })`.
+
+---
+
+## ?? How It Works
+
+SmartMotion revolves around modular **pipelines**. Each motion consists of:
+
+- A **collector**: defines the _broad scope_ of content. For example, `lines` collects all lines in the buffer. Future collectors could include things like `multi_buffer_lines`.
+- An **extractor**: finds individual targets (e.g., words, characters, symbols) from the collected text. Current extractors include `words`, `chars`, `lines`, and `text_search`.
+- A **filter**: narrows results. Right now we offer:
+  - `default` (pass-through)
+  - `filter_visible_lines` (only show what's visible)
+
+> [!TIP]
+> In the future, direction (e.g., `AFTER_CURSOR`, `BEFORE_CURSOR`) will be implemented using filters, making them easier to customize.
+
+- A **visualizer**: how targets are displayed. Currently we offer a `hint` visualizer with dynamic dimming and label positioning.
+- An **action**: what happens when you pick a target. Jump, yank, delete, change - or merge them.
+- A **pipeline wrapper**: lets you create behaviors like `live_search` or 2-char search input. Wrappers rerun the pipeline as the user types.
+  - `default`: pass-through
+  - `live_search`: reruns pipeline on text input
+  - `text_search`: waits for input then runs
+
+### ?? Presets in Your Config
+
+Presets are fully configurable:
 
 ```lua
-{
-    "FluxxField/smart-motion.nvim",
-    config = function()
-        require("smart-motion").setup()
-    end
+return {
+  "FluxxField/smart-motion.nvim",
+  opts = {
+    presets = {
+      words = true,
+      lines = true,
+      search = true,
+      delete = true,
+      yank = true,
+      change = true,
+    },
+  },
+}
+```
+
+To disable a preset or specific mappings:
+
+```lua
+presets = {
+  words = { "w", "b" }, -- disables "w" and "b" word motions
+}
+```
+
+Or for the default config structure:
+
+```lua
+return {
+  "FluxxField/smart-motion.nvim",
+  opts = {},
+}
+```
+
+> [!NOTE]
+> This does not turn on presets or mappings. You need to manually turn them on yourself
+
+Default values:
+
+```lua
+M.defaults = {
+  keys = "fjdksleirughtynm",
+  highlight = {
+    hint = "SmartMotionHint",
+    hint_dim = "SmartMotionHintFaded",
+    first_char = "SmartMotionFirstChar",
+    first_char_dim = "SmartMotionFirstCharDim",
+    second_char = "SmartMotionSecondChar",
+    second_char_dim = "SmartMotionSecondCharDim",
+    dim = "SmartMotionDim",
+  },
+  presets = {},
 }
 ```
 
 ---
 
-## 🛠️ Configuration
+## ?? What a Basic Motion Looks Like
 
 ```lua
-require("smart-motion").setup({
-    keys = "fjdksleirughtynm",
-    highlight = {
-        dim = "SmartMotionDim",
-        hint = "SmartMotionHint",
-        first_char = "SmartMotionFirstChar",
-        second_char = "SmartMotionSecondChar",
-        first_char_dim = "SmartMotionFirstCharDim",
-    },
-    multi_line = true,
-    mappings = {
-        n = {},
-        v = {}
-    },
-})
-```
-
----
-
-## 📌 Example Mappings (Flow-State in Action)
-
-```lua
-local smart_motion = require "smart-motion"
-local DIRECTION = smart_motion.consts.DIRECTION
-local HINT_POSITION = smart_motion.consts.HINT_POSITION
-
-require("smart-motion").setup {
-    mappings = {
-        n = {
-            w = { function() smart_motion.hint_words(DIRECTION.AFTER_CURSOR, HINT_POSITION.START) end },
-            b = { function() smart_motion.hint_words(DIRECTION.BEFORE_CURSOR, HINT_POSITION.START) end },
-            e = { function() smart_motion.hint_words(DIRECTION.AFTER_CURSOR, HINT_POSITION.END) end },
-            ge = { function() smart_motion.hint_words(DIRECTION.BEFORE_CURSOR, HINT_POSITION.END) end },
-        },
-    }
+w = {
+  pipeline = {
+    collector = "lines",
+    extractor = "words",
+    visualizer = "hint_start",
+    filter = "default",
+  },
+  pipeline_wrapper = "default",
+  action = "jump",
+  state = {
+    direction = DIRECTION.AFTER_CURSOR,
+    hint_position = HINT_POSITION.START,
+  },
+  map = true,
+  modes = { "n", "v" },
+  metadata = {
+    label = "Jump to Start of Word after cursor",
+    description = "Jumps to the start of a visible word target using labels after the cursor",
+  },
 }
 ```
 
----
-
-## 🌟 Exposed Methods
-
-| Method                            | Description                      |
-| --------------------------------- | -------------------------------- |
-| `hint_words(direction, position)` | Word jump motion                 |
-
----
-
-## 🔄 Roadmap
-
-- Character motions (`f`, `t`, etc.)
-- Operator support (`d`, `c`, `y`)
-- Timeout tuning for double-char hints
-- Paragraph & block motions
-- Advanced label customization
+This shows the anatomy of a full motion declaration using SmartMotion's modular system. You can register your own motions with full control over behavior, visuals, and context.
 
 ---
 
@@ -157,3 +197,6 @@ I also build custom websites for businesses and brands using Next.js, React, Tai
 
 📧 [keenanjj13@protonmail.com](mailto:keenanjj13@protonmail.com)
 
+---
+
+For full documentation and how to create your own modules or motion presets, check out the [docs/](./docs) directory.

@@ -1,10 +1,15 @@
 local log = require("smart-motion.core.log")
 
+--- @alias HighlightDefinition string | { fg?: string, bg?: string, bold?: boolean, italic?: boolean, underline?: boolean }
+
+--- @type table<string, { fg: string, bg: string }>
 local default_highlights = {
 	SmartMotionHint = { fg = "#E06C75", bg = "none" },
+	SmartMotionHintDim = { fg = "#7F4A4A", bg = "none" },
 	SmartMotionFirstChar = { fg = "#98C379", bg = "none" },
-	SmartMotionSecondChar = { fg = "#61AFEF", bg = "none" },
 	SmartMotionFirstCharDim = { fg = "#6F8D57", bg = "none" },
+	SmartMotionSecondChar = { fg = "#61AFEF", bg = "none" },
+	SmartMotionSecondCharDim = { fg = "#3E5E76", bg = "none" },
 	SmartMotionDim = { fg = "#5C6370", bg = "none" },
 }
 
@@ -15,9 +20,8 @@ local function highlight_key_to_group(key)
 	return "SmartMotion" .. key:gsub("_(%l)", string.upper)
 end
 
---- Apply a highlight group.
----@param group string Highlight group name.
----@param opts table Highlight definition.
+---@param group string
+---@param opts { fg?: string, bg?: string, [string]: any }
 local function apply_highlight(group, opts)
 	vim.api.nvim_set_hl(0, group, opts)
 end

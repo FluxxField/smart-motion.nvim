@@ -2,6 +2,33 @@
 local log = require("smart-motion.core.log")
 local consts = require("smart-motion.consts")
 
+--- @class SmartMotionMotionState
+--- @field total_keys integer
+--- @field max_lines integer
+--- @field max_labels integer
+--- @field direction Direction
+--- @field hint_position HintPosition
+--- @field target_type TargetType
+--- @field ignore_whitespace boolean
+
+-- Target tracking
+--- @field jump_target_count integer
+--- @field jump_targets JumpTarget[]  -- Replace `any` with a concrete `JumpTarget` type later
+--- @field selected_jump_target? JumpTarget
+
+-- Hint labeling
+--- @field hint_labels string[]  -- Possibly just strings or label metadata?
+--- @field assigned_hint_labels table<string, HintEntry>
+
+-- Label logic
+--- @field single_label_count integer
+--- @field double_label_count integer
+--- @field sacrificed_keys_count integer
+
+-- Selection
+--- @field selection_mode SelectionMode
+--- @field selection_first_char? string
+
 local M = {}
 
 M.static = {}
@@ -34,12 +61,13 @@ function M.init_motion_state(cfg)
 end
 
 --- Creates a fresh motion state (per motion)
----@param direction string Motion direction ("before_cursor" or "after_cursor")
----@param hint_position string Hint position ("start" or "end")
----@param target_type string "word", "char", "line"
+---@param direction Direction
+---@param hint_position HintPosition
+---@param target_type TargetType
 ---@param ignore_whitespace boolean
----@return table motion_state
+---@return SmartMotionMotionState
 function M.create_motion_state(direction, hint_position, target_type, ignore_whitespace)
+	---@type SmartMotionMotionState
 	return {
 		total_keys = M.static.total_keys,
 		max_lines = M.static.max_lines,
@@ -70,7 +98,7 @@ function M.create_motion_state(direction, hint_position, target_type, ignore_whi
 end
 
 --- Finalizes the motion state after target collection.
----@param motion_state table The current motion state (mutable)
+---@param motion_state SmartMotionMotionState
 function M.finalize_motion_state(motion_state)
 	if motion_state.total_keys == 0 then
 		log.error("finalize_motion_state called before static state was initialized")
