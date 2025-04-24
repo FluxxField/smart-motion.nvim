@@ -134,8 +134,4 @@ function M.is_non_empty_string(s)
 	return type(s) == "string" and s:gsub("%s+", "") ~= ""
 end
 
-function M.escape_lua_pattern(str)
-	return str:gsub("([%(%)%.%%%+%-%*%?%[%^%$])", "%%%1")
-end
-
 return M

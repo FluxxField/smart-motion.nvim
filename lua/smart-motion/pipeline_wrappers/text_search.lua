@@ -52,11 +52,8 @@ function M.run(run_pipeline, ctx, cfg, motion_state, opts)
 				start_time = nil -- stop timeout tracking
 
 				-- Run the pipeline once we hit the desired char count
-				local merged_opts = vim.tbl_extend(
-					"force",
-					opts,
-					{ text = utils.escape_lua_pattern(search_text), is_search_mode = num_of_char > 1 }
-				)
+				local merged_opts =
+					vim.tbl_extend("force", opts, { text = search_text, is_search_mode = num_of_char > 1 })
 				run_pipeline(ctx, cfg, motion_state, merged_opts)
 
 				local count = motion_state.jump_target_count

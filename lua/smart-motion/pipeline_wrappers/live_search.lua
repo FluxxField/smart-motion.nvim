@@ -55,11 +55,8 @@ function M.run(run_pipeline, ctx, cfg, motion_state, opts)
 
 			if search_text ~= last_search_text and search_text ~= "" then
 				-- Run the pipeline with the current input
-				local merged_opts = vim.tbl_extend(
-					"force",
-					opts,
-					{ text = utils.escape_lua_pattern(search_text), is_search_mode = #search_text > 1 }
-				)
+				local merged_opts =
+					vim.tbl_extend("force", opts, { text = search_text, is_search_mode = #search_text > 1 })
 				run_pipeline(ctx, cfg, motion_state, merged_opts)
 
 				start_time = vim.fn.reltime()
