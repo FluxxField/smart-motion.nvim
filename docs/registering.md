@@ -38,7 +38,7 @@ require("smart-motion").register_motion("w", {
 
 
 
-⸻
+---
 
 ## ⚙️ Motion Options
 
@@ -55,22 +55,46 @@ Each motion supports the following fields:
 [!TIP]
 Want to create a motion like dw? Use merge({ jump, delete }) as the action.
 
-⸻
+---
 
-## 🧠 is_action and Smart Inference
+# 🧠 is_action and Trigger Behavior
 
-If a motion is registered with is_action = true, it can act like d, y, or c in Vim. SmartMotion will:
-	•	Infer the extractor from the next motion key (e.g., w, e, ))
-	•	Run the selected motion as a child of the action
+When registering a motion, the is_action flag controls how the dispatcher interprets the first keypress:
+	•	If is_action = false (default), the motion key is the motion itself.
+	•	If is_action = true, the key is treated as a trigger for an action, and the next key determines the motion to apply the action to.
 
-This allows you to do things like:
+This distinction is handled by the dispatcher:
+	•	A trigger motion runs a complete motion pipeline directly
+	•	A trigger action captures the next motion key, resolves it, then runs the pipeline and applies the action on top
 
-dw → delete to next word
-ciw → change inner word
+Example:
 
-Without manually registering every combination.
+-- `d` is registered as an action:
+require("smart-motion").register_motion("d", {
+  is_action = true,
+  action = "delete",
+})
 
-⸻
+Now:
+
+dw → means "delete to the next word"
+dt) → means "delete until ')'"
+
+SmartMotion will:
+	1.	Capture the w or t motion based on the next key
+	2.	Resolve its motion definition
+	3.	Run the pipeline for that motion
+	4.	Apply the action (delete) on the result
+
+[!IMPORTANT]
+When is_action is enabled, SmartMotion uses internal lookup to resolve the next motion. This enables native-like operator behavior without requiring you to register dw, de, d) manually.
+
+[!NOTE]
+Under the hood, the first key (the trigger) looks up a registered action, and the second key (the motion key) is used to look up the corresponding extractor.
+
+However, this logic assumes the second key is a valid motion key — which is not always guaranteed. The methodology may evolve to support more flexible parsing.
+
+---
 
 ## 🧵 Registering Multiple Motions
 
@@ -84,7 +108,7 @@ require("smart-motion").register_many_motions({
 
 This is used internally by the presets system.
 
-⸻
+---
 
 ## 🧙 How Presets Work
 
@@ -92,7 +116,7 @@ Presets call register_many_motions() under the hood. Each preset (like words, se
 
 See presets.md for a full breakdown of each available preset.
 
-⸻
+---
 
 For more advanced motion building, check out:
 	•	custom_motion.md
