@@ -20,7 +20,7 @@ Covers:
 
 ⸻
 
-⚙️ presets.md
+## ⚙️ presets.md
 
 A guide to the built-in presets and how to use or customize them.
 
@@ -33,7 +33,7 @@ Covers:
 
 ⸻
 
-🧱 collectors.md
+## 🧱 collectors.md
 
 Collectors define the search range for your motion targets.
 
@@ -46,7 +46,7 @@ Covers:
 
 ⸻
 
-🔎 extractors.md
+## 🔎 extractors.md
 
 Extractors determine what kind of target you’re looking for.
 
@@ -58,7 +58,7 @@ Covers:
 
 ⸻
 
-🧹 filters.md
+## 🧹 filters.md
 
 Filters narrow down the targets returned by extractors.
 
@@ -71,7 +71,7 @@ Covers:
 
 ⸻
 
-🎨 visualizers.md
+## 🎨 visualizers.md
 
 Visualizers control how targets appear in the UI.
 
@@ -84,7 +84,7 @@ Covers:
 
 ⸻
 
-🧠 actions.md
+## 🧠 actions.md
 
 Actions define what happens when a user selects a target.
 
@@ -97,7 +97,7 @@ Covers:
 
 ⸻
 
-🧪 pipeline_wrappers.md
+## 🧪 pipeline_wrappers.md
 
 Pipeline wrappers add runtime behavior like live search.
 
@@ -110,7 +110,7 @@ Covers:
 
 ⸻
 
-✨ custom_motion.md
+## ✨ custom_motion.md
 
 Step-by-step guide to building a custom motion from scratch.
 
@@ -123,7 +123,7 @@ Covers:
 
 ⸻
 
-🚀 advanced.md
+## 🚀 advanced.md
 
 Explore deeper features like flow state and motion chaining.
 
@@ -136,7 +136,7 @@ Covers:
 
 ⸻
 
-⚙️ config.md
+## ⚙️ config.md
 
 Describes the options available in setup({}).
 
@@ -148,7 +148,7 @@ Covers:
 
 ⸻
 
-🐞 debugging.md
+## 🐞 debugging.md
 
 Tips for testing and debugging your custom motions.
 
