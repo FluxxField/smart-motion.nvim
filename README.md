@@ -28,7 +28,7 @@ For deep dives into modules, flow state, action merging, or highlight customizat
 
 ---
 
-![demo gif](assets/smart-motion-showcase.mp4)
+![demo gif](assets/smart-motion-showcase.gif)
 
 ---
 
