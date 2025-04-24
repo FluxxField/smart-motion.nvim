@@ -1,4 +1,4 @@
-SmartMotion.nvim Overview
+# SmartMotion.nvim Overview
 
 Welcome to the SmartMotion documentation! This plugin is built around the idea that motions should be smart, modular, and composable — allowing you to move through your codebase like a pro with a system you can fully customize.
 
@@ -6,7 +6,7 @@ Below is a high-level summary of what each document covers and how it fits into 
 
 ⸻
 
-📦 registering.md
+## 📦 registering.md
 
 Learn how to register your own motions and presets.
 
