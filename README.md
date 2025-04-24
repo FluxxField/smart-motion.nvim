@@ -23,7 +23,60 @@ With SmartMotion, you build exactly what _you_ need - using composable modules, 
 
 For deep dives into modules, flow state, action merging, or highlight customization, see the [docs folder](./docs).
 
-> **Early Stage Warning:** This plugin is under active development. Breaking changes are expected as it matures.
+> [!WARNING] > **Early Stage Warning:** This plugin is under active development. Breaking changes are expected as it matures.
+
+---
+
+## Configuration
+
+SmartMotion comes with no default mappings -- everything is opt-in. Here's a quick-start example with presets and highlight customization:
+
+```lua
+return {
+  "FluxxField/smart-motion.nvim",
+  opts = {
+    presets = {
+      words = true,
+      search = true,
+      delete = true,
+    },
+    highlight = {
+      hint = { fg = "#FFD700", bg = "#222222" },
+      dim = "Comment",
+    },
+    keys = "fjdksleirughtynm",
+  },
+}
+```
+
+To disable certain presets:
+
+```lua
+presets = {
+  words = { "w", "b" }, -- disables "w" and "b" word motions
+}
+```
+
+Default values:
+
+```lua
+M.defaults = {
+  keys = "fjdksleirughtynm",
+  highlight = {
+    hint = "SmartMotionHint",
+    hint_dim = "SmartMotionHintFaded",
+    first_char = "SmartMotionFirstChar",
+    first_char_dim = "SmartMotionFirstCharDim",
+    second_char = "SmartMotionSecondChar",
+    second_char_dim = "SmartMotionSecondCharDim",
+    dim = "SmartMotionDim",
+  },
+  presets = {},
+}
+```
+
+> [!NOTE]
+> 📖 For a complete list of presets and highlight keys, see [presets.md](/docs/presets.md) and [advanced.md](/docs/advanced.md)
 
 ---
 
@@ -35,6 +88,7 @@ Press `w`, see labels  press `w` again quickly  jump immediately. You're in fl
 
 Pressing another motion like `b` during flow seamlessly switches motion types.
 
+> [!NOTE]
 > 📖 Learn more in the [advanced usage guide](./docs/advanced.md#-flow-state-behavior)
 
 ---
@@ -54,6 +108,7 @@ highlight = {
 
 Supports both string references and highlight tables.
 
+> [!NOTE]
 > 📖 See full customization options in [advanced.md → Highlight Customization](./docs/advanced.md#-highlight-customization)
 
 ---
@@ -71,6 +126,7 @@ Each motion is built from pluggable pieces:
 
 You can even inject targets manually or build entire pipelines from scratch.
 
+> [!NOTE]
 > 📖 Read about custom wrappers, module contribution, and action merging in [advanced.md](./docs/advanced.md)
 
 ---
@@ -87,6 +143,7 @@ presets = {
 }
 ```
 
+> [!NOTE]
 > 📖 See all available presets and options in [presets.md](./docs/presets.md)
 
 ---
@@ -125,6 +182,7 @@ Licensed under [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html).
 Built by [FluxxField](https://github.com/FluxxField)
 Business inquiries: [keenanjj13@protonmail.com](mailto:keenanjj13@protonmail.com)
 
+> [!IMPORTANT]
 > ✨ Also builds premium websites: [SLP Custom Built](https://www.slpcustombuilt.com), [Cornerstone Homes](https://www.cornerstonehomesok.com)
 
 ---
