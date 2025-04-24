@@ -10,6 +10,7 @@ function M.run(ctx, cfg, motion_state)
 
 	-- Delete to the end of the line
 	if target.end_pos.col == #line then
+		-- NOTE: Does not copy like normal
 		vim.cmd("normal! D")
 	else
 		vim.api.nvim_buf_set_mark(target.bufnr, ">", target.end_pos.row + 1, target.end_pos.col, {})

@@ -201,6 +201,10 @@ function M.trigger_action(trigger_key)
 		end
 	end
 
+	-- NOTE: The action, like delete, is not using the delete_jump. So, if we aren't under_cursor_target
+	-- Change the action to the jump version
+	action = registries.actions.get_by_name(action.name .. "_jump")
+
 	-- Check if wrapper needs fallback
 	local pipeline_wrapper = registries.pipeline_wrappers.get_by_name(motion.pipeline_wrapper or "default")
 	if not pipeline_wrapper or not pipeline_wrapper.run then
