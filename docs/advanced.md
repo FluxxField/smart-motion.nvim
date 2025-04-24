@@ -64,6 +64,49 @@ This is useful for:
 
 ---
 
+## Highlight Customization
+
+SmartMotion allows full control over highlight groups. You can change foreground colors, add backgrounds, or even point to existing highlight groups in your colorscheme.
+
+### Available Groups
+
+| Key               | Default Group            | Description                          |
+| ----------------- | ------------------------ | ------------------------------------ |
+| `hint`            | SmartMotionHint          | Standard hint label                  |
+| `hint_dim`        | SmartMotionHintDim       | Dimmed hint label                    |
+| `first_char`      | SmartMotionFirstChar     | Brighter first label character       |
+| `first_char_dim`  | SmartMotionFirstCharDim  | Dimmed first label character         |
+| `second_char`     | SmartMotionSecondChar    | Brighter second label character      |
+| `second_char_dim` | SmartMotionSecondCharDim | Dimmed second label character        |
+| `dim`             | SmartMotionDim           | Background dim when not in selection |
+
+### Setting Custom Highlights
+
+You can pass a `highlight` table in your config:
+
+```lua
+require("smart-motion").setup({
+  highlight = {
+    hint = { fg = "#FFD700", bg = "#222222", bold = true },
+    first_char = "Type", -- use an existing highlight group
+    dim = "Comment",
+  },
+})
+```
+
+SmartMotion supports both:
+
+- **Tables** with `fg`, `bg`, `bold`, `italic`, `underline`.
+- **Strings** referring to existing highlight groups.
+
+If a string group is invalid, it will fall back to the default.
+
+### Reacts to ColorScheme
+
+If your colorscheme changes, SmartMotion will reapply your highlights automatically to ensure consistency.
+
+---
+
 ## 🧪 Custom Wrapper Flows
 
 Want a 3-character search? Want to ask the user twice? Want a modal search interface?
