@@ -14,7 +14,7 @@ function presets.words(exclude)
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
-			action = "jump",
+			action = "jump_centered",
 			state = {
 				hint_position = HINT_POSITION.START,
 			},
@@ -33,7 +33,7 @@ function presets.words(exclude)
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
-			action = "jump",
+			action = "jump_centered",
 			state = {
 				hint_position = HINT_POSITION.START,
 			},
@@ -52,7 +52,7 @@ function presets.words(exclude)
 				visualizer = "hint_end",
 			},
 			pipeline_wrapper = "default",
-			action = "jump",
+			action = "jump_centered",
 			state = {
 				hint_position = HINT_POSITION.END,
 			},
@@ -71,7 +71,7 @@ function presets.words(exclude)
 				visualizer = "hint_end",
 			},
 			pipeline_wrapper = "default",
-			action = "jump",
+			action = "jump_centered",
 			state = {
 				hint_position = HINT_POSITION.END,
 			},
@@ -140,7 +140,7 @@ function presets.search(exclude)
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "live_search",
-			action = "jump",
+			action = "jump_centered",
 			state = {
 				hint_position = HINT_POSITION.START,
 			},
@@ -159,7 +159,7 @@ function presets.search(exclude)
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "live_search",
-			action = "jump",
+			action = "jump_centered",
 			state = {
 				hint_position = HINT_POSITION.START,
 			},
@@ -178,7 +178,7 @@ function presets.search(exclude)
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "text_search",
-			action = "jump",
+			action = "jump_centered",
 			state = {
 				hint_position = HINT_POSITION.START,
 			},
@@ -200,7 +200,7 @@ function presets.search(exclude)
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "text_search",
-			action = "jump",
+			action = "jump_centered",
 			state = {
 				hint_position = HINT_POSITION.START,
 			},
@@ -224,7 +224,7 @@ function presets.delete(exclude)
 			is_action = true,
 			pipeline = {
 				collector = "lines",
-				filter = "default",
+				filter = "filter_visible",
 				visualizer = "hint_start",
 			},
 			map = true,
@@ -329,7 +329,7 @@ function presets.yank(exclude)
 			is_action = true,
 			pipeline = {
 				collector = "lines",
-				filter = "default",
+				filter = "filter_visible",
 				visualizer = "hint_start",
 			},
 			state = {
@@ -434,7 +434,7 @@ function presets.change(exclude)
 			is_action = true,
 			pipeline = {
 				collector = "lines",
-				filter = "default",
+				filter = "filter_visible",
 				visualizer = "hint_start",
 			},
 			state = {
@@ -494,16 +494,6 @@ function presets.change(exclude)
 	}, exclude)
 end
 
-local presets = {
-	words = {
-		"w" = {
-			map = false,
-		},
-		"b" = false,
-	},
-	delete = false,
-}
-
 --- Internal registration logic with optional filtering.
 --- @param motions_list table<string, SmartMotionModule>
 --- @param exclude? string[]
@@ -527,7 +517,7 @@ function presets._register(motions_list, user_overrides)
 		end
 
 		-- Merge override into motion config if table provider
-		if type(override) == 'table' then
+		if type(override) == "table" then
 			final_motions[key] = vim.tbl_deep_extend("force", motion, override)
 		else
 			-- No override, use default motion
