@@ -20,15 +20,15 @@ end
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
----@param jump_target JumpTarget
+---@param target Target
 ---@param label string
 ---@param options HintOptions
-function M.apply_single_hint_label(ctx, cfg, motion_state, jump_target, label, options)
-	local row = jump_target.start_pos.row
-	local col = jump_target.start_pos.col
+function M.apply_single_hint_label(ctx, cfg, motion_state, target, label, options)
+	local row = target.start_pos.row
+	local col = target.start_pos.col
 
 	if motion_state.hint_position == HINT_POSITION.END then
-		col = jump_target.end_pos.col - 1
+		col = target.end_pos.col - 1
 	end
 
 	log.debug(string.format("Applying single hint '%s' at line %d, col %d", label, row, col))
@@ -54,26 +54,21 @@ end
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
----@param jump_target JumpTarget
+---@param target Target
 ---@param label string
 ---@param options HintOptions
-function M.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, options)
+function M.apply_double_hint_label(ctx, cfg, motion_state, target, label, options)
 	options = options or {}
 
-	local row = jump_target.start_pos.row
-	local col = jump_target.start_pos.col
+	local row = target.start_pos.row
+	local col = target.start_pos.col
 
 	if motion_state.hint_position == HINT_POSITION.END then
-		col = jump_target.end_pos - 1
+		col = target.end_pos.col - 1
 	end
 
 	log.debug(
-		string.format(
-			"Extmark for '%s' at row: %d col: %d",
-			label,
-			jump_target.start_pos.row - 1,
-			jump_target.start_pos.col
-		)
+		string.format("Extmark for '%s' at row: %d col: %d", label, target.start_pos.row - 1, target.start_pos.col)
 	)
 
 	local first_char, second_char = label:sub(1, 1), label:sub(2, 2)
@@ -129,13 +124,13 @@ function M.filter_double_hints(ctx, cfg, motion_state, active_prefix)
 
 	for label, entry in pairs(motion_state.assigned_hint_labels) do
 		if #label == 2 and label:sub(1, 1) == active_prefix then
-			local jump_target = entry.jump_target
-			if not jump_target then
+			local target = entry.target
+			if not target then
 				log.error("filter_double_hints: Missing target for label " .. label)
 				goto continue
 			end
 
-			M.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, { dim_first_char = true })
+			M.apply_double_hint_label(ctx, cfg, motion_state, target, label, { dim_first_char = true })
 
 			::continue::
 		end

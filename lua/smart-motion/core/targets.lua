@@ -2,10 +2,11 @@ local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 
 local TARGET_TYPES = consts.TARGET_TYPES
+local DIRECTION = consts.DIRECTION
 
 local M = {}
 
---- @class JumpTarget
+--- @class Target
 --- @field bufnr integer
 --- @field winid integer
 --- @field row integer
@@ -14,25 +15,26 @@ local M = {}
 --- @field start_pos { row: integer, col: integer }
 --- @field end_pos { row: integer, col: integer }
 --- @field type string
+--- @field filetype string
 --- @field metadata? table
 
---- Formats a jump target to ensure consistent structure.
+--- Formats a target to ensure consistent structure.
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
 ---@param raw_data table
----@return JumpTarget
-function M.format_jump_target(ctx, cfg, motion_state, raw_data)
+---@return Target
+function M.format_target(ctx, cfg, motion_state, raw_data)
 	return {
-		bufnr = ctx.bufnr,
-		winid = ctx.winid,
-		row = raw_data.row,
-		col = raw_data.col,
 		text = raw_data.text,
 		start_pos = raw_data.start_pos,
 		end_pos = raw_data.end_pos,
 		type = raw_data.type or "unknown",
-		metadata = raw_data.metadata or {},
+		metadata = vim.tbl_deep_extend("force", raw_data.metadata or {}, {
+			bufnr = ctx.bufnr,
+			windid = ctx.winid,
+			filetype = vim.bo[ctx.bufnr].filetype,
+		}),
 	}
 end
 
@@ -41,22 +43,22 @@ end
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
 ---@param extractor thread
----@return JumpTarget[] jump_targets
----@return JumpTarget? first_jump_target
-function M.get_jump_targets(ctx, cfg, motion_state, extractor)
-	local jump_targets = {}
-	local first_jump_target = nil
+function M.get_targets(ctx, cfg, motion_state, filter_gen)
+	local targets = {}
+	local first_target = nil
 
-	-- Ensure extractor is a coroutine
-	if type(extractor) ~= "thread" then
-		error("Extractor must be a coroutine")
+	if type(filter_gen) ~= "thread" then
+		error("Then filter generator must be a coroutine")
 	end
 
 	while true do
-		local ok, data_or_error = coroutine.resume(extractor, ctx, cfg, motion_state)
+		local ok, data_or_error = coroutine.resume(filter_gen, ctx, cfg, motion_state)
 
 		if not ok then
-			log.error("Coroutine error: " .. tostring(data_or_error))
+			if type(data_or_error) == "string" then
+				log.error("Coroutine Error: " .. tostring(data_or_error))
+			end
+
 			break
 		end
 
@@ -64,25 +66,29 @@ function M.get_jump_targets(ctx, cfg, motion_state, extractor)
 			break
 		end
 
-		local formatted_jump_target = M.format_jump_target(ctx, cfg, motion_state, data_or_error)
+		local formatted_target = M.format_target(ctx, cfg, motion_state, data_or_error)
 
-		table.insert(jump_targets, formatted_jump_target)
+		table.insert(targets, formatted_target)
 
 		-- Capture the first valid target
-		if not first_jump_target then
-			first_jump_target = formatted_jump_target
+		if not first_target then
+			first_target = formatted_target
 		end
 	end
 
-	motion_state.jump_targets = jump_targets
-	motion_state.selected_jump_target = first_jump_target
+	if motion_state.direction == DIRECTION.BEFORE_CURSOR then
+		targets = vim.fn.reverse(targets)
+	end
+
+	motion_state.jump_targets = targets
+	motion_state.selected_jump_target = first_target
 end
 
 --- Gets a synthetic jump target directly under the cursor.
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
----@return JumpTarget|nil
+---@return Target|nil
 function M.get_target_under_cursor(ctx, cfg, motion_state)
 	local bufnr = ctx.bufnr
 	local cursor_line, cursor_col = ctx.cursor_line, ctx.cursor_col
@@ -93,9 +99,7 @@ function M.get_target_under_cursor(ctx, cfg, motion_state)
 	end
 
 	if motion_state.target_type == TARGET_TYPES.LINES then
-		return M.format_jump_target(ctx, cfg, motion_state, {
-			row = cursor_line,
-			col = 0,
+		return M.format_target(ctx, cfg, motion_state, {
 			start_pos = { row = cursor_line, col = 0 },
 			end_pos = { row = cursor_line, col = #line_content },
 			text = line_content,
@@ -113,9 +117,7 @@ function M.get_target_under_cursor(ctx, cfg, motion_state)
 			end
 
 			if cursor_col >= match_start and cursor_col < match_end then
-				return M.format_jump_target(ctx, cfg, motion_state, {
-					row = cursor_line,
-					col = match_start,
+				return M.format_target(ctx, cfg, motion_state, {
 					start_pos = { row = cursor_line, col = match_start },
 					end_pos = { row = cursor_line, col = match_end },
 					text = matched_text,

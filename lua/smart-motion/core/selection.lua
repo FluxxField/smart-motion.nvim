@@ -38,7 +38,7 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 		if entry then
 			if #char == 1 and entry.is_single_prefix then
 				log.debug("User selected single-char hint: " .. char)
-				motion_state.selected_jump_target = entry.jump_target
+				motion_state.selected_jump_target = entry.target
 				return
 			end
 
@@ -68,7 +68,7 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 
 		if entry then
 			log.debug("User completed double-char selection: " .. full_hint)
-			motion_state.selected_jump_target = entry.jump_target
+			motion_state.selected_jump_target = entry.target
 			return
 		end
 

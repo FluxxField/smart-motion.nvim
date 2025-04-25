@@ -59,10 +59,10 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 
 	local entry = motion_state.assigned_hint_labels[char]
 
-	if entry and entry.jump_target then
-		log.debug("User selected hint: " .. vim.inspect(entry.jump_target))
+	if entry and entry.target then
+		log.debug("User selected hint: " .. vim.inspect(entry.target))
 
-		return entry.jump_target
+		return entry.target
 	else
 		log.debug("No matching hint found for input: " .. char)
 
