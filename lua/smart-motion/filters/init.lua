@@ -21,8 +21,8 @@ local filter_entries = {
 	},
 	filter_lines_after_cursor = {
 		run = merge({
-			require("smart-motion.filters.filter_visible_lines").run,
-			require("smart-motion.filters.filter_lines_after_cursor").run,
+			require("smart-motion.filters.filter_visible_lines"),
+			require("smart-motion.filters.filter_lines_after_cursor"),
 		}),
 		metadata = {
 			label = "Lines After Cursor",
@@ -31,8 +31,8 @@ local filter_entries = {
 	},
 	filter_lines_before_cursor = {
 		run = merge({
-			require("smart-motion.filters.filter_visible_lines").run,
-			require("smart-motion.filters.filter_lines_before_cursor").run,
+			require("smart-motion.filters.filter_visible_lines"),
+			require("smart-motion.filters.filter_lines_before_cursor"),
 		}),
 		metadata = {
 			label = "Lines Before Cursor",
@@ -41,8 +41,8 @@ local filter_entries = {
 	},
 	filter_words_after_cursor = {
 		run = merge({
-			require("smart-motion.filters.filter_visible_lines").run,
-			require("smart-motion.filters.filter_words_after_cursor").run,
+			require("smart-motion.filters.filter_visible_lines"),
+			require("smart-motion.filters.filter_words_after_cursor"),
 		}),
 		metadata = {
 			label = "Words After Cursor",
@@ -51,8 +51,8 @@ local filter_entries = {
 	},
 	filter_words_before_cursor = {
 		run = merge({
-			require("smart-motion.filters.filter_visible_lines").run,
-			require("smart-motion.filters.filter_words_before_cursor").run,
+			require("smart-motion.filters.filter_visible_lines"),
+			require("smart-motion.filters.filter_words_before_cursor"),
 		}),
 		metadata = {
 			label = "Words Before Cursor",

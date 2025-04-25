@@ -1,7 +1,7 @@
 local M = {}
 
---- @param ... fun(ctx: SmartMotionContext, targets: SmartMotionTarget[]): SmartMotionTarget[]
---- @return fun(ctx: SmartMotionContext, targets: SmartMotionTarget[]): SmartMotionTarget[]
+--- @param actions SmartMotionActionModuleEntry[]
+--- @return SmartMotionActionModuleEntry
 function M.merge(filters)
 	return function(ctx, cfg, motion_state, opts)
 		for _, filter in ipairs(filters) do
