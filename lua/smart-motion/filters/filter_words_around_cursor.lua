@@ -15,19 +15,21 @@ function M.run(input_gen)
 			end
 
 			if target.start_pos.row ~= cursor_row then
-				if target.start_pos.row > cursor_row then
-					coroutine.yield(target)
-				end
+				-- Different row? Always keep it
+				coroutine.yield(target)
 			else
-				if hint_position == HINT_POSITION.START then
-					if target.start_pos.col >= cursor_col then
+				if hint_position == HINT_POSITION.END then
+					-- Keep if cursor is NOT exactly on the target's end
+					if cursor_col ~= target.end_pos.col - 1 then
 						coroutine.yield(target)
 					end
-				elseif hint_position == HINT_POSITION.END then
-					if cursor_col < target.end_pos.col - 1 then
+				elseif hint_position == HINT_POSITION.START then
+					-- Keep if cursor is NOT exactly on the target's start
+					if cursor_col ~= target.start_pos.col then
 						coroutine.yield(target)
 					end
 				else
+					-- No hint_position set? Keep by default
 					coroutine.yield(target)
 				end
 			end
