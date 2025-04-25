@@ -3,14 +3,20 @@ local HINT_POSITION = require("smart-motion.consts").HINT_POSITION
 ---@type SmartMotionFilterModuleEntry
 local M = {}
 
-function M.run(input_gen)
+function M.run(extractor_gen)
 	return coroutine.create(function(ctx, cfg, motion_state)
 		local hint_position = motion_state.hint_position
 		local cursor_row, cursor_col = ctx.cursor_line, ctx.cursor_col
 
 		while true do
-			local ok, target = coroutine.resume(input_gen, ctx, cfg, motion_state)
-			if not ok or not target then
+			local ok, target = coroutine.resume(extractor_gen, ctx, cfg, motion_state)
+
+			if not ok then
+				log.error("Extractor Coroutine Error: " .. tostring(target))
+				break
+			end
+
+			if target == nil then
 				break
 			end
 
@@ -20,14 +26,15 @@ function M.run(input_gen)
 				end
 			else
 				if hint_position == HINT_POSITION.START then
-					if target.start_pos.col >= cursor_col then
+					if target.start_pos.col > cursor_col then
 						coroutine.yield(target)
 					end
 				elseif hint_position == HINT_POSITION.END then
-					if cursor_col < target.end_pos.col - 1 then
+					if target.end_pos.col > cursor_col then
 						coroutine.yield(target)
 					end
 				else
+					-- Fallback case: always yield
 					coroutine.yield(target)
 				end
 			end

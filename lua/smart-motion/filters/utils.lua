@@ -10,7 +10,13 @@ function M.merge(filters)
 		return coroutine.create(function(ctx, cfg, motion_state)
 			while true do
 				local ok, target = coroutine.resume(input_gen, ctx, cfg, motion_state)
-				if not ok or not target then
+
+				if not ok then
+					log.error("Filter Merge input_gen Error: " .. tostring(target))
+					break
+				end
+
+				if not target then
 					break
 				end
 

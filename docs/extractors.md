@@ -76,8 +76,16 @@ local M = {}
 function M.run(collector, opts)
   return coroutine.create(function(ctx, cfg, motion_state)
     while true do
-      local ok, line_data = coroutine.resume(collector, ctx, cfg, motion_state)
-      if not ok or not line_data then break end
+      local ok, data_or_error = coroutine.resume(collector, ctx, cfg, motion_state)
+
+      if not ok then
+        log.error("Collector Coroutine Error: " .. tostring(data_or_error))
+        break
+      end
+
+      if data_or_error == nil then
+        break
+      end
 
       local row = line_data.line_number
       local line = line_data.text

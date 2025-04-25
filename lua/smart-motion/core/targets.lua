@@ -45,7 +45,6 @@ end
 ---@param extractor thread
 function M.get_targets(ctx, cfg, motion_state, filter_gen)
 	local targets = {}
-	local first_target = nil
 
 	if type(filter_gen) ~= "thread" then
 		error("Then filter generator must be a coroutine")
@@ -55,10 +54,7 @@ function M.get_targets(ctx, cfg, motion_state, filter_gen)
 		local ok, data_or_error = coroutine.resume(filter_gen, ctx, cfg, motion_state)
 
 		if not ok then
-			if type(data_or_error) == "string" then
-				log.error("Coroutine Error: " .. tostring(data_or_error))
-			end
-
+			log.error("Filter Coroutine Error: " .. tostring(data_or_error))
 			break
 		end
 
@@ -66,14 +62,7 @@ function M.get_targets(ctx, cfg, motion_state, filter_gen)
 			break
 		end
 
-		local formatted_target = M.format_target(ctx, cfg, motion_state, data_or_error)
-
-		table.insert(targets, formatted_target)
-
-		-- Capture the first valid target
-		if not first_target then
-			first_target = formatted_target
-		end
+		table.insert(targets, M.format_target(ctx, cfg, motion_state, data_or_error))
 	end
 
 	if motion_state.direction == DIRECTION.BEFORE_CURSOR then
@@ -81,7 +70,7 @@ function M.get_targets(ctx, cfg, motion_state, filter_gen)
 	end
 
 	motion_state.jump_targets = targets
-	motion_state.selected_jump_target = first_target
+	motion_state.selected_jump_target = targets[1]
 end
 
 --- Gets a synthetic jump target directly under the cursor.

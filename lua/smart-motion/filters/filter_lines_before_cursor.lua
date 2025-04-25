@@ -7,7 +7,13 @@ function M.run(input_gen)
 
 		while true do
 			local ok, target = coroutine.resume(input_gen, ctx, cfg, motion_state)
-			if not ok or not target then
+
+			if not ok then
+				log.error("Extractor Coroutine Error: " .. tostring(target))
+				break
+			end
+
+			if target == nil then
 				break
 			end
 

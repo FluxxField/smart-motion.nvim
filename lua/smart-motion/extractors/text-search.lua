@@ -17,12 +17,17 @@ function M.run(collector, opts)
 		end
 
 		while true do
-			local ok, line_data = coroutine.resume(collector, ctx, cfg, motion_state)
-			if not ok or not line_data then
+			local ok, data_or_error = coroutine.resume(collector, ctx, cfg, motion_state)
+			if not ok then
+				log.error("Collector Coroutine Error: " .. tostring(data_or_error))
 				break
 			end
 
-			local line_text, line_number = line_data.text, line_data.line_number
+			if not data_or_error then
+				break
+			end
+
+			local line_text, line_number = data_or_error.text, data_or_error.line_number
 			local search_start_col = 0
 
 			while true do
@@ -35,14 +40,14 @@ function M.run(collector, opts)
 				end
 
 				---@type SmartMotionTarget
-				local target = {
-					text = match.text,
-					start_pos = { row = line_number, col = match.start_pos },
-					end_pos = { row = line_number, col = match.end_pos },
-					type = consts.TARGET_TYPES.SEARCH,
-				}
+				local target = {}
 
-				coroutine.yield(target)
+				coroutine.yield({
+					text = match_text,
+					start_pos = { row = line_number, col = start_pos },
+					end_pos = { row = line_number, col = end_pos },
+					type = consts.TARGET_TYPES.SEARCH,
+				})
 
 				search_start_col = end_pos + 1
 			end

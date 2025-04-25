@@ -1,14 +1,20 @@
 ---@type SmartMotionFilterModuleEntry
 local M = {}
 
-function M.run(input_gen)
+function M.run(extractor_gen)
 	return coroutine.create(function(ctx, cfg, motion_state)
 		local top_line = vim.fn.line("w0", ctx.winid) - 1
 		local bottom_line = vim.fn.line("w$", ctx.winid) - 1
 
 		while true do
-			local ok, target = coroutine.resume(input_gen, ctx, cfg, motion_state)
-			if not ok or not target then
+			local ok, target = coroutine.resume(extractor_gen, ctx, cfg, motion_state)
+
+			if not ok then
+				log.error("Extractor Coroutine Error: " .. tostring(target))
+				break
+			end
+
+			if target == nil then
 				break
 			end
 

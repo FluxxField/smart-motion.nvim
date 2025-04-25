@@ -16,13 +16,18 @@ local M = {}
 function M.run(collector, opts)
 	return coroutine.create(function(ctx, cfg, motion_state)
 		while true do
-			local ok, line_data = coroutine.resume(collector, ctx, cfg, motion_state)
+			local ok, data_or_error = coroutine.resume(collector, ctx, cfg, motion_state)
 
-			if not ok or not line_data then
+			if not ok then
+				log.error("Collector Coroutine Error: " .. tostring(data_or_error))
 				break
 			end
 
-			local line_text, line_number = line_data.text, line_data.line_number
+			if not data_or_error then
+				break
+			end
+
+			local line_text, line_number = data_or_error.text, data_or_error.line_number
 			local search_start = 0
 
 			while true do
