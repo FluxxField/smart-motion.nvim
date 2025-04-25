@@ -1,4 +1,4 @@
-local until_action = require("smart-motion.actions.until")
+local merge = require("smart-motion.actions.utils").merge
 
 ---@type SmartMotionRegistry<SmartMotionActionModuleEntry>
 local actions = require("smart-motion.core.registry")("actions")
