@@ -66,7 +66,7 @@ end
 ---@param target_type TargetType
 ---@param ignore_whitespace boolean
 ---@return SmartMotionMotionState
-function M.create_motion_state(direction, hint_position, target_type, ignore_whitespace)
+function M.create_motion_state(target_type)
 	---@type SmartMotionMotionState
 	return {
 		total_keys = M.static.total_keys,
@@ -74,10 +74,7 @@ function M.create_motion_state(direction, hint_position, target_type, ignore_whi
 		max_labels = M.static.max_labels,
 
 		-- Motion Intent
-		direction = direction,
-		hint_position = hint_position,
 		target_type = target_type,
-		ignore_whitespace = ignore_whitespace,
 
 		-- Motion-specific data (starts empty)
 		jump_target_count = 0,

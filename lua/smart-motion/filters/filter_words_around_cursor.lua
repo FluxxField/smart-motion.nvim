@@ -1,3 +1,4 @@
+local log = require("smart-motion.core.log")
 local HINT_POSITION = require("smart-motion.consts").HINT_POSITION
 
 ---@type SmartMotionFilterModuleEntry

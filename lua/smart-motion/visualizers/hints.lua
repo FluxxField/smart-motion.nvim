@@ -65,8 +65,7 @@ end
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
----@param opts table data passed around through the pipeline
-function M.run(ctx, cfg, motion_state, opts)
+function M.run(ctx, cfg, motion_state)
 	local targets = motion_state.jump_targets or {}
 	local targets_count = motion_state.jump_target_count
 
@@ -86,7 +85,7 @@ function M.run(ctx, cfg, motion_state, opts)
 	highlight.clear(ctx, cfg, motion_state)
 	highlight.dim_background(ctx, cfg, motion_state)
 
-	local is_search_mode = opts.is_search_mode == true
+	local is_search_mode = motion_state.is_search_mode == true
 
 	for index, target in ipairs(targets) do
 		local label = label_pool[index]

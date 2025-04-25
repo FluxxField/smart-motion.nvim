@@ -11,9 +11,8 @@ local M = {}
 
 --- Extracts words from the given line collector coroutine.
 --- @param collector thread
---- @param opts table Additional options passed along the pipeline
 --- @return thread Coroutine yielding SmartMotionTarget
-function M.run(collector, opts)
+function M.run(collector)
 	return coroutine.create(function(ctx, cfg, motion_state)
 		while true do
 			local ok, data_or_error = coroutine.resume(collector, ctx, cfg, motion_state)

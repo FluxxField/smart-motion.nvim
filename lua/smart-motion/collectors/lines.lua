@@ -9,9 +9,8 @@ local log = require("smart-motion.core.log")
 local M = {}
 
 --- Collects lines from buffer based on motion direction.
---- @param opts table Passed down the pipeline (can be empty or contain custom data)
 --- @return thread A coroutine generator yielding SmartMotionLineData objects
-function M.run(opts)
+function M.run()
 	return coroutine.create(function(ctx, cfg, motion_state)
 		if not vim.api.nvim_buf_is_valid(ctx.bufnr) then
 			log.error("lines_collector received an invalid buffer: " .. tostring(ctx.bufnr))

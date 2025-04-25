@@ -5,9 +5,8 @@ local M = {}
 
 --- Extracts valid line jump targets from the given lines collector.
 --- @param collector thread
---- @param opts table Arbitrary options passed through the pipeline
 --- @return thread Coroutine yielding SmartMotionTarget
-function M.run(collector, opts)
+function M.run(collector)
 	return coroutine.create(function(ctx, cfg, motion_state)
 		while true do
 			local ok, data_or_error = coroutine.resume(collector, ctx, cfg, motion_state)

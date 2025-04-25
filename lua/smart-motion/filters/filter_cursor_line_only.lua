@@ -3,6 +3,9 @@ local log = require("smart-motion.core.log")
 ---@type SmartMotionFilterModuleEntry
 local M = {}
 
+--- Cursor Line Only Filter
+-- Keeps only targets that are on the same line as the cursor.
+-- @type SmartMotionFilterModuleEntry
 function M.run(extractor_gen)
 	return coroutine.create(function(ctx, cfg, motion_state)
 		local cursor_row = ctx.cursor_line
@@ -19,10 +22,9 @@ function M.run(extractor_gen)
 				break
 			end
 
-			if target.start_pos.row ~= cursor_row then
+			if target.start_pos.row == cursor_row then
 				coroutine.yield(target)
 			end
-			-- else: skip it (same line as cursor)
 		end
 	end)
 end

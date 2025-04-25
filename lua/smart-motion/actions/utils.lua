@@ -4,9 +4,9 @@ local M = {}
 --- @param actions SmartMotionActionModuleEntry[]
 --- @return SmartMotionActionModuleEntry
 function M.merge(actions)
-	return function(ctx, cfg, motion_state, opts)
+	return function(ctx, cfg, motion_state)
 		for _, action in ipairs(actions) do
-			action.run(ctx, cfg, motion_state, opts)
+			action.run(ctx, cfg, motion_state)
 		end
 	end
 end

@@ -1,3 +1,4 @@
+local log = require("smart-motion.core.log")
 local DIRECTION = require("smart-motion.consts").DIRECTION
 
 ---@type SmartMotionFilterModuleEntry

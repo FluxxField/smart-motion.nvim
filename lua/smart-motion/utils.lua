@@ -71,27 +71,10 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 end
 
 --- Prepares the motion by gathering context, config, and initializing state.
----@param direction Direction
----@param hint_position HintPosition
 ---@param target_type TargetType
----@param ignore_whitespace boolean
 ---@return SmartMotionContext?, SmartMotionConfig?, SmartMotionMotionState?
-function M.prepare_motion(direction, hint_position, target_type, ignore_whitespace)
+function M.prepare_motion(target_type)
 	local ctx = context.get()
-
-	local direction_values = vim.tbl_values(consts.DIRECTION)
-	if not vim.tbl_contains(direction_values, direction) then
-		log.error("prepare_motion: Invalid direction provided: " .. tostring(direction))
-
-		return nil, nil, nil
-	end
-
-	local hint_position_values = vim.tbl_values(consts.HINT_POSITION)
-	if not vim.tbl_contains(hint_position_values, hint_position) then
-		log.error("prepare_motion: Invalid hint_position provided: " .. tostring(hint_position))
-
-		return nil, nil, nil
-	end
 
 	local cfg = config.validated
 
@@ -107,7 +90,7 @@ function M.prepare_motion(direction, hint_position, target_type, ignore_whitespa
 		return nil, nil, nil
 	end
 
-	local motion_state = state.create_motion_state(direction, hint_position, target_type, ignore_whitespace)
+	local motion_state = state.create_motion_state(target_type)
 
 	return ctx, cfg, motion_state
 end

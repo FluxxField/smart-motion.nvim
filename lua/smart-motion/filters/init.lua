@@ -21,6 +21,13 @@ local filter_entries = {
 			description = "Filters to targets visible in the current window.",
 		},
 	},
+	filter_cursor_line_only = {
+		run = require("smart-motion.filters.filter_cursor_line_only").run,
+		metadata = {
+			label = "Cursor Line Only",
+			description = "Filters targets to the ones only on the cursor line",
+		},
+	},
 	filter_lines_after_cursor = {
 		run = merge({
 			require("smart-motion.filters.filter_visible_lines"),
@@ -109,6 +116,30 @@ local filter_entries = {
 			motion_state = {
 				direction = DIRECTION.BOTH,
 			},
+		},
+	},
+	filter_words_on_cursor_line_after_cursor = {
+		run = merge({
+			require("smart-motion.filters.filter_cursor_line_only"),
+			require("smart-motion.filters.filter_words_after_cursor"),
+		}),
+		metadata = {
+			label = "Filter Words On Cursor Line After Cursor",
+			description = "Keeps word targets only on the cursor line after the cursor position.",
+			merged = true,
+			module_names = { "filter_words", "cursor_line_only", "after_cursor" },
+		},
+	},
+	filter_words_on_cursor_line_before_cursor = {
+		run = merge({
+			require("smart-motion.filters.filter_cursor_line_only"),
+			require("smart-motion.filters.filter_words_before_cursor"),
+		}),
+		metadata = {
+			label = "Filter Words On Cursor Line Before Cursor",
+			description = "Keeps word targets only on the cursor line before the cursor position.",
+			merged = true,
+			module_names = { "filter_words", "cursor_line_only", "before_cursor" },
 		},
 	},
 }

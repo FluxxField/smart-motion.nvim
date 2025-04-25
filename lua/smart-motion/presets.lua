@@ -15,9 +15,6 @@ function presets.words(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "jump_centered",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
 			map = true,
 			modes = { "n", "v" },
 			metadata = {
@@ -34,9 +31,6 @@ function presets.words(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "jump_centered",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
 			map = true,
 			modes = { "n", "v" },
 			metadata = {
@@ -53,9 +47,6 @@ function presets.words(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "jump_centered",
-			state = {
-				hint_position = HINT_POSITION.END,
-			},
 			map = true,
 			modes = { "n", "v" },
 			metadata = {
@@ -72,9 +63,6 @@ function presets.words(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "jump_centered",
-			state = {
-				hint_position = HINT_POSITION.END,
-			},
 			map = true,
 			modes = { "n", "v" },
 			metadata = {
@@ -97,9 +85,6 @@ function presets.lines(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "jump_centered",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
 			map = true,
 			modes = { "n", "v" },
 			metadata = {
@@ -116,9 +101,6 @@ function presets.lines(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "jump_centered",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
 			map = true,
 			modes = { "n", "v" },
 			metadata = {
@@ -141,9 +123,6 @@ function presets.search(exclude)
 			},
 			pipeline_wrapper = "live_search",
 			action = "jump_centered",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -160,9 +139,6 @@ function presets.search(exclude)
 			},
 			pipeline_wrapper = "live_search",
 			action = "jump_centered",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -177,14 +153,8 @@ function presets.search(exclude)
 				filter = "filter_words_after_cursor",
 				visualizer = "hint_start",
 			},
-			pipeline_wrapper = "text_search",
+			pipeline_wrapper = "text_search_2_char",
 			action = "jump_centered",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
-			opts = {
-				num_of_char = 2,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -199,14 +169,8 @@ function presets.search(exclude)
 				filter = "filter_words_before_cursor",
 				visualizer = "hint_start",
 			},
-			pipeline_wrapper = "text_search",
+			pipeline_wrapper = "text_search_2_char",
 			action = "jump_centered",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
-			opts = {
-				num_of_char = 2,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -229,9 +193,6 @@ function presets.delete(exclude)
 			},
 			map = true,
 			modes = { "n" },
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
 			metadata = {
 				label = "Delete Action",
 				description = "Deletes based on motion provided",
@@ -241,17 +202,11 @@ function presets.delete(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_words_after_cursor",
+				filter = "filter_words_on_cursor_line_after_cursor",
 				visualizer = "hint_start",
 			},
-			pipeline_wrapper = "text_search",
+			pipeline_wrapper = "text_search_1_char",
 			action = "delete_until",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
-			opts = {
-				num_of_char = 1,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -263,17 +218,11 @@ function presets.delete(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_words_before_cursor",
+				filter = "filter_words_on_cursor_line_before_cursor",
 				visualizer = "hint_start",
 			},
-			pipeline_wrapper = "text_search",
+			pipeline_wrapper = "text_search_1_char",
 			action = "delete_until",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
-			opts = {
-				num_of_char = 1,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -290,9 +239,6 @@ function presets.delete(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "remote_delete",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -309,9 +255,6 @@ function presets.delete(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "remote_delete",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -332,9 +275,6 @@ function presets.yank(exclude)
 				filter = "filter_visible",
 				visualizer = "hint_start",
 			},
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -346,17 +286,11 @@ function presets.yank(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_words_after_cursor",
+				filter = "filter_words_on_cursor_line_after_cursor",
 				visualizer = "hint_start",
 			},
-			pipeline_wrapper = "text_search",
+			pipeline_wrapper = "text_search_1_char",
 			action = "yank_until",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
-			opts = {
-				num_of_char = 1,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -368,17 +302,11 @@ function presets.yank(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_words_before_cursor",
+				filter = "filter_words_on_cursor_line_before_cursor",
 				visualizer = "hint_start",
 			},
-			pipeline_wrapper = "text_search",
+			pipeline_wrapper = "text_search_1_char",
 			action = "yank_until",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
-			opts = {
-				num_of_char = 1,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -395,9 +323,6 @@ function presets.yank(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "remote_yank",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -414,9 +339,6 @@ function presets.yank(exclude)
 			},
 			pipeline_wrapper = "default",
 			action = "remote_yank",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -437,9 +359,6 @@ function presets.change(exclude)
 				filter = "filter_visible",
 				visualizer = "hint_start",
 			},
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -451,17 +370,11 @@ function presets.change(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_words_after_cursor",
+				filter = "filter_words_on_cursor_line_after_cursor",
 				visualizer = "hint_start",
 			},
-			pipeline_wrapper = "text_search",
+			pipeline_wrapper = "text_search_1_char",
 			action = "change_until",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
-			opts = {
-				num_of_char = 1,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -473,17 +386,11 @@ function presets.change(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "text_search",
-				filter = "filter_words_before_cursor",
+				filter = "filter_words_on_cursor_line_before_cursor",
 				visualizer = "hint_start",
 			},
-			pipeline_wrapper = "text_search",
+			pipeline_wrapper = "text_search_1_char",
 			action = "change_until",
-			state = {
-				hint_position = HINT_POSITION.START,
-			},
-			opts = {
-				num_of_char = 1,
-			},
 			map = true,
 			modes = { "n" },
 			metadata = {

@@ -6,11 +6,10 @@ local M = {}
 
 --- Extracts searched text from given collector.
 --- @param collector thread
---- @param opts table<{ text: string }>
 --- @return thread Coroutine yielding SmartMotionTarget
-function M.run(collector, opts)
+function M.run(collector)
 	return coroutine.create(function(ctx, cfg, motion_state)
-		local search_text = opts.text
+		local search_text = motion_state.search_text or ""
 
 		if not search_text or search_text == "" then
 			coroutine.yield()

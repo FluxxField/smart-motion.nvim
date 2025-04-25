@@ -8,7 +8,7 @@ local M = {}
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
-function M.run(ctx, cfg, motion_state, opts)
+function M.run(ctx, cfg, motion_state)
 	local target = motion_state.selected_jump_target
 	local bufnr = target.metadata.bufnr
 	local winid = target.metadata.winid
