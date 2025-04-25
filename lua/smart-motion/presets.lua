@@ -494,27 +494,50 @@ function presets.change(exclude)
 	}, exclude)
 end
 
+local presets = {
+	words = {
+		"w" = {
+			map = false,
+		},
+		"b" = false,
+	},
+	delete = false,
+}
+
 --- Internal registration logic with optional filtering.
 --- @param motions_list table<string, SmartMotionModule>
 --- @param exclude? string[]
-function presets._register(motions_list, exclude)
+function presets._register(motions_list, user_overrides)
 	local registries = require("smart-motion.core.registries"):get()
-	exclude = exclude or {}
+	user_overrides = user_overrides or {}
 
-	if #exclude == 0 then
-		registries.motions.register_many_motions(motions_list)
+	-- Check if the entire preset is disabled
+	if user_overrides == false then
 		return
 	end
 
-	local filtered_motions = {}
+	local final_motions = {}
 
 	for key, motion in pairs(motions_list) do
-		if not vim.tbl_contains(exclude, key) then
-			filtered_motions[key] = motion
+		local override = user_overrides[key]
+
+		-- Skip if this motion is explicitly disabled
+		if override == false then
+			goto continue
 		end
+
+		-- Merge override into motion config if table provider
+		if type(override) == 'table' then
+			final_motions[key] = vim.tbl_deep_extend("force", motion, override)
+		else
+			-- No override, use default motion
+			final_motions[key] = motion
+		end
+
+		::continue::
 	end
 
-	registries.motions.register_many_motions(filtered_motions)
+	registries.motions.register_many_motions(final_motions)
 end
 
 return presets
