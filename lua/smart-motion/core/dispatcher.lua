@@ -34,8 +34,8 @@ function M.trigger_motion(trigger_key)
 	end
 
 	local direction = consts.DIRECTION.AFTER_CURSOR
-	if motion.state and motion.state.direction ~= nil then
-		direction = motion.state.direction
+	if filter.metadata.motion_state and filter.metadata.motion_state.direction ~= nil then
+		direction = filter.metadata.motion_state.direction
 	end
 
 	local hint_position = consts.HINT_POSITION.START
@@ -58,7 +58,7 @@ function M.trigger_motion(trigger_key)
 	utils.reset_motion(ctx, cfg, motion_state)
 
 	if flow_state.evaluate_flow_at_motion_start() then
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, motion.opts)
+		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter, motion.opts)
 
 		if motion_state.selected_jump_target then
 			action.run(ctx, cfg, motion_state, motion.opts)
@@ -127,8 +127,8 @@ function M.trigger_action(trigger_key)
 	end
 
 	local direction = consts.DIRECTION.AFTER_CURSOR
-	if motion.state and motion.state.direction ~= nil then
-		direction = motion.state.direction
+	if filter.metadata.motion_state and filter.metadata.motion_state.direction ~= nil then
+		direction = filter.metadata.motion_state.direction
 	end
 
 	local hint_position = consts.HINT_POSITION.START
@@ -142,6 +142,9 @@ function M.trigger_action(trigger_key)
 	end
 
 	local ctx, cfg, motion_state = utils.prepare_motion(direction, hint_position, "", ignore_whitespace)
+
+	-- TODO: Each module can now use metadata to update motion_state
+	-- We dont need to pass this data to prepare_motion anymore
 
 	if not ctx or not cfg or not motion_state then
 		log.error("Failde to prepare motion - aborting")
@@ -192,7 +195,7 @@ function M.trigger_action(trigger_key)
 	end
 
 	if flow_state.evaluate_flow_at_motion_start() then
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, motion.opts)
+		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter, motion.opts)
 
 		if motion_state.selected_jump_target then
 			action.run(ctx, cfg, motion_state, motion.opts)
@@ -243,7 +246,7 @@ end
 --- @param collector SmartMotionCollectorModuleEntry
 --- @param extractor SmartMotionExtractorModuleEntry
 --- @param opts table
-function M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, opts)
+function M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter, opts)
 	local lines_gen = collector.run(opts)
 	if not lines_gen then
 		return
@@ -254,7 +257,12 @@ function M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, opts)
 		return
 	end
 
-	targets.get_jump_targets(ctx, cfg, motion_state, extractor_gen)
+	local filter_gen = filter.run(extractor_gen, opts)
+	if not filter_gen then
+		return
+	end
+
+	targets.get_targets(ctx, cfg, motion_state, filter_gen)
 	state.finalize_motion_state(motion_state)
 end
 
@@ -268,9 +276,8 @@ function M._build_pipeline(collector, extractor, filter, visualizer)
 	local function run_pipeline(ctx, cfg, motion_state, opts)
 		utils.reset_motion(ctx, cfg, motion_state)
 
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, opts)
+		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter, opts)
 
-		filter.run(ctx, cfg, motion_state, opts)
 		visualizer.run(ctx, cfg, motion_state, opts)
 	end
 
