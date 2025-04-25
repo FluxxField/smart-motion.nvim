@@ -19,10 +19,10 @@ function M.run(collector, opts)
 			local line_text, line_number = line_data.text, line_data.line_number
 			local col
 
-				if motion_state.ignore_whitespace then
-					local first_non_ws = line_text:find("%S")
-					col = first_non_ws and (first_non_ws - 1) or 0
-				else
+			if motion_state.ignore_whitespace then
+				local first_non_ws = line_text:find("%S")
+				col = first_non_ws and (first_non_ws - 1) or 0
+			end
 
 			---@type SmartMotionJumpTarget
 			coroutine.yield({
