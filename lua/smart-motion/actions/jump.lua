@@ -16,7 +16,7 @@ function M.run(ctx, cfg, motion_state, opts)
 	local row = target.start_pos.row
 
 	if motion_state.hint_position == HINT_POSITION.END then
-		col = target.end_pos.col
+		col = target.end_pos.col - 1
 		row = target.end_pos.row
 	end
 
@@ -30,7 +30,7 @@ function M.run(ctx, cfg, motion_state, opts)
 		vim.api.nvim_set_current_buf(bufnr)
 	end
 
-	local pos = { row + 1, col }
+	local pos = { row + 1, math.max(col, 0) }
 	local success, err = pcall(vim.api.nvim_win_set_cursor, winid or 0, pos)
 
 	if not success then
