@@ -6,7 +6,7 @@ local M = {}
 --- Extracts valid line jump targets from the given lines collector.
 --- @param collector thread
 --- @param opts table Arbitrary options passed through the pipeline
---- @return thread Coroutine yielding SmartMotionJumpTarget
+--- @return thread Coroutine yielding SmartMotionTarget
 function M.run(collector, opts)
 	return coroutine.create(function(ctx, cfg, motion_state)
 		while true do
@@ -24,10 +24,8 @@ function M.run(collector, opts)
 				col = first_non_ws and (first_non_ws - 1) or 0
 			end
 
-			---@type SmartMotionJumpTarget
+			---@type SmartMotionTarget
 			coroutine.yield({
-				row = line_number,
-				col = col,
 				text = line_text,
 				start_pos = { row = line_number, col = col },
 				end_pos = { row = line_number, col = #line_text },

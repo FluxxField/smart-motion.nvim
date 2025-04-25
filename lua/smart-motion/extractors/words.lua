@@ -1,3 +1,4 @@
+local log = require("smart-motion.core.log")
 local consts = require("smart-motion.consts")
 
 ---@class SmartMotionWordMatch
@@ -11,7 +12,7 @@ local M = {}
 --- Extracts words from the given line collector coroutine.
 --- @param collector thread
 --- @param opts table Additional options passed along the pipeline
---- @return thread Coroutine yielding SmartMotionJumpTarget
+--- @return thread Coroutine yielding SmartMotionTarget
 function M.run(collector, opts)
 	return coroutine.create(function(ctx, cfg, motion_state)
 		while true do
@@ -33,8 +34,6 @@ function M.run(collector, opts)
 				end
 
 				coroutine.yield({
-					row = line_number,
-					col = start_pos,
 					text = match_text,
 					start_pos = { row = line_number, col = start_pos },
 					end_pos = { row = line_number, col = end_pos },
