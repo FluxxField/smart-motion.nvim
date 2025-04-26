@@ -21,11 +21,24 @@ local pipeline_wrapper_entries = {
 			description = "Executes pipeline while the user searches for text",
 		},
 	},
-	text_search = {
+	text_search_1_char = {
 		run = text_search.run,
 		metadata = {
-			label = "Text Search Wrapper",
-			description = "Executes pipeline while the user searches for a specific number of text",
+			label = "Text Search Wrapper 1 Character",
+			description = "Executes pipeline while the user searches for 1 character",
+			motion_state = {
+				num_of_char = 1,
+			},
+		},
+	},
+	text_search_2_char = {
+		run = text_search.run,
+		metadata = {
+			label = "Text Search Wrapper 2 Characters",
+			description = "Executes pipeline while the user searches for 2 characters",
+			motion_state = {
+				num_of_char = 2,
+			},
 		},
 	},
 }

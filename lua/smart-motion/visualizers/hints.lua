@@ -65,30 +65,29 @@ end
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
----@param opts table data passed around through the pipeline
-function M.run(ctx, cfg, motion_state, opts)
-	local jump_targets = motion_state.jump_targets or {}
-	local jump_target_count = motion_state.jump_target_count
+function M.run(ctx, cfg, motion_state)
+	local targets = motion_state.jump_targets or {}
+	local targets_count = motion_state.jump_target_count
 
-	if jump_target_count == 0 then
+	if targets_count == 0 then
 		log.debug("assign_and_apply_labels: No targets to label")
 		return
 	end
 
-	log.debug(string.format("Assigning and applying labels for %d targets", jump_target_count))
+	log.debug(string.format("Assigning and applying labels for %d targets", targets_count))
 
 	local label_pool = M.generate_hint_labels(ctx, cfg, motion_state)
 
-	if jump_target_count > #label_pool then
-		log.debug(string.format("Only %d labels available, but %d targets found", #label_pool, jump_target_count))
+	if targets_count > #label_pool then
+		log.debug(string.format("Only %d labels available, but %d targets found", #label_pool, targets_count))
 	end
 
 	highlight.clear(ctx, cfg, motion_state)
 	highlight.dim_background(ctx, cfg, motion_state)
 
-	local is_search_mode = opts.is_search_mode == true
+	local is_search_mode = motion_state.is_search_mode == true
 
-	for index, jump_target in ipairs(jump_targets) do
+	for index, target in ipairs(targets) do
 		local label = label_pool[index]
 
 		if not label then
@@ -100,21 +99,21 @@ function M.run(ctx, cfg, motion_state, opts)
 				ctx,
 				cfg,
 				motion_state,
-				jump_target,
+				target,
 				label,
 				{ dim_first_char = is_search_mode }
 			)
-			motion_state.assigned_hint_labels[label] = { jump_target = jump_target, is_single_prefix = true }
+			motion_state.assigned_hint_labels[label] = { target = target, is_single_prefix = true }
 		elseif #label == 2 then
 			highlight.apply_double_hint_label(
 				ctx,
 				cfg,
 				motion_state,
-				jump_target,
+				target,
 				label,
 				{ dim_first_char = is_search_mode, dim_second_char = is_search_mode }
 			)
-			motion_state.assigned_hint_labels[label] = { jump_target = jump_target }
+			motion_state.assigned_hint_labels[label] = { target = target }
 			motion_state.assigned_hint_labels[label:sub(1, 1)] = { is_double_prefix = true }
 		else
 			log.error("Unexpected hint length for label: '" .. label .. "'")

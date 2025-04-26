@@ -10,9 +10,7 @@ local M = {}
 --- @param motion_state SmartMotionMotionState
 --- @return SearchExitType
 function M.run(run_pipeline, ctx, cfg, motion_state)
-	local opts = {}
-
-	run_pipeline(ctx, cfg, motion_state, opts)
+	run_pipeline(ctx, cfg, motion_state)
 
 	return SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION
 end

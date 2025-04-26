@@ -12,10 +12,9 @@ local M = {}
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
----@param opts table
 ---@return SearchExitType
-function M.run(run_pipeline, ctx, cfg, motion_state, opts)
-	local num_of_char = opts.num_of_char or 1
+function M.run(run_pipeline, ctx, cfg, motion_state)
+	local num_of_char = motion_state.num_of_char or 1
 	local timeout_ms = 2000
 	local search_text = ""
 	local start_time = vim.fn.reltime()
@@ -52,11 +51,8 @@ function M.run(run_pipeline, ctx, cfg, motion_state, opts)
 				start_time = nil -- stop timeout tracking
 
 				-- Run the pipeline once we hit the desired char count
-				local merged_opts = vim.tbl_extend(
-					"force",
-					opts,
-					{ text = utils.escape_lua_pattern(search_text), is_search_mode = num_of_char > 1 }
-				)
+				motion_state.search_text = search_text
+				motion_state.is_search_mode = num_of_char > 1
 				run_pipeline(ctx, cfg, motion_state, merged_opts)
 
 				local count = motion_state.jump_target_count

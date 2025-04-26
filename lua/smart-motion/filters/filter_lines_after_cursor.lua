@@ -1,12 +1,12 @@
 local log = require("smart-motion.core.log")
+local DIRECTION = require("smart-motion.consts").DIRECTION
 
 ---@type SmartMotionFilterModuleEntry
 local M = {}
 
 function M.run(extractor_gen)
 	return coroutine.create(function(ctx, cfg, motion_state)
-		local top_line = vim.fn.line("w0", ctx.winid) - 1
-		local bottom_line = vim.fn.line("w$", ctx.winid) - 1
+		local cursor_row = ctx.cursor_line
 
 		while true do
 			local ok, target = coroutine.resume(extractor_gen, ctx, cfg, motion_state)
@@ -20,9 +20,7 @@ function M.run(extractor_gen)
 				break
 			end
 
-			local row = target.start_pos.row
-
-			if row >= top_line and row <= bottom_line then
+			if target.start_pos.row > cursor_row then
 				coroutine.yield(target)
 			end
 		end

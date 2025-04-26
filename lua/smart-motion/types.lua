@@ -58,8 +58,8 @@
 ---@field target_type TargetType
 ---@field ignore_whitespace boolean
 ---@field jump_target_count integer
----@field jump_targets SmartMotionJumpTarget[]
----@field selected_jump_target? SmartMotionJumpTarget
+---@field jump_targets SmartMotionTarget[]
+---@field selected_jump_target? SmartMotionTarget
 ---@field hint_labels string[]
 ---@field assigned_hint_labels table<string, SmartMotionHintEntry>
 ---@field single_label_count integer
@@ -68,7 +68,7 @@
 ---@field selection_mode SelectionMode
 ---@field selection_first_char? string
 
----@class SmartMotionJumpTarget
+---@class SmartMotionTarget
 ---@field bufnr integer
 ---@field winid integer
 ---@field row integer
@@ -80,7 +80,7 @@
 ---@field metadata? table
 
 ---@class SmartMotionHintEntry
----@field jump_target? SmartMotionJumpTarget
+---@field jump_target? SmartMotionTarget
 ---@field is_single_prefix? boolean
 ---@field is_double_prefix? boolean
 

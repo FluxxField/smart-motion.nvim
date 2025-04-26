@@ -39,6 +39,7 @@ return function(module_type)
 		entry.metadata = entry.metadata or {}
 		entry.metadata.label = entry.metadata.label or name:gsub("^%l", string.upper)
 		entry.metadata.description = entry.metadata.description or ("SmartMotion: " .. entry.metadata.label)
+		entry.metadata.motion_state = entry.metadata.motion_state or {}
 
 		registry.by_name[name] = entry
 

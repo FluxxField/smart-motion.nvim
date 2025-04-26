@@ -2,6 +2,8 @@
 local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 
+local HINT_POSITION = consts.HINT_POSITION
+
 local M = {}
 
 --- Clears all SmartMotion highlights in the current buffer.
@@ -18,11 +20,18 @@ end
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
----@param jump_target JumpTarget
+---@param target Target
 ---@param label string
 ---@param options HintOptions
-function M.apply_single_hint_label(ctx, cfg, motion_state, jump_target, label, options)
-	log.debug(string.format("Applying single hint '%s' at line %d, col %d", label, jump_target.row, jump_target.col))
+function M.apply_single_hint_label(ctx, cfg, motion_state, target, label, options)
+	local row = target.start_pos.row
+	local col = target.start_pos.col
+
+	if motion_state.hint_position == HINT_POSITION.END then
+		col = target.end_pos.col - 1
+	end
+
+	log.debug(string.format("Applying single hint '%s' at line %d, col %d", label, row, col))
 
 	local hint = cfg.highlight.hint or "SmartMotionHint"
 
@@ -30,7 +39,7 @@ function M.apply_single_hint_label(ctx, cfg, motion_state, jump_target, label, o
 		hint = cfg.highlight.hint_dim or "SmartMotionHintDim"
 	end
 
-	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, jump_target.row, jump_target.col, {
+	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, row, col, {
 		virt_text = { { label, hint } },
 		virt_text_pos = "overlay",
 		hl_mode = "combine",
@@ -45,13 +54,22 @@ end
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
----@param jump_target JumpTarget
+---@param target Target
 ---@param label string
 ---@param options HintOptions
-function M.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, options)
+function M.apply_double_hint_label(ctx, cfg, motion_state, target, label, options)
 	options = options or {}
 
-	log.debug(string.format("Extmark for '%s' at row: %d col: %d", label, jump_target.row - 1, jump_target.col))
+	local row = target.start_pos.row
+	local col = target.start_pos.col
+
+	if motion_state.hint_position == HINT_POSITION.END then
+		col = target.end_pos.col - 1
+	end
+
+	log.debug(
+		string.format("Extmark for '%s' at row: %d col: %d", label, target.start_pos.row - 1, target.start_pos.col)
+	)
 
 	local first_char, second_char = label:sub(1, 1), label:sub(2, 2)
 
@@ -66,17 +84,9 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, o
 		hint = cfg.highlight.hint_faded or "SmartMotionHintFaded"
 	end
 
-	log.debug(
-		string.format(
-			"Applying double hint '%s%s' at line %d, col %d",
-			first_char,
-			second_char,
-			jump_target.row,
-			jump_target.col
-		)
-	)
+	log.debug(string.format("Applying double hint '%s%s' at line %d, col %d", first_char, second_char, row, col))
 
-	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, jump_target.row, jump_target.col, {
+	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, row, col, {
 		virt_text = {
 			{ first_char, first_hl },
 			{ second_char, second_hl },
@@ -114,13 +124,13 @@ function M.filter_double_hints(ctx, cfg, motion_state, active_prefix)
 
 	for label, entry in pairs(motion_state.assigned_hint_labels) do
 		if #label == 2 and label:sub(1, 1) == active_prefix then
-			local jump_target = entry.jump_target
-			if not jump_target then
+			local target = entry.target
+			if not target then
 				log.error("filter_double_hints: Missing target for label " .. label)
 				goto continue
 			end
 
-			M.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, { dim_first_char = true })
+			M.apply_double_hint_label(ctx, cfg, motion_state, target, label, { dim_first_char = true })
 
 			::continue::
 		end

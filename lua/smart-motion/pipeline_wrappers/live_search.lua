@@ -13,9 +13,8 @@ local M = {}
 --- @param ctx SmartMotionContext
 --- @param cfg SmartMotionConfig
 --- @param motion_state SmartMotionMotionState
---- @param opts table
 --- @return SearchExitType
-function M.run(run_pipeline, ctx, cfg, motion_state, opts)
+function M.run(run_pipeline, ctx, cfg, motion_state)
 	local early_exit_timeout = 2000
 	local continue_timeout = 500
 	local start_time = vim.fn.reltime()
@@ -55,12 +54,9 @@ function M.run(run_pipeline, ctx, cfg, motion_state, opts)
 
 			if search_text ~= last_search_text and search_text ~= "" then
 				-- Run the pipeline with the current input
-				local merged_opts = vim.tbl_extend(
-					"force",
-					opts,
-					{ text = utils.escape_lua_pattern(search_text), is_search_mode = #search_text > 1 }
-				)
-				run_pipeline(ctx, cfg, motion_state, merged_opts)
+				motion_state.search_text = search_text
+				motion_state.is_search_mode = true
+				run_pipeline(ctx, cfg, motion_state)
 
 				start_time = vim.fn.reltime()
 				last_search_text = search_text

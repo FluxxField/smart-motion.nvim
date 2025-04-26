@@ -1,5 +1,5 @@
-local consts = require("smart-motion.consts")
 local hints = require("smart-motion.visualizers.hints")
+local HINT_POSITION = require("smart-motion.consts").HINT_POSITION
 
 ---@type SmartMotionRegistry<SmartMotionVisualizerModuleEntry>
 local visualizers = require("smart-motion.core.registry")("visualizers")
@@ -11,6 +11,9 @@ local visualizer_entries = {
 		metadata = {
 			label = "Hint Start Visualizer",
 			description = "Applies hints to the start of targets",
+			motion_state = {
+				hint_position = HINT_POSITION.START,
+			},
 		},
 	},
 	hint_end = {
@@ -18,6 +21,9 @@ local visualizer_entries = {
 		metadata = {
 			label = "Hint End Visualizer",
 			description = "Applies hints to the end of targets",
+			motion_state = {
+				hint_position = HINT_POSITION.END,
+			},
 		},
 	},
 }
