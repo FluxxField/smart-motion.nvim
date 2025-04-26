@@ -1,12 +1,28 @@
-local M = {}
-
 local log = require("smart-motion.core.log")
 
---
--- Constants
--- TODO: add to config
---
 local FLOW_TIMEOUT_MS = 300
+
+--- @class FlowState
+--- @field is_active boolean
+--- @field is_paused boolean
+--- @field pause_started_at number?  -- in milliseconds
+--- @field last_motion_timestamp number?  -- in milliseconds
+
+--- @type FlowState & {
+---   evaluate_flow_at_motion_start: fun(): boolean,
+---   evaluate_flow_at_selection: fun(): boolean,
+---   should_cancel_on_keypress: fun(key: string): boolean,
+---   is_flow_active: fun(): boolean,
+---   is_expired: fun(): boolean,
+---   refresh_timestamp: fun(),
+---   start_flow: fun(),
+---   pause_flow: fun(),
+---   resume_flow: fun(),
+---   exit_flow: fun(),
+---   reset: fun(),
+---   get_timestamp: fun(): number,
+--- }
+local M = {}
 
 M.is_active = false
 M.is_paused = false

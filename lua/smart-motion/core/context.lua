@@ -1,17 +1,11 @@
 --- Module for gathering buffer, window, and cursor context.
 local log = require("smart-motion.core.log")
 
----@class Context
----@field bufnr integer Buffer number.
----@field winid integer Window ID.
----@field cursor_line integer 0-based cursor line.
----@field cursor_col integer 0-based cursor column.
----@field last_line integer Total line count.
-
+---@type SmartMotionContext
 local M = {}
 
 --- Validates the collected context (for internal debugging).
----@param ctx Context
+---@param ctx SmartMotionContext
 local function validate(ctx)
 	if ctx.cursor_line < 0 or ctx.cursor_line >= ctx.last_line then
 		log.debug(string.format("Cursor line %d is out of range (0 to %d)", ctx.cursor_line, ctx.last_line - 1))
@@ -23,7 +17,7 @@ local function validate(ctx)
 end
 
 --- Collects context for the current buffer, window, and cursor.
----@return Context
+---@return SmartMotionContext
 function M.get()
 	local bufnr = vim.api.nvim_get_current_buf()
 	local winid = vim.api.nvim_get_current_win()

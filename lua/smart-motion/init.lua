@@ -6,11 +6,12 @@ local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 local highlight_setup = require("smart-motion.highlight_setup")
 
+---@type SmartMotionPlugin
 local M = {}
 
 --- Sets up smart-motion with user-provided config.
 --- This should be called froh the user's init.lua/init.vim.
----@param user_config table|nil
+---@param user_config? SmartMotionConfig
 function M.setup(user_config)
 	registries_module:init({
 		collectors = require("smart-motion.collectors"),

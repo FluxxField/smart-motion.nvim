@@ -6,11 +6,13 @@ local state = require("smart-motion.core.state")
 local flow_state = require("smart-motion.core.flow-state")
 local selection = require("smart-motion.core.selection")
 
+local SEARCH_EXIT_TYPE = consts.SEARCH_EXIT_TYPE
+
+--- @class Dispatcher
 local M = {}
 
---
--- Trigger Motion
---
+--- Triggers a motion by its trigger key.
+--- @param trigger_key string
 function M.trigger_motion(trigger_key)
 	local registries = require("smart-motion.core.registries"):get()
 	local motion = require("smart-motion.motions").get_by_key(trigger_key)
@@ -23,6 +25,7 @@ function M.trigger_motion(trigger_key)
 	local collector = registries.collectors.get_by_name(pipeline.collector)
 	local extractor = registries.extractors.get_by_name(pipeline.extractor)
 	local visualizer = registries.visualizers.get_by_name(pipeline.visualizer)
+	local action = registries.actions.get_by_name(motion.action)
 
 	-- Check if filter needs fallback
 	local filter = registries.filters.get_by_name(pipeline.filter or "default")
@@ -30,10 +33,13 @@ function M.trigger_motion(trigger_key)
 		filter = registries.filters.get_by_name("default")
 	end
 
-	local direction = motion.direction or consts.DIRECTION.AFTER_CURSOR
-	local hint_position = (visualizer and visualizer.hint_position) or consts.HINT_POSITION.START
+	local ctx, cfg, motion_state = utils.prepare_motion(extractor.name)
 
-	local ctx, cfg, motion_state = utils.prepare_motion(direction, hint_position, extractor.name, true)
+	for _, module in ipairs({ motion, collector, extractor, filter, visualizer }) do
+		if module.metadata and module.metadata.motion_state then
+			motion_state = vim.tbl_deep_extend("force", motion_state, module.metadata.motion_state)
+		end
+	end
 
 	if not ctx or not cfg or not motion_state then
 		log.error("Failed to prepare motion - aborting")
@@ -43,10 +49,10 @@ function M.trigger_motion(trigger_key)
 	utils.reset_motion(ctx, cfg, motion_state)
 
 	if flow_state.evaluate_flow_at_motion_start() then
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, {})
+		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter, motion.opts)
 
 		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, {})
+			action.run(ctx, cfg, motion_state, motion.opts)
 			utils.reset_motion(ctx, cfg, motion_state)
 
 			return
@@ -54,35 +60,49 @@ function M.trigger_motion(trigger_key)
 	end
 
 	-- Check if wrapper needs fallback
-	local wrapper = registries.wrappers.get_by_name(motion.pipeline_wrapper or "default")
-	if not wrapper or not wrapper.run then
-		wrapper = registries.wrappers.get_by_name("default")
+	local pipeline_wrapper = registries.pipeline_wrappers.get_by_name(motion.pipeline_wrapper or "default")
+	if not pipeline_wrapper or not pipeline_wrapper.run then
+		pipeline_wrapper = registries.pipeline_wrappers.get_by_name("default")
 	end
 
-	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
-	local exit = wrapper.run(run_pipeline, ctx, cfg, motion_state, action)
+	motion_state = vim.tbl_deep_extend("force", motion_state, pipeline_wrapper.metadata.motion_state)
 
-	if exit then
+	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
+	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, motion.opts)
+
+	if exit_type == SEARCH_EXIT_TYPE.EARLY_EXIT then
 		utils.reset_motion(ctx, cfg, motion_state)
 		return
 	end
 
-	selection.wait_for_hint_selection(ctx, cfg, motion_state)
+	if exit_type == SEARCH_EXIT_TYPE.DIRECT_HINT or exit_type == SEARCH_EXIT_TYPE.AUTO_SELECT then
+		if motion_state.selected_jump_target then
+			action.run(ctx, cfg, motion_state, motion.opts)
+		end
+	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
+		-- Rerun the visualizer to makes sure that the hints are not dimmed
+		motion_state.is_searching_mode = false
+		visualizer.run(ctx, cfg, motion_state)
+		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 
-	if motion_state.selected_jump_target then
-		action.run(ctx, cfg, motion_state, opts)
+		if motion_state.selected_jump_target then
+			action.run(ctx, cfg, motion_state, motion.opts)
+		end
 	end
 
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 
---
--- Trigger Action
---
+--- Triggers an action-type motion with secondary key input.
+--- @param trigger_key string
 function M.trigger_action(trigger_key)
 	local registries = require("smart-motion.core.registries"):get()
 	local motion = require("smart-motion.motions").get_by_key(trigger_key)
-	local action = registries.actions.get_by_key(trigger_key)
+	local action = registries.actions.get_by_name(motion.action)
+
+	if motion.is_action then
+		action = registries.actions.get_by_key(trigger_key)
+	end
 
 	local ok, motion_char = pcall(vim.fn.getchar)
 	if not ok then
@@ -100,11 +120,16 @@ function M.trigger_action(trigger_key)
 		filter = registries.filters.get_by_name("default")
 	end
 
-	local direction = motion.direction or consts.DIRECTION.AFTER_CURSOR
-	local hint_position = (visualizer and visualizer.hint_position) or consts.HINT_POSITION.START
+	for _, module in ipairs({ motion, collector, extractor, filter, visualizer }) do
+		if module.metadata and module.metadata.motion_state then
+			motion_state = vim.tbl_deep_extend("force", motion_state, module.metadata.motion_state)
+		end
+	end
 
-	local ctx, cfg, motion_state =
-		utils.prepare_motion(direction, hint_position, consts.TARGET_TYPES_BY_KEY[trigger_key] or "", true)
+	local ctx, cfg, motion_state = utils.prepare_motion("")
+
+	-- TODO: Each module can now use metadata to update motion_state
+	-- We dont need to pass this data to prepare_motion anymore
 
 	if not ctx or not cfg or not motion_state then
 		log.error("Failde to prepare motion - aborting")
@@ -117,10 +142,14 @@ function M.trigger_action(trigger_key)
 	local motion_key = vim.fn.nr2char(motion_char)
 	local extractor = registries.extractors.get_by_key(motion_key)
 
+	motion_state.target_type = consts.TARGET_TYPES_BY_KEY[motion_key] or ""
+
 	-- Fallback to native behavior if no extractor exists
 	if not extractor or not extractor.run then
 		-- Is this a short-curcit double key?
 		if motion_key == trigger_key then
+			motion_state.target_type = "lines"
+
 			local line_action = registries.actions.get_by_name(action.name .. "_line")
 
 			if not line_action or not line_action.run then
@@ -131,7 +160,7 @@ function M.trigger_action(trigger_key)
 			motion_state.selected_jump_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
 
 			if motion_state.selected_jump_target then
-				line_action.run(ctx, cfg, motion_state, {})
+				line_action.run(ctx, cfg, motion_state, motion.opts)
 			end
 
 			return
@@ -141,67 +170,97 @@ function M.trigger_action(trigger_key)
 		return
 	end
 
+	local under_cursor_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
+
+	if under_cursor_target then
+		motion_state.selected_jump_target = under_cursor_target
+		action.run(ctx, cfg, motion_state, motion.opts)
+		utils.reset_motion(ctx, cfg, motion_state)
+		return
+	end
+
 	if flow_state.evaluate_flow_at_motion_start() then
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, {})
+		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter, motion.opts)
 
 		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, {})
+			action.run(ctx, cfg, motion_state, motion.opts)
 			utils.reset_motion(ctx, cfg, motion_state)
 			return
 		end
 	end
 
+	action = registries.actions.get_by_name(action.name .. "_jump")
+
 	-- Check if wrapper needs fallback
-	local wrapper = registries.wrappers.get_by_name(motion.pipeline_wrapper or "default")
-	if not wrapper or not wrapper.run then
-		wrapper = registries.wrappers.get_by_name("default")
+	local pipeline_wrapper = registries.pipeline_wrappers.get_by_name(motion.pipeline_wrapper or "default")
+	if not pipeline_wrapper or not pipeline_wrapper.run then
+		pipeline_wrapper = registries.pipeline_wrappers.get_by_name("default")
 	end
 
+	motion_state = vim.tbl_deep_extend("force", motion_state, pipeline_wrapper.metadata.motion_state)
+
 	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
-	local exit = wrapper.run(run_pipeline, ctx, cfg, motion_state, action)
-	if exit then
+	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, motion.opts)
+
+	if exit_type == SEARCH_EXIT_TYPE.EARLY_EXIT then
 		utils.reset_motion(ctx, cfg, motion_state)
 		return
 	end
 
-	selection.wait_for_hint_selection(ctx, cfg, motion_state)
+	if exit_type == SEARCH_EXIT_TYPE.DIRECT_HINT or exit_type == SEARCH_EXIT_TYPE.AUTO_SELECT then
+		if motion_state.selected_jump_target then
+			action.run(ctx, cfg, motion_state, motion.opts)
+		end
+	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
+		motion_state.is_searching_mode = false
+		visualizer.run(ctx, cfg, motion_state)
+		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 
-	if motion_state.selected_jump_target then
-		action.run(ctx, cfg, motion_state, {})
+		if motion_state.selected_jump_target then
+			action.run(ctx, cfg, motion_state, motion.opts)
+		end
 	end
 
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 
---
--- _prepare_pipeline
---
-function M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, opts)
-	local lines_gen = collector.run(opts)
+--- Prepares the pipeline by collecting and extracting motion targets.
+--- @param ctx SmartMotionContext
+--- @param cfg SmartMotionConfig
+--- @param motion_state SmartMotionMotionState
+--- @param collector SmartMotionCollectorModuleEntry
+--- @param extractor SmartMotionExtractorModuleEntry
+function M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter)
+	local lines_gen = collector.run()
 	if not lines_gen then
 		return
 	end
 
-	local extractor_gen = extractor.run(lines_gen, opts)
+	local extractor_gen = extractor.run(lines_gen)
 	if not extractor_gen then
 		return
 	end
 
-	targets.get_jump_targets(ctx, cfg, motion_state, extractor_gen)
+	local filter_gen = filter.run(extractor_gen)
+	if not filter_gen then
+		return
+	end
+
+	targets.get_targets(ctx, cfg, motion_state, filter_gen)
 	state.finalize_motion_state(motion_state)
 end
 
---
--- _build_pipeline
---
+--- Builds the pipeline runner function
+--- @param collector SmartMotionCollectorModuleEntry
+--- @param extractor SmartMotionExtractorModuleEntry
+--- @param filter SmartMotionFilterModuleEntry
+--- @param visualizer SmartMotionVisualizerModuleEntry
+--- @return fun(ctx: SmartMotionContext, cfg: SmartMotionConfig, motion_state: SmartMotionMotionState): nil
 function M._build_pipeline(collector, extractor, filter, visualizer)
-	local function run_pipeline(ctx, cfg, motion_state, opts)
+	local function run_pipeline(ctx, cfg, motion_state)
 		utils.reset_motion(ctx, cfg, motion_state)
-
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, opts)
-
-		filter.run(ctx, cfg, motion_state, opts)
-		visualizer.run(ctx, cfg, motion_state, opts)
+		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter)
+		visualizer.run(ctx, cfg, motion_state)
 	end
 
 	return run_pipeline

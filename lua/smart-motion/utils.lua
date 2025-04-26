@@ -4,6 +4,7 @@ local context = require("smart-motion.core.context")
 local state = require("smart-motion.core.state")
 local config = require("smart-motion.config")
 local highlight = require("smart-motion.core.highlight")
+local consts = require("smart-motion.consts")
 
 local M = {}
 
@@ -35,10 +36,10 @@ function M.close_floating_windows()
 end
 
 --- Waits for the user to press a hint key and returns the associated jump target.
----@param ctx table  Motion context (contains bufnr, etc.).
----@param cfg table  Validated configuration (not used here but part of the signature).
----@param motion_state table  Current motion state (not used here but part of the signature).
----@return table|nil Selected target if a matching hint is pressed; nil if cancelled.
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
+---@return any|nil
 function M.wait_for_hint_selection(ctx, cfg, motion_state)
 	log.debug("Waiting for user hint selection")
 
@@ -58,10 +59,10 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 
 	local entry = motion_state.assigned_hint_labels[char]
 
-	if entry and entry.jump_target then
-		log.debug("User selected hint: " .. vim.inspect(entry.jump_target))
+	if entry and entry.target then
+		log.debug("User selected hint: " .. vim.inspect(entry.target))
 
-		return entry.jump_target
+		return entry.target
 	else
 		log.debug("No matching hint found for input: " .. char)
 
@@ -70,25 +71,10 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 end
 
 --- Prepares the motion by gathering context, config, and initializing state.
----@param direction "before_cursor"|"after_cursor"
----@param hint_position "start"|"end"
----@param target_type string
----@param ignore_whitespace boolean
----@return table|nil ctx, table|nil cfg, table|nil motion_state - Returns nils if validation fails.
-function M.prepare_motion(direction, hint_position, target_type, ignore_whitespace)
+---@param target_type TargetType
+---@return SmartMotionContext?, SmartMotionConfig?, SmartMotionMotionState?
+function M.prepare_motion(target_type)
 	local ctx = context.get()
-
-	if not vim.tbl_contains({ "before_cursor", "after_cursor" }, direction) then
-		log.error("prepare_motion: Invalid direction provided: " .. tostring(direction))
-
-		return nil, nil, nil
-	end
-
-	if not vim.tbl_contains({ "start", "end" }, hint_position) then
-		log.error("prepare_motion: Invalid hint_position provided: " .. tostring(hint_position))
-
-		return nil, nil, nil
-	end
 
 	local cfg = config.validated
 
@@ -104,16 +90,15 @@ function M.prepare_motion(direction, hint_position, target_type, ignore_whitespa
 		return nil, nil, nil
 	end
 
-	local motion_state = state.create_motion_state(direction, hint_position, target_type, ignore_whitespace)
+	local motion_state = state.create_motion_state(target_type)
 
 	return ctx, cfg, motion_state
 end
 
---- Resets the motion by clearing highlights, closing floating windows,
---- clearing spam tracking, and resetting the dynamic state.
----@param ctx table Motion context (must include bufnr).
----@param cfg table Validated config.
----@param motion_state table Current motion state (will be mutated).
+--- Resets the motion by clearing highlights, closing floating windows, and clearing dynamic state.
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
 function M.reset_motion(ctx, cfg, motion_state)
 	-- Clear any virtual text and extmarks.
 	highlight.clear(ctx, cfg, motion_state)
@@ -125,6 +110,9 @@ function M.reset_motion(ctx, cfg, motion_state)
 	motion_state = state.reset(motion_state)
 end
 
+--- Checks if a string is non-empty and non-whitespace.
+---@param s any
+---@return boolean
 function M.is_non_empty_string(s)
 	return type(s) == "string" and s:gsub("%s+", "") ~= ""
 end

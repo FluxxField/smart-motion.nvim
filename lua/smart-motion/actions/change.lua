@@ -1,8 +1,14 @@
+local log = require("smart-motion.core.log")
+
+---@type SmartMotionActionModuleEntry
 local M = {}
 
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
 function M.run(ctx, cfg, motion_state)
 	local target = motion_state.selected_jump_target
-	local bufnr = target.bufnr
+	local bufnr = target.metadata.bufnr
 	local row = target.end_pos.row
 	local col = target.end_pos.col
 
@@ -12,13 +18,17 @@ function M.run(ctx, cfg, motion_state)
 		vim.cmd("normal! D")
 		vim.cmd("startinsert!")
 	else
-		vim.api.nvim_buf_set_mark(0, ">", row + 1, col, {})
+		vim.api.nvim_buf_set_mark(bufnr, ">", row + 1, col, {})
 		vim.cmd("normal! d`>")
 		vim.cmd("startinsert")
 	end
 
 	-- Clear mark
-	pcall(vim.api.nvim_buf_del_mark, bufnr, ">")
+	local ok = pcall(vim.api.nvim_buf_del_mark, bufnr, ">")
+
+	if not ok then
+		log.error("Action Change: del_mark failed")
+	end
 end
 
 return M

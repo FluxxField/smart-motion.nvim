@@ -1,11 +1,19 @@
-local motions = require("smart-motion.core.registry")("motions")
 local dispatcher = require("smart-motion.core.dispatcher")
 local utils = require("smart-motion.utils")
 local log = require("smart-motion.core.log")
 
+--- @type SmartMotionMotionRegistry
+local motions = require("smart-motion.core.registry")("motions")
+
+--- Fields that every motion pipeline must contain
 local REQUIRED_PIPELINE_FIELDS = { "collector", "visualizer" }
+
 local error_label = "[Motion Registry] "
 
+--- Validate a motion before registering it
+--- @param name string
+--- @param motion SmartMotionMotionEntry
+--- @return boolean
 function motions._validate_motion_entry(name, motion)
 	local registries = require("smart-motion.core.registries"):get()
 	local error_name = "Module '" .. name .. "': "
@@ -39,6 +47,9 @@ function motions._validate_motion_entry(name, motion)
 	return true
 end
 
+--- Register a motion with validation and keybinding logic
+--- @param name string
+--- @param motion SmartMotionMotionEntry
 function motions.register_motion(name, motion)
 	if not motions._validate_motion_entry(name, motion) then
 		log.error(error_label .. " Registration aborted: " .. name)
@@ -50,6 +61,7 @@ function motions.register_motion(name, motion)
 	motion.metadata = motion.metadata or {}
 	motion.metadata.label = motion.metadata.label or name:gsub("^%l", string.upper)
 	motion.metadata.description = motion.metadata.description or ("SmartMotion: " .. motion.metadata.label)
+	motion.metadata.motion_state = motion.metadata.motion_state or {}
 
 	motions.by_name[name] = motion
 	motions.by_key[motion.trigger_key] = motion
@@ -90,6 +102,9 @@ function motions.register_motion(name, motion)
 	end
 end
 
+--- Register multiple motions
+--- @param tbl table<string, SmartMotionMotionEntry>
+--- @param opts? { override?: boolean }
 function motions.register_many_motions(tbl, opts)
 	opts = opts or {}
 	for name, motion in pairs(tbl) do

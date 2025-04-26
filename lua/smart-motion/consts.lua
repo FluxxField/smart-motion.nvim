@@ -1,3 +1,9 @@
+--- @alias Direction "after_cursor" | "before_cursor" | "both"
+--- @alias HintPosition "start" | "end"
+--- @alias TargetType "words" | "lines" | "search"
+--- @alias SelectionMode "first" | "second"
+--- @alias SearchExitType "early_exit" | "direct_hint" | "auto_select" | "continue_to_selection"
+
 local M = {}
 
 M.ns_id = vim.api.nvim_create_namespace("smart_motion")
@@ -9,23 +15,27 @@ M.highlights = {
 	DimmedChar = "SmartMotionDimmedChar",
 }
 
+---@type table<string, Direction>
 M.DIRECTION = {
 	AFTER_CURSOR = "after_cursor",
 	BEFORE_CURSOR = "before_cursor",
-	BOTH = "BOTH",
+	BOTH = "both",
 }
 
+---@type table<string, HintPosition>
 M.HINT_POSITION = {
 	START = "start",
 	END = "end",
 }
 
+---@type table<string, TargetType>
 M.TARGET_TYPES = {
 	WORDS = "words",
 	LINES = "lines",
 	SEARCH = "search",
 }
 
+---@type table<string, TargetType>
 M.TARGET_TYPES_BY_KEY = {
 	w = "words",
 	l = "lines",
@@ -34,9 +44,17 @@ M.TARGET_TYPES_BY_KEY = {
 
 M.WORD_PATTERN = [[\k\+]]
 
+---@type table<string, SelectionMode>
 M.SELECTION_MODE = {
 	FIRST = "first",
 	SECOND = "second",
+}
+
+M.SEARCH_EXIT_TYPE = {
+	EARLY_EXIT = "early_exit",
+	DIRECT_HINT = "direct_hint",
+	AUTO_SELECT = "auto_select",
+	CONTINUE_TO_SELECTION = "continue_to_selection",
 }
 
 return M

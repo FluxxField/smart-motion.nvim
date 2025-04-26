@@ -2,12 +2,14 @@
 local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 
+local HINT_POSITION = consts.HINT_POSITION
+
 local M = {}
 
 --- Clears all SmartMotion highlights in the current buffer.
----@param ctx table  Motion context (must include bufnr).
----@param cfg table  Validated config (unused here, but part of the signature).
----@param motion_state table  Current motion state (unused here, but part of the signature).
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
 function M.clear(ctx, cfg, motion_state)
 	log.debug("Clearing all highlights in buffer " .. ctx.bufnr)
 
@@ -15,64 +17,129 @@ function M.clear(ctx, cfg, motion_state)
 end
 
 --- Applies a single-character hint label at a given position.
----@param ctx table  Motion context (must include bufnr).
----@param cfg table  Validated config.
----@param motion_state table  Current motion state.
----@param jump_target table The jump target we are highlighting.
----@param label string The single-character label.
-function M.apply_single_hint_label(ctx, cfg, motion_state, jump_target, label)
-	log.debug(string.format("Applying single hint '%s' at line %d, col %d", label, jump_target.row, jump_target.col))
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
+---@param target Target
+---@param label string
+---@param options HintOptions
+function M.apply_single_hint_label(ctx, cfg, motion_state, target, label, options)
+	local row = target.start_pos.row
+	local col = target.start_pos.col
 
-	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, jump_target.row, jump_target.col, {
-		virt_text = { { label, cfg.highlight.hint or "SmartMotionHint" } },
+	if motion_state.hint_position == HINT_POSITION.END then
+		col = target.end_pos.col - 1
+	end
+
+	log.debug(string.format("Applying single hint '%s' at line %d, col %d", label, row, col))
+
+	local virt_text
+
+	if motion_state.live_search and motion_state.search_text and #motion_state.search_text > 1 then
+		local prefix = motion_state.search_text:sub(1, #motion_state.search_text - 1)
+
+		local prefix_hl = cfg.highlight.search_prefix or "SmartMotionSearchPrefix"
+		local hint_hl = cfg.highlight.hint or "SmartMotionHint"
+
+		if options.dim_first_char then
+			prefix_hl = cfg.highlight.search_prefix_dim or "SmartMotionSearchPrefixDim"
+			hint_hl = cfg.highlight.hint_dim or "SmartMotionHintDim"
+		end
+
+		virt_text = {
+			{ prefix, prefix_hl },
+			{ label, hint_hl },
+		}
+	else
+		local hint_hl = cfg.highlight.hint or "SmartMotionHint"
+
+		if options.dim_first_char then
+			hint_hl = cfg.highlight.hint_dim or "SmartMotionHintDim"
+		end
+
+		virt_text = { { label, hint_hl } }
+	end
+
+	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, row, col, {
+		virt_text = virt_text,
 		virt_text_pos = "overlay",
 		hl_mode = "combine",
 	})
 end
+
+--- @class HintOptions
+--- @field dim_first_char? boolean
+--- @field dim_second_char? boolean
 
 --- Applies a double-character hint label at a given position.
----@param ctx table  Motion context (must include bufnr).
----@param cfg table  Validated config.
----@param motion_state table  Current motion state.
----@param jump_target table THe jump_target we are highlighting.
----@param label string The double-character label.
----@param options table Used to set which char is dimmed
-function M.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, options)
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
+---@param target Target
+---@param label string
+---@param options HintOptions
+function M.apply_double_hint_label(ctx, cfg, motion_state, target, label, options)
 	options = options or {}
 
-	log.debug(string.format("Extmark for '%s' at row: %d col: %d", label, jump_target.row - 1, jump_target.col))
+	local row = target.start_pos.row
+	local col = target.start_pos.col
+	local first_char = label:sub(1, 1)
+	local second_char = label:sub(2, 2)
 
-	local first_char, second_char = label:sub(1, 1), label:sub(2, 2)
+	if motion_state.hint_position == HINT_POSITION.END then
+		col = target.end_pos.col - 1
+	end
 
-	local first_hl = options.dim_first_char and (cfg.highlight.first_char_dim or "SmartMotionFirstCharDim")
-		or (cfg.highlight.first_char or "SmartMotionFirstChar")
-	local second_hl = options.dim_first_char and (cfg.highlight.first_char or "SmartMotionFirstChar")
-		or (cfg.highlight.second_char or "SmartMotionSecondChar")
+	log.debug(string.format("Extmark for '%s' at row: %d col: %d", label, row, col))
 
-	log.debug(
-		string.format(
-			"Applying double hint '%s%s' at line %d, col %d",
-			first_char,
-			second_char,
-			jump_target.row,
-			jump_target.col
-		)
-	)
+	local virt_text = {}
 
-	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, jump_target.row, jump_target.col, {
-		virt_text = {
-			{ first_char, first_hl },
-			{ second_char, second_hl },
-		},
+	if motion_state.live_search and motion_state.search_text and #motion_state.search_text > 1 then
+		local prefix = motion_state.search_text:sub(1, #motion_state.search_text - 2)
+
+		local prefix_hl = cfg.highlight.search_prefix or "SmartMotionSearchPrefix"
+		local first_hl = cfg.highlight.first_char or "SmartMotionFirstChar"
+		local second_hl = cfg.highlight.second_char or "SmartMotionSecondChar"
+
+		-- TODO: Fix prefix for 2char hints
+		col = target.start_pos.col
+
+		if options.dim_first_char then
+			prefix_hl = cfg.highlight.search_prefix_dim or "SmartMotionSearchPrefixDim" -- fallback to normal if no dim version
+			first_hl = cfg.highlight.first_char_dim or "SmartMotionFirstCharDim"
+		end
+
+		if options.dim_second_char then
+			second_hl = cfg.highlight.second_char_dim or "SmartMotionSecondCharDim"
+		end
+
+		if #prefix > 0 then
+			table.insert(virt_text, { prefix, prefix_hl })
+		end
+
+		table.insert(virt_text, { first_char, first_hl })
+		table.insert(virt_text, { second_char, second_hl })
+	else
+		local first_hl = options.dim_first_char and (cfg.highlight.first_char_dim or "SmartMotionFirstCharDim")
+			or (cfg.highlight.first_char or "SmartMotionFirstChar")
+		local second_hl = options.dim_second_char and (cfg.highlight.second_char_dim or "SmartMotionSecondCharDim")
+			or (cfg.highlight.second_char or "SmartMotionSecondChar")
+
+		table.insert(virt_text, { first_char, first_hl })
+		table.insert(virt_text, { second_char, second_hl })
+	end
+
+	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, row, col, {
+		virt_text = virt_text,
 		virt_text_pos = "overlay",
 		hl_mode = "combine",
 	})
 end
 
---- Dims background
----@param ctx table  Motion context (must include bufnr).
----@param cfg table  Validated config.
----@param motion_state table  Current motion state.
+--- Dims the background for the entire buffer.
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
 function M.dim_background(ctx, cfg, motion_state)
 	local total_lines = vim.api.nvim_buf_line_count(ctx.bufnr)
 
@@ -80,13 +147,15 @@ function M.dim_background(ctx, cfg, motion_state)
 	for line = 0, total_lines - 1 do
 		vim.api.nvim_buf_add_highlight(ctx.bufnr, consts.ns_id, cfg.highlight.dim or "SmartMotionDim", line, 0, -1)
 	end
+
+	vim.cmd("redraw")
 end
 
 --- Filters double-character hints to only show those matching the active prefix.
----@param ctx table  Motion context (must include bufnr).
----@param cfg table  Validated config.
----@param motion_state table  Current motion state.
----@param active_prefix string  The active prefix used for filtering.
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
+---@param active_prefix string
 function M.filter_double_hints(ctx, cfg, motion_state, active_prefix)
 	log.debug("Filtering double hints with prefix: " .. active_prefix)
 
@@ -95,17 +164,19 @@ function M.filter_double_hints(ctx, cfg, motion_state, active_prefix)
 
 	for label, entry in pairs(motion_state.assigned_hint_labels) do
 		if #label == 2 and label:sub(1, 1) == active_prefix then
-			local jump_target = entry.jump_target
-			if not jump_target then
+			local target = entry.target
+			if not target then
 				log.error("filter_double_hints: Missing target for label " .. label)
 				goto continue
 			end
 
-			M.apply_double_hint_label(ctx, cfg, motion_state, jump_target, label, { dim_first_char = true })
+			M.apply_double_hint_label(ctx, cfg, motion_state, target, label, { dim_first_char = true })
 
 			::continue::
 		end
 	end
+
+	vim.cmd("redraw")
 end
 
 return M

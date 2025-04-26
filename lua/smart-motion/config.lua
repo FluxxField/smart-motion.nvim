@@ -5,19 +5,24 @@ local M = {}
 -- Default highlight group names
 local default_highlight_groups = {
 	hint = "SmartMotionHint",
+	hint_dim = "SmartMotionHintFaded",
 	first_char = "SmartMotionFirstChar",
-	second_char = "SmartMotionSecondChar",
 	first_char_dim = "SmartMotionFirstCharDim",
+	second_char = "SmartMotionSecondChar",
+	second_char_dim = "SmartMotionSecondCharDim",
 	dim = "SmartMotionDim",
+	search_prefix = "SmartMotionSearchPrefix",
+	search_prefix_dim = "SmartMotionSearchPrefixDim",
 }
 
---- Default Configuration
+---@type SmartMotionConfig
 M.defaults = {
 	keys = "fjdksleirughtynm",
-	highlight = {},
+	highlight = default_highlight_groups,
 	presets = {},
 }
 
+---@type SmartMotionConfig
 M.validated = nil
 
 local function split_string(str)
@@ -29,8 +34,8 @@ local function split_string(str)
 end
 
 --- Validates user configuration and applies defaults where needed.
----@param user_config table|nil
----@return table final_config
+---@param user_config? SmartMotionConfig
+---@return SmartMotionConfig
 function M.validate(user_config)
 	log.debug("Validating SmartMotion configuration")
 
