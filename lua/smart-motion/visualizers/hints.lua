@@ -85,7 +85,7 @@ function M.run(ctx, cfg, motion_state)
 	highlight.clear(ctx, cfg, motion_state)
 	highlight.dim_background(ctx, cfg, motion_state)
 
-	local is_search_mode = motion_state.is_search_mode == true
+	local is_searching_mode = motion_state.is_searching_mode == true
 
 	for index, target in ipairs(targets) do
 		local label = label_pool[index]
@@ -101,7 +101,7 @@ function M.run(ctx, cfg, motion_state)
 				motion_state,
 				target,
 				label,
-				{ dim_first_char = is_search_mode }
+				{ dim_first_char = is_searching_mode }
 			)
 			motion_state.assigned_hint_labels[label] = { target = target, is_single_prefix = true }
 		elseif #label == 2 then
@@ -111,7 +111,7 @@ function M.run(ctx, cfg, motion_state)
 				motion_state,
 				target,
 				label,
-				{ dim_first_char = is_search_mode, dim_second_char = is_search_mode }
+				{ dim_first_char = is_searching_mode, dim_second_char = is_searching_mode }
 			)
 			motion_state.assigned_hint_labels[label] = { target = target }
 			motion_state.assigned_hint_labels[label:sub(1, 1)] = { is_double_prefix = true }

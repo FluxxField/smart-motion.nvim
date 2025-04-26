@@ -11,20 +11,14 @@ local default_highlight_groups = {
 	second_char = "SmartMotionSecondChar",
 	second_char_dim = "SmartMotionSecondCharDim",
 	dim = "SmartMotionDim",
+	search_prefix = "SmartMotionSearchPrefix",
+	search_prefix_dim = "SmartMotionSearchPrefixDim",
 }
 
 ---@type SmartMotionConfig
 M.defaults = {
 	keys = "fjdksleirughtynm",
-	highlight = {
-		hint = "SmartMotionHint",
-		hint_dim = "SmartMotionHintFaded",
-		first_char = "SmartMotionFirstChar",
-		first_char_dim = "SmartMotionFirstCharDim",
-		second_char = "SmartMotionSecondChar",
-		second_char_dim = "SmartMotionSecondCharDim",
-		dim = "SmartMotionDim",
-	},
+	highlight = default_highlight_groups,
 	presets = {},
 }
 

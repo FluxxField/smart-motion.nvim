@@ -55,7 +55,7 @@ function M.run(run_pipeline, ctx, cfg, motion_state)
 			if search_text ~= last_search_text and search_text ~= "" then
 				-- Run the pipeline with the current input
 				motion_state.search_text = search_text
-				motion_state.is_search_mode = true
+				motion_state.is_searching_mode = true
 				run_pipeline(ctx, cfg, motion_state)
 
 				start_time = vim.fn.reltime()

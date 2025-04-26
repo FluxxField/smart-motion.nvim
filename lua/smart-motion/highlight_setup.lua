@@ -11,6 +11,8 @@ local default_highlights = {
 	SmartMotionSecondChar = { fg = "#61AFEF", bg = "none" },
 	SmartMotionSecondCharDim = { fg = "#3E5E76", bg = "none" },
 	SmartMotionDim = { fg = "#5C6370", bg = "none" },
+	SmartMotionSearchPrefix = { fg = "#FFFFFF", bg = "none" },
+	SmartMotionSearchPrefixDim = { fg = "#CCCCCC", bg = "none" }, -- optional for dimmed during search
 }
 
 local M = {}
