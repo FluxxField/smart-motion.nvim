@@ -24,41 +24,45 @@ end
 ---@param label string
 ---@param options HintOptions
 function M.apply_single_hint_label(ctx, cfg, motion_state, target, label, options)
+	options = options or {}
+
 	local row = target.start_pos.row
 	local col = target.start_pos.col
+
+	local prefix = ""
+	local virt_text = {}
+
+	local highlight = cfg.highlight
+	local hint = highlight.hint or "SmartMotionHint"
+	local hint_dim = highlight.hint_dim or "SmartMotionHintDim"
+	local prefix_highlight = highlight.search_prefix or "SmartMotionSearchPrefix"
+	local prefix_dim_highlight = highlight.search_prefix_dim or "SmartMotionSearchPrefixDim"
+
+	local hint_hl = hint
+	local prefix_hl = prefix_highlight
+
+	log.debug(string.format("Applying single hint '%s' at line %d, col %d", label, row, col))
 
 	if motion_state.hint_position == HINT_POSITION.END then
 		col = target.end_pos.col - 1
 	end
 
-	log.debug(string.format("Applying single hint '%s' at line %d, col %d", label, row, col))
-
-	local virt_text
-
-	if motion_state.live_search and motion_state.search_text and #motion_state.search_text > 1 then
-		local prefix = motion_state.search_text:sub(1, #motion_state.search_text - 1)
-
-		local prefix_hl = cfg.highlight.search_prefix or "SmartMotionSearchPrefix"
-		local hint_hl = cfg.highlight.hint or "SmartMotionHint"
-
-		if options.dim_first_char then
-			prefix_hl = cfg.highlight.search_prefix_dim or "SmartMotionSearchPrefixDim"
-			hint_hl = cfg.highlight.hint_dim or "SmartMotionHintDim"
-		end
-
-		virt_text = {
-			{ prefix, prefix_hl },
-			{ label, hint_hl },
-		}
-	else
-		local hint_hl = cfg.highlight.hint or "SmartMotionHint"
-
-		if options.dim_first_char then
-			hint_hl = cfg.highlight.hint_dim or "SmartMotionHintDim"
-		end
-
-		virt_text = { { label, hint_hl } }
+	if motion_state.search_text and #motion_state.search_text >= 1 then
+		prefix = motion_state.search_text:sub(1, #motion_state.search_text)
 	end
+
+	if motion_state.is_searching_mode then
+		col = target.start_pos.col
+
+		hint_hl = hint_dim
+		prefix_hl = prefix_dim_highlight
+	end
+
+	if #prefix > 0 then
+		table.insert(virt_text, { prefix, prefix_hl })
+	end
+
+	table.insert(virt_text, { label, hint_hl })
 
 	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, row, col, {
 		virt_text = virt_text,
@@ -83,51 +87,51 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, target, label, option
 
 	local row = target.start_pos.row
 	local col = target.start_pos.col
+
 	local first_char = label:sub(1, 1)
 	local second_char = label:sub(2, 2)
+	local prefix = ""
+	local virt_text = {}
+
+	local highlight = cfg.highlight
+	local two_char_hint = highlight.two_char_hint or "SmartMotionTwoCharHint"
+	local two_char_hint_dim = highlight.two_char_hint_dim or "SmartMotionTwoCharHintDim"
+	local prefix_highlight = highlight.search_prefix or "SmartMotionSearchPrefix"
+	local prefix_dim_highlight = highlight.search_prefix_dim or "SmartMotionSearchPrefixDim"
+
+	local first_hl = two_char_hint
+	local second_hl = two_char_hint_dim
+	local prefix_hl = prefix_highlight
+
+	log.debug(string.format("Extmark for '%s' at row: %d col: %d", label, row, col))
 
 	if motion_state.hint_position == HINT_POSITION.END then
 		col = target.end_pos.col - 1
 	end
 
-	log.debug(string.format("Extmark for '%s' at row: %d col: %d", label, row, col))
+	if motion_state.search_text and #motion_state.search_text >= 1 then
+		prefix = motion_state.search_text:sub(1, #motion_state.search_text)
+	end
 
-	local virt_text = {}
-
-	if motion_state.live_search and motion_state.search_text and #motion_state.search_text > 1 then
-		local prefix = motion_state.search_text:sub(1, #motion_state.search_text - 2)
-
-		local prefix_hl = cfg.highlight.search_prefix or "SmartMotionSearchPrefix"
-		local first_hl = cfg.highlight.first_char or "SmartMotionFirstChar"
-		local second_hl = cfg.highlight.second_char or "SmartMotionSecondChar"
-
-		-- TODO: Fix prefix for 2char hints
+	if motion_state.is_searching_mode then
 		col = target.start_pos.col
 
-		if options.dim_first_char then
-			prefix_hl = cfg.highlight.search_prefix_dim or "SmartMotionSearchPrefixDim" -- fallback to normal if no dim version
-			first_hl = cfg.highlight.first_char_dim or "SmartMotionFirstCharDim"
-		end
-
-		if options.dim_second_char then
-			second_hl = cfg.highlight.second_char_dim or "SmartMotionSecondCharDim"
-		end
-
-		if #prefix > 0 then
-			table.insert(virt_text, { prefix, prefix_hl })
-		end
-
-		table.insert(virt_text, { first_char, first_hl })
-		table.insert(virt_text, { second_char, second_hl })
+		first_hl = two_char_hint_dim
+		second_hl = two_char_hint_dim
+		prefix_hl = prefix_dim_highlight
 	else
-		local first_hl = options.dim_first_char and (cfg.highlight.first_char_dim or "SmartMotionFirstCharDim")
-			or (cfg.highlight.first_char or "SmartMotionFirstChar")
-		local second_hl = options.dim_second_char and (cfg.highlight.second_char_dim or "SmartMotionSecondCharDim")
-			or (cfg.highlight.second_char or "SmartMotionSecondChar")
-
-		table.insert(virt_text, { first_char, first_hl })
-		table.insert(virt_text, { second_char, second_hl })
+		if options.dim_first_char then
+			first_hl = two_char_hint_dim
+			second_hl = two_char_hint
+		end
 	end
+
+	if #prefix > 0 then
+		table.insert(virt_text, { prefix, prefix_hl })
+	end
+
+	table.insert(virt_text, { first_char, first_hl })
+	table.insert(virt_text, { second_char, second_hl })
 
 	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, row, col, {
 		virt_text = virt_text,

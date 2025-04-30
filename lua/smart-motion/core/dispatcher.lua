@@ -87,8 +87,6 @@ function M.trigger_motion(trigger_key)
 			action.run(ctx, cfg, motion_state, motion.opts)
 		end
 	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
-		-- Rerun the visualizer to makes sure that the hints are not dimmed
-		motion_state.is_searching_mode = false
 		visualizer.run(ctx, cfg, motion_state)
 		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 
@@ -220,7 +218,6 @@ function M.trigger_action(trigger_key)
 			action.run(ctx, cfg, motion_state, motion.opts)
 		end
 	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
-		motion_state.is_searching_mode = false
 		visualizer.run(ctx, cfg, motion_state)
 		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 
