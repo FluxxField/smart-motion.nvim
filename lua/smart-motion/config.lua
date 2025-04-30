@@ -5,27 +5,20 @@ local M = {}
 -- Default highlight group names
 local default_highlight_groups = {
 	hint = "SmartMotionHint",
-	hint_dim = "SmartMotionHintFaded",
-	first_char = "SmartMotionFirstChar",
-	first_char_dim = "SmartMotionFirstCharDim",
-	second_char = "SmartMotionSecondChar",
-	second_char_dim = "SmartMotionSecondCharDim",
+	hint_dim = "SmartMotionHintDim",
+	two_char_hint = "SmartMotionTwoCharHint",
+	two_char_hint_dim = "SmartMotionTwoCharHintDim",
 	dim = "SmartMotionDim",
+	search_prefix = "SmartMotionSearchPrefix",
+	search_prefix_dim = "SmartMotionSearchPrefixDim",
 }
 
 ---@type SmartMotionConfig
 M.defaults = {
 	keys = "fjdksleirughtynm",
-	highlight = {
-		hint = "SmartMotionHint",
-		hint_dim = "SmartMotionHintFaded",
-		first_char = "SmartMotionFirstChar",
-		first_char_dim = "SmartMotionFirstCharDim",
-		second_char = "SmartMotionSecondChar",
-		second_char_dim = "SmartMotionSecondCharDim",
-		dim = "SmartMotionDim",
-	},
+	highlight = default_highlight_groups,
 	presets = {},
+	use_background_highlights = false,
 }
 
 ---@type SmartMotionConfig

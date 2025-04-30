@@ -14,7 +14,9 @@ local M = {}
 --- Triggers a motion by its trigger key.
 --- @param trigger_key string
 function M.trigger_motion(trigger_key)
+	-- Get Registries and motion data
 	local registries = require("smart-motion.core.registries"):get()
+
 	local motion = require("smart-motion.motions").get_by_key(trigger_key)
 	if not motion then
 		log.warn("No motion found for key: " .. trigger_key)
@@ -33,21 +35,24 @@ function M.trigger_motion(trigger_key)
 		filter = registries.filters.get_by_name("default")
 	end
 
+	-- Build ctx, cfg, motion_state
 	local ctx, cfg, motion_state = utils.prepare_motion(extractor.name)
+	if not ctx or not cfg or not motion_state then
+		log.error("Failed to prepare motion - aborting")
+		return
+	end
 
+	-- Update motion_state with data from modules
 	for _, module in ipairs({ motion, collector, extractor, filter, visualizer }) do
 		if module.metadata and module.metadata.motion_state then
 			motion_state = vim.tbl_deep_extend("force", motion_state, module.metadata.motion_state)
 		end
 	end
 
-	if not ctx or not cfg or not motion_state then
-		log.error("Failed to prepare motion - aborting")
-		return
-	end
-
+	-- Make sure everything is starting empty
 	utils.reset_motion(ctx, cfg, motion_state)
 
+	-- Evaluate flow state
 	if flow_state.evaluate_flow_at_motion_start() then
 		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter, motion.opts)
 
@@ -67,9 +72,11 @@ function M.trigger_motion(trigger_key)
 
 	motion_state = vim.tbl_deep_extend("force", motion_state, pipeline_wrapper.metadata.motion_state)
 
+	-- Build and run the pipeline
 	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
 	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, motion.opts)
 
+	-- Handle pipeline early exits
 	if exit_type == SEARCH_EXIT_TYPE.EARLY_EXIT then
 		utils.reset_motion(ctx, cfg, motion_state)
 		return
@@ -80,8 +87,6 @@ function M.trigger_motion(trigger_key)
 			action.run(ctx, cfg, motion_state, motion.opts)
 		end
 	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
-		-- Rerun the visualizer to makes sure that the hints are not dimmed
-		motion_state.is_search_mode = false
 		visualizer.run(ctx, cfg, motion_state)
 		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 
@@ -90,6 +95,7 @@ function M.trigger_motion(trigger_key)
 		end
 	end
 
+	-- Clean up
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 
@@ -120,20 +126,16 @@ function M.trigger_action(trigger_key)
 		filter = registries.filters.get_by_name("default")
 	end
 
-	for _, module in ipairs({ motion, collector, extractor, filter, visualizer }) do
-		if module.metadata and module.metadata.motion_state then
-			motion_state = vim.tbl_deep_extend("force", motion_state, module.metadata.motion_state)
-		end
-	end
-
 	local ctx, cfg, motion_state = utils.prepare_motion("")
-
-	-- TODO: Each module can now use metadata to update motion_state
-	-- We dont need to pass this data to prepare_motion anymore
-
 	if not ctx or not cfg or not motion_state then
 		log.error("Failde to prepare motion - aborting")
 		return
+	end
+
+	for _, module in ipairs({ motion, collector, filter, visualizer }) do
+		if module.metadata.motion_state then
+			motion_state = vim.tbl_deep_extend("force", motion_state, module.metadata.motion_state)
+		end
 	end
 
 	utils.reset_motion(ctx, cfg, motion_state)
@@ -168,6 +170,10 @@ function M.trigger_action(trigger_key)
 
 		vim.api.nvim_feedkeys(trigger_key .. motion_key, "n", false)
 		return
+	end
+
+	if extractor.metadata.motion_state then
+		motion_state = vim.tbl_deep_extend("force", motion_state, extractor.metadata.motion_state)
 	end
 
 	local under_cursor_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
@@ -212,7 +218,6 @@ function M.trigger_action(trigger_key)
 			action.run(ctx, cfg, motion_state, motion.opts)
 		end
 	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
-		motion_state.is_search_mode = false
 		visualizer.run(ctx, cfg, motion_state)
 		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 

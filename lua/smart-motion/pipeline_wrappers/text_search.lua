@@ -52,7 +52,7 @@ function M.run(run_pipeline, ctx, cfg, motion_state)
 
 				-- Run the pipeline once we hit the desired char count
 				motion_state.search_text = search_text
-				motion_state.is_search_mode = num_of_char > 1
+				motion_state.is_searching_mode = num_of_char > 1
 				run_pipeline(ctx, cfg, motion_state, merged_opts)
 
 				local count = motion_state.jump_target_count
@@ -67,6 +67,7 @@ function M.run(run_pipeline, ctx, cfg, motion_state)
 		end
 	end
 
+	motion_state.is_searching_mode = false
 	return SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION
 end
 

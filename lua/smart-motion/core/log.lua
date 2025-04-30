@@ -11,11 +11,11 @@ end
 ---@param level integer
 ---@param opts table|nil
 local function log(msg, level, opts)
-	if has_notify() then
-		require("notify")(msg, level, opts or {})
-	else
-		vim.notify(msg, level)
-	end
+	-- if has_notify() then
+	-- 	require("notify")(msg, level, opts or {})
+	-- else
+	vim.notify(msg, level)
+	-- end
 end
 
 --- Logs an error message.

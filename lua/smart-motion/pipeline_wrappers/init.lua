@@ -19,6 +19,7 @@ local pipeline_wrapper_entries = {
 		metadata = {
 			label = "Live Search Wrapper",
 			description = "Executes pipeline while the user searches for text",
+			motion_state = { live_search = true },
 		},
 	},
 	text_search_1_char = {
