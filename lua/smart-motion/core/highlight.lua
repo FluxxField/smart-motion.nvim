@@ -47,7 +47,7 @@ function M.apply_single_hint_label(ctx, cfg, motion_state, target, label, option
 		col = target.end_pos.col - 1
 	end
 
-	if motion_state.search_text and #motion_state.search_text >= 1 then
+	if motion_state.is_searching_mode and motion_state.search_text and #motion_state.search_text >= 1 then
 		prefix = motion_state.search_text:sub(1, #motion_state.search_text)
 	end
 
@@ -109,7 +109,7 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, target, label, option
 		col = target.end_pos.col - 1
 	end
 
-	if motion_state.search_text and #motion_state.search_text >= 1 then
+	if motion_state.is_searching_mode and motion_state.search_text and #motion_state.search_text >= 1 then
 		prefix = motion_state.search_text:sub(1, #motion_state.search_text)
 	end
 
