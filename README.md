@@ -35,16 +35,17 @@ SmartMotion comes with no default mappings -- everything is opt-in. Here's a qui
 return {
   "FluxxField/smart-motion.nvim",
   opts = {
+    keys = "fjdksleirughtynm",
+    highlight = {
+      hint = { fg = "#FF2FD0" },
+      two_char_hint = { fg = "#2FD0FF" },
+      dim = "Comment",
+    },
     presets = {
       words = true,
       search = true,
       delete = true,
     },
-    highlight = {
-      hint = { fg = "#FFD700", bg = "#222222" },
-      dim = "Comment",
-    },
-    keys = "fjdksleirughtynm",
   },
 }
 ```
@@ -64,12 +65,12 @@ M.defaults = {
   keys = "fjdksleirughtynm",
   highlight = {
     hint = "SmartMotionHint",
-    hint_dim = "SmartMotionHintFaded",
-    first_char = "SmartMotionFirstChar",
-    first_char_dim = "SmartMotionFirstCharDim",
-    second_char = "SmartMotionSecondChar",
-    second_char_dim = "SmartMotionSecondCharDim",
+    hint_dim = "SmartMotionHintDim",
+    two_char_hint = "SmartMotionTwoCharHint",
+    two_char_hint_dim = "SmartMotionTwoCharHintDim",
     dim = "SmartMotionDim",
+    search_prefix = "SmartMotionSearchPrefix",
+    search_prefix_dim = "SmartMotionSearchPrefixDim",
   },
   presets = {},
 }
@@ -101,12 +102,21 @@ Whether you want high-contrast backgrounds, colors that match your theme, or to 
 
 ```lua
 highlight = {
-  hint = { fg = "#FFD700", bg = "#222222" },
+  hint = { fg = "#FF2FD0" },
+  two_char_hint = { fg = "#2FD0FF" },
   dim = "Comment",
 }
 ```
 
 Supports both string references and highlight tables.
+
+You can also use the toggle use_background_highlights to change between character and background hints
+
+```lua
+opts = {
+  use_background_highlights = true,
+}
+```
 
 > [!NOTE]
 > 📖 See full customization options in [advanced.md → Highlight Customization](./docs/advanced.md#-highlight-customization)

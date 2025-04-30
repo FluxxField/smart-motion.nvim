@@ -16,9 +16,9 @@ local default_highlight_groups = {
 ---@type SmartMotionConfig
 M.defaults = {
 	keys = "fjdksleirughtynm",
+	use_background_highlights = false,
 	highlight = default_highlight_groups,
 	presets = {},
-	use_background_highlights = false,
 }
 
 ---@type SmartMotionConfig
