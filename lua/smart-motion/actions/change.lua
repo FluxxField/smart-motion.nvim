@@ -15,17 +15,17 @@ function M.run(ctx, cfg, motion_state)
 	local line = vim.api.nvim_buf_get_lines(bufnr, row, row + 1, false)[1] or ""
 
 	if col >= #line then
-		vim.cmd("normal! D")
+		vim.cmd("normal! C")
 		vim.cmd("startinsert!")
 	else
 		vim.api.nvim_buf_set_mark(bufnr, ">", row + 1, col, {})
-		vim.cmd("normal! d`>")
+		vim.cmd("normal! c`>")
+		vim.api.nvim_win_set_cursor(0, { target.end_pos.row + 1, target.start_pos.col })
 		vim.cmd("startinsert")
 	end
 
 	-- Clear mark
 	local ok = pcall(vim.api.nvim_buf_del_mark, bufnr, ">")
-
 	if not ok then
 		log.error("Action Change: del_mark failed")
 	end

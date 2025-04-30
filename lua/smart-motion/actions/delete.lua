@@ -15,7 +15,6 @@ function M.run(ctx, cfg, motion_state)
 
 	-- Delete to the end of the line
 	if col == #line then
-		-- NOTE: Does not copy like normal
 		vim.cmd("normal! D")
 	else
 		vim.api.nvim_buf_set_mark(bufnr, ">", row + 1, col, {})
