@@ -32,7 +32,7 @@ function M.format_target(ctx, cfg, motion_state, raw_data)
 		type = raw_data.type or "unknown",
 		metadata = vim.tbl_deep_extend("force", raw_data.metadata or {}, {
 			bufnr = ctx.bufnr,
-			windid = ctx.winid,
+			winid = ctx.winid,
 			filetype = vim.bo[ctx.bufnr].filetype,
 		}),
 	}
