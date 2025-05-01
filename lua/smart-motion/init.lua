@@ -5,6 +5,7 @@ local config = require("smart-motion.config")
 local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 local highlight_setup = require("smart-motion.highlight_setup")
+local merge = require("smart-motion.merge")
 
 ---@type SmartMotionPlugin
 local M = {}
@@ -57,6 +58,9 @@ function M.setup(user_config)
 			end
 		end
 	end
+
+	M.merge_filters = merge.merge_filters
+	M.merge_actions = merge.merge_actions
 
 	M.register_motion = registries.motions.register_motion
 	M.register_many_motions = registries.motions.register_many_motions
