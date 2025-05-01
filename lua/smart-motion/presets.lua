@@ -234,7 +234,7 @@ function presets.delete(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "words",
-				filter = "default",
+				filter = "filter_visible",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
@@ -250,7 +250,7 @@ function presets.delete(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "lines",
-				filter = "default",
+				filter = "filter_visible",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
@@ -318,7 +318,7 @@ function presets.yank(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "words",
-				filter = "default",
+				filter = "filter_visible",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
@@ -334,7 +334,7 @@ function presets.yank(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "lines",
-				filter = "default",
+				filter = "filter_visible",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
