@@ -13,6 +13,9 @@ local extractor_entries = {
 		metadata = {
 			label = "Line Extractor",
 			description = "Extracts lines to generate targets from collector",
+			motion_state = {
+				ignore_whitespace = true,
+			},
 		},
 	},
 	words = {

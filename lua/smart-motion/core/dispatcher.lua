@@ -42,14 +42,7 @@ function M.trigger_motion(trigger_key)
 		return
 	end
 
-	-- Update motion_state with data from modules
-	for _, module in ipairs({ motion, collector, extractor, filter, visualizer }) do
-		if module.metadata and module.metadata.motion_state then
-			motion_state = vim.tbl_deep_extend("force", motion_state, module.metadata.motion_state)
-		end
-	end
-
-	-- Make sure everything is starting empty
+	state.merge_motion_state(motion_state, motion, collector, extractor, filter, visualizer, action)
 	utils.reset_motion(ctx, cfg, motion_state)
 
 	-- Evaluate flow state
@@ -77,23 +70,7 @@ function M.trigger_motion(trigger_key)
 	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, motion.opts)
 
 	-- Handle pipeline early exits
-	if exit_type == SEARCH_EXIT_TYPE.EARLY_EXIT then
-		utils.reset_motion(ctx, cfg, motion_state)
-		return
-	end
-
-	if exit_type == SEARCH_EXIT_TYPE.DIRECT_HINT or exit_type == SEARCH_EXIT_TYPE.AUTO_SELECT then
-		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, motion.opts)
-		end
-	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
-		visualizer.run(ctx, cfg, motion_state)
-		selection.wait_for_hint_selection(ctx, cfg, motion_state)
-
-		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, motion.opts)
-		end
-	end
+	M._handle_exit(ctx, cfg, motion_state, exit_type, action, visualizer)
 
 	-- Clean up
 	utils.reset_motion(ctx, cfg, motion_state)
@@ -132,12 +109,7 @@ function M.trigger_action(trigger_key)
 		return
 	end
 
-	for _, module in ipairs({ motion, collector, filter, visualizer }) do
-		if module.metadata.motion_state then
-			motion_state = vim.tbl_deep_extend("force", motion_state, module.metadata.motion_state)
-		end
-	end
-
+	state.merge_motion_state(motion_state, motion, collector, filter, visualizer, action)
 	utils.reset_motion(ctx, cfg, motion_state)
 
 	-- Get motion_key
@@ -172,9 +144,7 @@ function M.trigger_action(trigger_key)
 		return
 	end
 
-	if extractor.metadata.motion_state then
-		motion_state = vim.tbl_deep_extend("force", motion_state, extractor.metadata.motion_state)
-	end
+	state.merge_motion_state(motion_state, extractor)
 
 	local under_cursor_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
 
@@ -203,28 +173,12 @@ function M.trigger_action(trigger_key)
 		pipeline_wrapper = registries.pipeline_wrappers.get_by_name("default")
 	end
 
-	motion_state = vim.tbl_deep_extend("force", motion_state, pipeline_wrapper.metadata.motion_state)
+	state.merge_motion_state(motion_state, pipeline_wrapper)
 
 	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
 	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, motion.opts)
 
-	if exit_type == SEARCH_EXIT_TYPE.EARLY_EXIT then
-		utils.reset_motion(ctx, cfg, motion_state)
-		return
-	end
-
-	if exit_type == SEARCH_EXIT_TYPE.DIRECT_HINT or exit_type == SEARCH_EXIT_TYPE.AUTO_SELECT then
-		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, motion.opts)
-		end
-	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
-		visualizer.run(ctx, cfg, motion_state)
-		selection.wait_for_hint_selection(ctx, cfg, motion_state)
-
-		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, motion.opts)
-		end
-	end
+	M._handle_exit(ctx, cfg, motion_state, exit_type, action, visualizer)
 
 	utils.reset_motion(ctx, cfg, motion_state)
 end
@@ -269,6 +223,25 @@ function M._build_pipeline(collector, extractor, filter, visualizer)
 	end
 
 	return run_pipeline
+end
+
+function M._handle_exit(ctx, cfg, motion_state, exit_type, action, visualizer)
+	if exit_type == SEARCH_EXIT_TYPE.EARLY_EXIT then
+		return
+	end
+
+	if exit_type == SEARCH_EXIT_TYPE.DIRECT_HINT or exit_type == SEARCH_EXIT_TYPE.AUTO_SELECT then
+		if motion_state.selected_jump_target then
+			action.run(ctx, cfg, motion_state)
+		end
+	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
+		visualizer.run(ctx, cfg, motion_state)
+		selection.wait_for_hint_selection(ctx, cfg, motion_state)
+
+		if motion_state.selected_jump_target then
+			action.run(ctx, cfg, motion_state)
+		end
+	end
 end
 
 return M
