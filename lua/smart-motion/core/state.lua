@@ -163,6 +163,8 @@ function M.merge_motion_state(motion_state, ...)
 			motion_state = vim.tbl_deep_extend("force", motion_state, module.metadata.motion_state)
 		end
 	end
+
+	return motion_state
 end
 
 return M
