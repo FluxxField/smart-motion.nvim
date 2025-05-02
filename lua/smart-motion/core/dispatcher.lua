@@ -42,7 +42,7 @@ function M.trigger_motion(trigger_key)
 		return
 	end
 
-	state.merge_motion_state(motion_state, motion, collector, extractor, filter, visualizer, action)
+	motion_state = state.merge_motion_state(motion_state, motion, collector, extractor, filter, visualizer, action)
 	utils.reset_motion(ctx, cfg, motion_state)
 
 	-- Evaluate flow state
@@ -109,7 +109,7 @@ function M.trigger_action(trigger_key)
 		return
 	end
 
-	state.merge_motion_state(motion_state, motion, collector, filter, visualizer, action)
+	motion_state = state.merge_motion_state(motion_state, motion, collector, filter, visualizer, action)
 	utils.reset_motion(ctx, cfg, motion_state)
 
 	-- Get motion_key
@@ -144,7 +144,7 @@ function M.trigger_action(trigger_key)
 		return
 	end
 
-	state.merge_motion_state(motion_state, extractor)
+	motion_state = state.merge_motion_state(motion_state, extractor)
 
 	local under_cursor_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
 
@@ -173,7 +173,7 @@ function M.trigger_action(trigger_key)
 		pipeline_wrapper = registries.pipeline_wrappers.get_by_name("default")
 	end
 
-	state.merge_motion_state(motion_state, pipeline_wrapper)
+	motion_state = state.merge_motion_state(motion_state, pipeline_wrapper)
 
 	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
 	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, motion.opts)
