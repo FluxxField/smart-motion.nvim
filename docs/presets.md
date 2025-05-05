@@ -91,6 +91,8 @@ You can selectively **override** motion settings, **disable** individual motions
 opts = {
   presets = {
     words = {
+      -- Note: "w" and "b" are the motion names. If no trigger_key is provided. The name is used
+      -- In all the presets, no trigger_key is provided so the name becomes the trigger key
       w = {
         map = false, -- Override: Do not automatically map 'w'
       },
