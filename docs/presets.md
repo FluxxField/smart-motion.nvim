@@ -141,6 +141,12 @@ In this example:
 - The motion logic is tied to `w` internally.
 - It is mapped to `W` instead of `w` manually by you.
 
+SmartMotion provides a helper util to map registered motions to their trigger_key later on if needed. All you need to do is provide the name the motion was registered to.
+
+```lua
+require("smart-motion").map_motion("w")
+```
+
 ---
 
 # Full Example
