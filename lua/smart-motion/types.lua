@@ -2,8 +2,9 @@
 
 ---@class SmartMotionPlugin
 ---@field setup fun(user_config: SmartMotionConfig | nil)
----@field register_motion fun(name: string, motion: SmartMotionMotionEntry)
+---@field register_motion fun(name: string, motion: SmartMotionMotionEntry, opts?: table)
 ---@field register_many_motions fun(tbl: table<string, SmartMotionMotionEntry>, opts?: { override?: boolean })
+---@field map_motion fun(name: string, motion_opts: SmartMotionMotionEntry, opts?: table): nil
 ---@field collectors { register: fun(name: string, mod: SmartMotionCollectorModuleEntry), register_many: fun(tbl: table<string, SmartMotionCollectorModule>, opts?: { override?: boolean }) }
 ---@field extractors { register: fun(name: string, mod: SmartMotionExtractorModuleEntry), register_many: fun(tbl: table<string, SmartMotionExtractorModule>, opts?: { override?: boolean }) }
 ---@field filters { register: fun(name: string, mod: SmartMotionFilterModuleEntry), register_many: fun(tbl: table<string, SmartMotionFilterModule>, opts?: { override?: boolean }) }
@@ -163,13 +164,13 @@
 ---@field _validate_module_entry fun(name: string, entry: T): boolean
 
 ---@class SmartMotionRegistryMap
----@field collectors SmartMotionRegistry<SmartMotionCollectorModule>
----@field extractors SmartMotionRegistry<SmartMotionExtractorModule>
----@field filters SmartMotionRegistry<SmartMotionFilterModule>
----@field visualizers SmartMotionRegistry<SmartMotionVisualizerModule>
----@field actions SmartMotionRegistry<SmartMotionActionModule>
----@field pipeline_wrappers SmartMotionRegistry<SmartMotionPipelineWrapperModule>
----@field motions SmartMotionRegistry<SmartMotionMotionModule>
+---@field collectors SmartMotionRegistry<SmartMotionCollectorModuleEntry>
+---@field extractors SmartMotionRegistry<SmartMotionExtractorModuleEntry>
+---@field filters SmartMotionRegistry<SmartMotionFilterModuleEntry>
+---@field visualizers SmartMotionRegistry<SmartMotionVisualizerModuleEntry>
+---@field actions SmartMotionRegistry<SmartMotionActionModuleEntry>
+---@field pipeline_wrappers SmartMotionRegistry<SmartMotionPipelineWrapperModuleEntry>
+---@field motions SmartMotionMotionRegistry
 
 ---@class SmartMotionRegistryManager
 ---@field registries? SmartMotionRegistryMap
@@ -178,5 +179,6 @@
 
 --- @class SmartMotionMotionRegistry : SmartMotionRegistry<SmartMotionMotionEntry>
 --- @field _validate_motion_entry fun(name: string, motion: SmartMotionMotionEntry): boolean
---- @field register_motion fun(name: string, motion: SmartMotionMotionEntry): nil
+--- @field register_motion fun(name: string, motion: SmartMotionMotionEntry, opts?: table): nil
 --- @field register_many_motions fun(tbl: table<string, SmartMotionMotionEntry>, opts?: { override?: boolean }): nil
+--- @field map_motion fun(name: string, motion_opts: SmartMotionMotionEntry, opts): nil

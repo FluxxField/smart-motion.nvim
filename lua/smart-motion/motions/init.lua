@@ -50,7 +50,10 @@ end
 --- Register a motion with validation and keybinding logic
 --- @param name string
 --- @param motion SmartMotionMotionEntry
-function motions.register_motion(name, motion)
+--- @param opts
+function motions.register_motion(name, motion, opts)
+	opts = opts or {}
+
 	if not motions._validate_motion_entry(name, motion) then
 		log.error(error_label .. " Registration aborted: " .. name)
 		return
@@ -87,11 +90,17 @@ function motions.register_motion(name, motion)
 				wk.register({ [motion.trigger_key] = { name = desc } }, { mode = mode })
 			end
 
-			local ok, err = pcall(vim.keymap.set, mode, motion.trigger_key, handler, {
-				desc = desc,
-				noremap = true,
-				silent = true,
-			})
+			local ok, err = pcall(
+				vim.keymap.set,
+				mode,
+				motion.trigger_key,
+				handler,
+				vim.tbl_deep_extend("force", {
+					desc = desc,
+					noremap = true,
+					silent = true,
+				}, opts)
+			)
 
 			if not ok then
 				require("smart-motion.core.log").error(
@@ -112,6 +121,57 @@ function motions.register_many_motions(tbl, opts)
 			require("smart-motion.core.log").warn("Skipping already-registered motion: " .. name)
 		else
 			motions.register_motion(name, motion)
+		end
+	end
+end
+
+--- Map a registered motion to its trigger key for the given modes
+--- @param name string
+--- @param motion_opts SmartMotionMotionEntry
+--- @param opts table
+function motions.map_motion(name, motion_opts, opts)
+	motion_opts = motion_opts or {}
+	opts = opts or {}
+	local registries = require("smart-motion.core.registries"):get()
+	local motion = registries.motions.by_name[name]
+
+	if not motion then
+		log.error("Tried to map unregistered motion: " .. name)
+		return
+	end
+
+	local modes = motion_opts.modes or motion.modes or { "n" }
+	local desc = motion_opts.description or motion.metadata and motion.metadata.label or name
+	local trigger_key = motion.trigger_key or name
+
+	local handler = function()
+		local trigger = motion.is_action and dispatcher.trigger_action or dispatcher.trigger_motion
+
+		trigger(trigger_key)
+	end
+
+	if opts.which_key ~= false and package.loaded["which-key"] then
+		local wk = require("which-key")
+		for _, mode in ipairs(modes) do
+			wk.register({ [trigger_key] = { name = desc } }, { mode = mode })
+		end
+	end
+
+	for _, mode in ipairs(modes) do
+		local ok, err = pcall(
+			vim.keymap.set,
+			mode,
+			trigger_key,
+			handler,
+			vim.tbl_deep_extend("force", {
+				desc = desc,
+				noremap = true,
+				silent = true,
+			}, opts)
+		)
+
+		if not ok then
+			log.error("Failed to register keymap for motion '" .. name .. "' (" .. trigger_key .. "): " .. err)
 		end
 	end
 end

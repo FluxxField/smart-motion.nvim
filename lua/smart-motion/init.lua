@@ -62,37 +62,54 @@ function M.setup(user_config)
 	M.merge_filters = merge.merge_filters
 	M.merge_actions = merge.merge_actions
 
-	M.register_motion = registries.motions.register_motion
-	M.register_many_motions = registries.motions.register_many_motions
+	M.motions = {
+		register = registries.motions.register_motion,
+		register_many = registries.motions.register_many_motions,
+		map_motion = registries.motions.map_motion,
+		get_by_key = registries.motions.get_by_key,
+		get_by_name = registries.motions.get_by_name,
+	}
 
 	M.collectors = {
 		register = registries.collectors.register,
 		register_many = registries.collectors.register_many,
+		get_by_key = registries.collectors.get_by_key,
+		get_by_name = registries.collectors.get_by_name,
 	}
 
 	M.extractors = {
 		register = registries.extractors.register,
 		register_many = registries.extractors.register_many,
+		get_by_key = registries.extractors.get_by_key,
+		get_by_name = registries.extractors.get_by_name,
 	}
 
 	M.filters = {
 		register = registries.filters.register,
 		register_many = registries.filters.register_many,
+		get_by_key = registries.filters.get_by_key,
+		get_by_name = registries.filters.get_by_name,
 	}
 
 	M.visualizers = {
 		register = registries.visualizers.register,
 		register_many = registries.visualizers.register_many,
+		get_by_key = registries.visualizers.get_by_key,
+		get_by_name = registries.visualizers.get_by_name,
 	}
 
 	M.actions = {
 		register = registries.actions.register,
 		register_many = registries.actions.register_many,
+		get_by_key = registries.actions.get_by_key,
+		get_by_name = registries.actions.get_by_name,
 	}
 
 	M.pipeline_wrappers = {
 		register = registries.pipeline_wrappers.register,
 		register_many = registries.pipeline_wrappers.register_many,
+		get_by_key = registries.pipeline_wrappers.get_by_key,
+		get_by_name = registries.pipeline_wrappers.get_by_name,
 	}
 end
 
