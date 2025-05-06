@@ -27,7 +27,8 @@ M.metadata = {
 	label = "Distance Metadata",
 	description = "Adds a `sort_weight` field to each target's metadata based on Manhattan distance from the cursor.",
 	motion_state = {
-		sort_by_weight = true,
+		sort_by = "sort_weight",
+		sort_descending = false,
 	},
 }
 
