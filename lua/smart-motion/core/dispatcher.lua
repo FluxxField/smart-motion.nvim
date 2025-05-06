@@ -29,7 +29,11 @@ function M.trigger_motion(trigger_key)
 	local visualizer = registries.visualizers.get_by_name(pipeline.visualizer)
 	local action = registries.actions.get_by_name(motion.action)
 
-	-- Check if filter needs fallback
+	local modifier = registries.modifiers.get_by_name(pipeline.modifier or "default")
+	if not modifier or not modifier.run then
+		modifier = registries.modifiers.get_by_name("default")
+	end
+
 	local filter = registries.filters.get_by_name(pipeline.filter or "default")
 	if not filter or not filter.run then
 		filter = registries.filters.get_by_name("default")
@@ -42,15 +46,16 @@ function M.trigger_motion(trigger_key)
 		return
 	end
 
-	motion_state = state.merge_motion_state(motion_state, motion, collector, extractor, filter, visualizer, action)
+	motion_state =
+		state.merge_motion_state(motion_state, motion, collector, extractor, modifier, filter, visualizer, action)
 	utils.reset_motion(ctx, cfg, motion_state)
 
 	-- Evaluate flow state
 	if flow_state.evaluate_flow_at_motion_start() then
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter, motion.opts)
+		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
 
 		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, motion.opts)
+			action.run(ctx, cfg, motion_state)
 			utils.reset_motion(ctx, cfg, motion_state)
 
 			return
@@ -66,8 +71,8 @@ function M.trigger_motion(trigger_key)
 	motion_state = vim.tbl_deep_extend("force", motion_state, pipeline_wrapper.metadata.motion_state)
 
 	-- Build and run the pipeline
-	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
-	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, motion.opts)
+	local run_pipeline = M._build_pipeline(collector, extractor, modifier, filter, visualizer)
+	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state)
 
 	-- Handle pipeline early exits
 	M._handle_exit(ctx, cfg, motion_state, exit_type, action, visualizer)
@@ -97,7 +102,11 @@ function M.trigger_action(trigger_key)
 	local collector = registries.collectors.get_by_name(pipeline.collector)
 	local visualizer = registries.visualizers.get_by_name(pipeline.visualizer)
 
-	-- Check if filter needs a fallback
+	local modifier = registries.modifiers.get_by_name(pipeline.modifier or "default")
+	if not modifier or not modifier.run then
+		modifier = registries.modifiers.get_by_name("default")
+	end
+
 	local filter = registries.filters.get_by_name(pipeline.filter or "default")
 	if not filter or not filter.run then
 		filter = registries.filters.get_by_name("default")
@@ -109,7 +118,7 @@ function M.trigger_action(trigger_key)
 		return
 	end
 
-	motion_state = state.merge_motion_state(motion_state, motion, collector, filter, visualizer, action)
+	motion_state = state.merge_motion_state(motion_state, motion, collector, modifier, filter, visualizer, action)
 	utils.reset_motion(ctx, cfg, motion_state)
 
 	-- Get motion_key
@@ -134,7 +143,7 @@ function M.trigger_action(trigger_key)
 			motion_state.selected_jump_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
 
 			if motion_state.selected_jump_target then
-				line_action.run(ctx, cfg, motion_state, motion.opts)
+				line_action.run(ctx, cfg, motion_state)
 			end
 
 			return
@@ -150,16 +159,16 @@ function M.trigger_action(trigger_key)
 
 	if under_cursor_target then
 		motion_state.selected_jump_target = under_cursor_target
-		action.run(ctx, cfg, motion_state, motion.opts)
+		action.run(ctx, cfg, motion_state)
 		utils.reset_motion(ctx, cfg, motion_state)
 		return
 	end
 
 	if flow_state.evaluate_flow_at_motion_start() then
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter, motion.opts)
+		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter)
 
 		if motion_state.selected_jump_target then
-			action.run(ctx, cfg, motion_state, motion.opts)
+			action.run(ctx, cfg, motion_state)
 			utils.reset_motion(ctx, cfg, motion_state)
 			return
 		end
@@ -175,8 +184,8 @@ function M.trigger_action(trigger_key)
 
 	motion_state = state.merge_motion_state(motion_state, pipeline_wrapper)
 
-	local run_pipeline = M._build_pipeline(collector, extractor, filter, visualizer)
-	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state, motion.opts)
+	local run_pipeline = M._build_pipeline(collector, extractor, modifier, filter, visualizer)
+	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state)
 
 	M._handle_exit(ctx, cfg, motion_state, exit_type, action, visualizer)
 
@@ -189,7 +198,7 @@ end
 --- @param motion_state SmartMotionMotionState
 --- @param collector SmartMotionCollectorModuleEntry
 --- @param extractor SmartMotionExtractorModuleEntry
-function M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter)
+function M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
 	local lines_gen = collector.run()
 	if not lines_gen then
 		return
@@ -200,7 +209,12 @@ function M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filte
 		return
 	end
 
-	local filter_gen = filter.run(extractor_gen)
+	local modifier_gen = modifier.run(extractor_gen)
+	if not modifier_gen then
+		return
+	end
+
+	local filter_gen = filter.run(modifier_gen)
 	if not filter_gen then
 		return
 	end
@@ -215,10 +229,10 @@ end
 --- @param filter SmartMotionFilterModuleEntry
 --- @param visualizer SmartMotionVisualizerModuleEntry
 --- @return fun(ctx: SmartMotionContext, cfg: SmartMotionConfig, motion_state: SmartMotionMotionState): nil
-function M._build_pipeline(collector, extractor, filter, visualizer)
+function M._build_pipeline(collector, extractor, modifier, filter, visualizer)
 	local function run_pipeline(ctx, cfg, motion_state)
 		utils.reset_motion(ctx, cfg, motion_state)
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter)
+		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
 		visualizer.run(ctx, cfg, motion_state)
 	end
 

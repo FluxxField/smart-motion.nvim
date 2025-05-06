@@ -17,6 +17,7 @@ function M.setup(user_config)
 	registries_module:init({
 		collectors = require("smart-motion.collectors"),
 		extractors = require("smart-motion.extractors"),
+		modifiers = require("smart-motion.modifiers"),
 		filters = require("smart-motion.filters"),
 		visualizers = require("smart-motion.visualizers"),
 		actions = require("smart-motion.actions"),
@@ -82,6 +83,13 @@ function M.setup(user_config)
 		register_many = registries.extractors.register_many,
 		get_by_key = registries.extractors.get_by_key,
 		get_by_name = registries.extractors.get_by_name,
+	}
+
+	M.modifiers = {
+		register = registries.modifiers.register,
+		register_many = registries.modifiers.register_many,
+		get_by_key = registries.modifiers.get_by_key,
+		get_by_name = registries.modifiers.get_by_name,
 	}
 
 	M.filters = {
