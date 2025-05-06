@@ -76,6 +76,14 @@ function M.run(ctx, cfg, motion_state)
 
 	log.debug(string.format("Assigning and applying labels for %d targets", targets_count))
 
+	if motion_state.sort_by_weight then
+		table.sort(targets, function(a, b)
+			local a_weight = a.metadata and a.metadata.sort_weight or math.huge
+			local b_weight = b.metadata and b.metadata.sort_weight or math.huge
+			return a_weight < b_weight
+		end)
+	end
+
 	local label_pool = M.generate_hint_labels(ctx, cfg, motion_state)
 
 	if targets_count > #label_pool then

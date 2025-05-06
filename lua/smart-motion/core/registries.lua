@@ -4,6 +4,7 @@ local log = require("smart-motion.core.log")
 --- @field collectors boolean
 --- @field extractors boolean
 --- @field filters boolean
+--- @field modifiers boolean
 --- @field visualizers boolean
 --- @field actions boolean
 --- @field pipeline_wrappers boolean
@@ -14,6 +15,7 @@ local default_registry_constructors = {
 	collectors = true,
 	extractors = true,
 	filters = true,
+	modifiers = true,
 	visualizers = true,
 	actions = true,
 	pipeline_wrappers = true,

@@ -93,29 +93,32 @@
 ---@field state? SmartMotionMotionState
 ---@field metadata? { label?: string, description?: string }
 
----@alias SmartMotionCollectorModuleEntry SmartMotionModuleEntry<fun(opts: table): thread>
+---@alias SmartMotionCollectorModuleEntry SmartMotionModuleEntry<fun(): thread>
 
----@alias SmartMotionExtractorModuleEntry SmartMotionModuleEntry<fun(generator: thread, opts: table): thread>
+---@alias SmartMotionExtractorModuleEntry SmartMotionModuleEntry<fun(generator: thread): thread>
 
 ---@alias SmartMotionActionModuleEntry SmartMotionModuleEntry<fun(
   ctx: SmartSmartMotionContext,
   cfg: SmartMotionConfig,
   state: SmartMotionMotionState,
-  opts: table
 ): nil>
 
 ---@alias SmartMotionVisualizerModuleEntry SmartMotionModuleEntry<fun(
   ctx: SmartSmartMotionContext,
   cfg: SmartMotionConfig,
   state: SmartMotionMotionState
-    opts: table
 ): nil>
 
 ---@alias SmartMotionFilterModuleEntry SmartMotionModuleEntry<fun(
   ctx: SmartSmartMotionContext,
   cfg: SmartMotionConfig,
   state: SmartMotionMotionState
-  opts: table
+): nil>
+
+---@alias SmartMotionModifierModuleEntry SmartMotionModuleEntry<fun(
+  ctx: SmartSmartMotionContext,
+  cfg: SmartMotionConfig,
+  state: SmartMotionMotionState
 ): nil>
 
 ---@alias SmartMotionPipelineWrapperModuleEntry SmartMotionModuleEntry<fun(
@@ -123,7 +126,6 @@
     ctx: SmartSmartMotionContext,
     cfg: SmartMotionConfig,
     state: SmartMotionMotionState,
-    opts: table
   ): nil,
   ctx: SmartSmartMotionContext,
   cfg: SmartMotionConfig,
@@ -167,6 +169,7 @@
 ---@field collectors SmartMotionRegistry<SmartMotionCollectorModuleEntry>
 ---@field extractors SmartMotionRegistry<SmartMotionExtractorModuleEntry>
 ---@field filters SmartMotionRegistry<SmartMotionFilterModuleEntry>
+---@field modifiers SmartMotionRegistry<SmartMotionModifierModuleEntry>
 ---@field visualizers SmartMotionRegistry<SmartMotionVisualizerModuleEntry>
 ---@field actions SmartMotionRegistry<SmartMotionActionModuleEntry>
 ---@field pipeline_wrappers SmartMotionRegistry<SmartMotionPipelineWrapperModuleEntry>
