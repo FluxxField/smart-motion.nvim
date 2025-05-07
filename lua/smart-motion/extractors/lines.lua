@@ -1,4 +1,5 @@
 local consts = require("smart-motion.consts")
+local log = require("smart-motion.core.log")
 
 ---@type SmartMotionExtractorModuleEntry
 local M = {}
@@ -21,7 +22,7 @@ function M.run(collector)
 			end
 
 			local line_text, line_number = data_or_error.text, data_or_error.line_number
-			local col
+			local col = 0
 
 			if motion_state.ignore_whitespace then
 				local first_non_ws = line_text:find("%S")

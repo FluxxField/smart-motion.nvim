@@ -28,7 +28,7 @@ function M.apply_single_hint_label(ctx, cfg, motion_state, target, label, option
 	local col = target.start_pos.col
 
 	if motion_state.hint_position == HINT_POSITION.END then
-		col = target.end_pos.col - 1
+		col = max(target.end_pos.col - 1, 0)
 	end
 
 	log.debug(string.format("Applying single hint '%s' at line %d, col %d", label, row, col))
@@ -87,7 +87,7 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, target, label, option
 	local second_char = label:sub(2, 2)
 
 	if motion_state.hint_position == HINT_POSITION.END then
-		col = target.end_pos.col - 1
+		col = max(target.end_pos.col - 1, 0)
 	end
 
 	log.debug(string.format("Extmark for '%s' at row: %d col: %d", label, row, col))
