@@ -28,7 +28,6 @@ function M.run(ctx, cfg, motion_state)
 
 	-- Clear mark
 	local ok = pcall(vim.api.nvim_buf_del_mark, bufnr, ">")
-
 	if not ok then
 		log.error("action Yank: del_mark failed")
 	end

@@ -25,10 +25,6 @@ require("smart-motion").register_motion("w", {
   },
   pipeline_wrapper = "default",
   action = "jump",
-  state = {
-    direction = DIRECTION.AFTER_CURSOR,
-    hint_position = HINT_POSITION.START,
-  },
   map = true,
   modes = { "n", "v" },
   metadata = {
@@ -38,17 +34,19 @@ require("smart-motion").register_motion("w", {
 })
 ```
 
+> [!NOTE]
+> Notice how no trigger_key is provided. Because of this the name, "w", is used as the trigger key. A name does not have to be a single key, it can even be: "hint_words_after_cursor", but then you would need to provide a trigger_key
+
 ---
 
 ## ⚙️ Motion Options
 
 Each motion supports the following fields:
 
+- `trigger_key`: the key that the motion is mapped to. If no trigger_key is provided the name is used.
 - `pipeline`: defines the motion stages (collector, extractor, filter, visualizer)
 - `pipeline_wrapper`: optional wrapper to control input/search behavior
 - `action`: what to do when a target is selected (`jump`, `delete`, etc.)
-- `state`: configuration like direction and hint positioning
-- `opts`: extra data passed to extractors or wrappers (e.g. `num_of_char`)
 - `map`: whether to create a keybinding for the motion
 - `modes`: which modes the motion is active in (`n`, `v`, `x`, etc.)
 - `metadata`: label and description for documentation/debugging

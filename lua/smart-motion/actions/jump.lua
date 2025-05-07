@@ -35,6 +35,7 @@ function M.run(ctx, cfg, motion_state)
 
 	if not success then
 		log.error("Failed to move cursor: " .. tostring(err))
+		return
 	end
 
 	log.debug(string.format("Cursor moved to line %d, col %d", row, col))

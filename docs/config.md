@@ -10,15 +10,16 @@ Here’s what the default config looks like internally:
 
 ```lua
 local default_config = {
-  keys = "fjdksleirughtynm",
-  highlight = {
+  keys = "fjdksleirughtynm", -- Keys used for hints
+  use_background_highlights = false, -- Toggles between character and background highlights
+  highlight = { -- Highlights used for hints
     hint = "SmartMotionHint",
-    hint_dim = "SmartMotionHintFaded",
-    first_char = "SmartMotionFirstChar",
-    first_char_dim = "SmartMotionFirstCharDim",
-    second_char = "SmartMotionSecondChar",
-    second_char_dim = "SmartMotionSecondCharDim",
+    hint_dim = "SmartMotionHintDim",
+    two_char_hint = "SmartMotionTwoCharHint",
+    two_char_hint_dim = "SmartMotionTwoCharHintDim",
     dim = "SmartMotionDim",
+    search_prefix = "SmartMotionSearchPrefix",
+    search_prefix_dim = "SmartMotionSearchPrefixDim",
   },
   presets = {},
 }
@@ -75,14 +76,21 @@ presets = {
 
 ```lua
 highlight = {
-  hint = { fg = "#E06C75" },
-  first_char = { fg = "#98C379" },
-  second_char = { fg = "#61AFEF" },
-  dim = { fg = "#5C6370" },
+  hint = { fg = "#FF2FD0" },
+  two_char_hint = { fg = "#2FD0FF" },
+  dim = { fg = "Comment" },
 }
 ```
 
 This allows SmartMotion to fit your theme or visual system.
+
+You can also use the toggle use_background_highlights to change between character and background hints
+
+```lua
+opts = {
+  use_background_highlights = true,
+}
+```
 
 ---
 

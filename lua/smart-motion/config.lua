@@ -5,11 +5,9 @@ local M = {}
 -- Default highlight group names
 local default_highlight_groups = {
 	hint = "SmartMotionHint",
-	hint_dim = "SmartMotionHintFaded",
-	first_char = "SmartMotionFirstChar",
-	first_char_dim = "SmartMotionFirstCharDim",
-	second_char = "SmartMotionSecondChar",
-	second_char_dim = "SmartMotionSecondCharDim",
+	hint_dim = "SmartMotionHintDim",
+	two_char_hint = "SmartMotionTwoCharHint",
+	two_char_hint_dim = "SmartMotionTwoCharHintDim",
 	dim = "SmartMotionDim",
 	search_prefix = "SmartMotionSearchPrefix",
 	search_prefix_dim = "SmartMotionSearchPrefixDim",
@@ -18,6 +16,7 @@ local default_highlight_groups = {
 ---@type SmartMotionConfig
 M.defaults = {
 	keys = "fjdksleirughtynm",
+	use_background_highlights = false,
 	highlight = default_highlight_groups,
 	presets = {},
 }
@@ -69,9 +68,9 @@ function M.validate(user_config)
 		if type(value) ~= "string" and type(value) ~= "table" then
 			log.error(
 				"`highlight."
-				.. key
-				.. "` must be a string (group name) or a table (color definition), got: "
-				.. type(value)
+					.. key
+					.. "` must be a string (group name) or a table (color definition), got: "
+					.. type(value)
 			)
 			error("smart-motion: `highlight." .. key .. "` must be a string or table")
 		end

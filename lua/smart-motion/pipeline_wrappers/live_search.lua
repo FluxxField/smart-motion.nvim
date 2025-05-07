@@ -30,6 +30,7 @@ function M.run(run_pipeline, ctx, cfg, motion_state)
 			if search_text == "" then
 				return SEARCH_EXIT_TYPE.EARLY_EXIT
 			else
+				motion_state.is_searching_mode = false
 				return SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION
 			end
 		end

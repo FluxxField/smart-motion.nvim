@@ -9,7 +9,7 @@ function M.run(ctx, cfg, motion_state)
 	local bufnr = target.bufnr
 	local row = target.end_pos.row
 
-	vim.cmd("normal! Y")
+	vim.cmd("normal! yy")
 
 	vim.highlight.on_yank({
 		higroup = "IncSearch",

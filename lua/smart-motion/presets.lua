@@ -234,7 +234,8 @@ function presets.delete(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "words",
-				filter = "default",
+				modifier = "distance_metadata",
+				filter = "filter_lines_around_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
@@ -250,7 +251,8 @@ function presets.delete(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "lines",
-				filter = "default",
+				modifier = "distance_metadata",
+				filter = "filter_lines_around_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
@@ -318,7 +320,8 @@ function presets.yank(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "words",
-				filter = "default",
+				modifier = "distance_metadata",
+				filter = "filter_lines_around_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
@@ -334,7 +337,8 @@ function presets.yank(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "lines",
-				filter = "default",
+				modifier = "distance_metadata",
+				filter = "filter_lines_around_cursor",
 				visualizer = "hint_start",
 			},
 			pipeline_wrapper = "default",
@@ -415,8 +419,8 @@ function presets._register(motions_list, user_overrides)
 
 	local final_motions = {}
 
-	for key, motion in pairs(motions_list) do
-		local override = user_overrides[key]
+	for name, motion in pairs(motions_list) do
+		local override = user_overrides[name]
 
 		-- Skip if this motion is explicitly disabled
 		if override == false then
@@ -425,10 +429,10 @@ function presets._register(motions_list, user_overrides)
 
 		-- Merge override into motion config if table provider
 		if type(override) == "table" then
-			final_motions[key] = vim.tbl_deep_extend("force", motion, override)
+			final_motions[name] = vim.tbl_deep_extend("force", motion, override)
 		else
 			-- No override, use default motion
-			final_motions[key] = motion
+			final_motions[name] = motion
 		end
 
 		::continue::

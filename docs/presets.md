@@ -91,6 +91,8 @@ You can selectively **override** motion settings, **disable** individual motions
 opts = {
   presets = {
     words = {
+      -- Note: "w" and "b" are the motion names. If no trigger_key is provided. The name is used
+      -- In all the presets, no trigger_key is provided so the name becomes the trigger key
       w = {
         map = false, -- Override: Do not automatically map 'w'
       },
@@ -140,6 +142,12 @@ In this example:
 
 - The motion logic is tied to `w` internally.
 - It is mapped to `W` instead of `w` manually by you.
+
+SmartMotion provides a helper util to map registered motions to their trigger_key later on if needed. All you need to do is provide the name the motion was registered to.
+
+```lua
+require("smart-motion").map_motion("w")
+```
 
 ---
 

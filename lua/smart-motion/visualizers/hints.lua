@@ -76,6 +76,22 @@ function M.run(ctx, cfg, motion_state)
 
 	log.debug(string.format("Assigning and applying labels for %d targets", targets_count))
 
+	if motion_state.sort_by then
+		local sort_by_key = motion_state.sort_by
+		local descending = motion_state.sort_descending == true
+
+		table.sort(targets, function(a, b)
+			local a_weight = a.metadata and a.metadata[sort_by_key] or math.huge
+			local b_weight = b.metadata and b.metadata[sort_by_key] or math.huge
+
+			if descending then
+				return a_val > b_val
+			else
+				return a_weight < b_weight
+			end
+		end)
+	end
+
 	local label_pool = M.generate_hint_labels(ctx, cfg, motion_state)
 
 	if targets_count > #label_pool then
@@ -85,8 +101,6 @@ function M.run(ctx, cfg, motion_state)
 	highlight.clear(ctx, cfg, motion_state)
 	highlight.dim_background(ctx, cfg, motion_state)
 
-	local is_searching_mode = motion_state.is_searching_mode == true
-
 	for index, target in ipairs(targets) do
 		local label = label_pool[index]
 
@@ -95,24 +109,10 @@ function M.run(ctx, cfg, motion_state)
 		end
 
 		if #label == 1 then
-			highlight.apply_single_hint_label(
-				ctx,
-				cfg,
-				motion_state,
-				target,
-				label,
-				{ dim_first_char = is_searching_mode }
-			)
+			highlight.apply_single_hint_label(ctx, cfg, motion_state, target, label)
 			motion_state.assigned_hint_labels[label] = { target = target, is_single_prefix = true }
 		elseif #label == 2 then
-			highlight.apply_double_hint_label(
-				ctx,
-				cfg,
-				motion_state,
-				target,
-				label,
-				{ dim_first_char = is_searching_mode, dim_second_char = is_searching_mode }
-			)
+			highlight.apply_double_hint_label(ctx, cfg, motion_state, target, label)
 			motion_state.assigned_hint_labels[label] = { target = target }
 			motion_state.assigned_hint_labels[label:sub(1, 1)] = { is_double_prefix = true }
 		else
