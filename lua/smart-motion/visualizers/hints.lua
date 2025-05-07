@@ -104,7 +104,7 @@ function M.run(ctx, cfg, motion_state)
 	for index, target in ipairs(targets) do
 		local label = label_pool[index]
 
-		if not label then
+		if not label or not target then
 			break
 		end
 

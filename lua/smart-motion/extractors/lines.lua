@@ -1,4 +1,5 @@
 local consts = require("smart-motion.consts")
+local log = require("smart-motion.core.log")
 
 ---@type SmartMotionExtractorModuleEntry
 local M = {}

@@ -72,6 +72,7 @@ function M.create_motion_state(target_type)
 		total_keys = M.static.total_keys,
 		max_lines = M.static.max_lines,
 		max_labels = M.static.max_labels,
+		ignore_whitespace = true,
 
 		-- Motion Intent
 		target_type = target_type,
