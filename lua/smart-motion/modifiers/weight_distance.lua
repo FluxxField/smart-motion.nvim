@@ -24,7 +24,7 @@ function M.run(input_gen)
 end
 
 M.metadata = {
-	label = "Distance Metadata",
+	label = "Weight Distance",
 	description = "Adds a `sort_weight` field to each target's metadata based on Manhattan distance from the cursor.",
 	motion_state = {
 		sort_by = "sort_weight",

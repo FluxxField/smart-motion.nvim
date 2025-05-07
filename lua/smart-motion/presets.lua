@@ -234,7 +234,7 @@ function presets.delete(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "words",
-				modifier = "distance_metadata",
+				modifier = "weight_distance",
 				filter = "filter_lines_around_cursor",
 				visualizer = "hint_start",
 			},
@@ -251,7 +251,7 @@ function presets.delete(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "lines",
-				modifier = "distance_metadata",
+				modifier = "weight_distance",
 				filter = "filter_lines_around_cursor",
 				visualizer = "hint_start",
 			},
@@ -320,7 +320,7 @@ function presets.yank(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "words",
-				modifier = "distance_metadata",
+				modifier = "weight_distance",
 				filter = "filter_lines_around_cursor",
 				visualizer = "hint_start",
 			},
@@ -337,7 +337,7 @@ function presets.yank(exclude)
 			pipeline = {
 				collector = "lines",
 				extractor = "lines",
-				modifier = "distance_metadata",
+				modifier = "weight_distance",
 				filter = "filter_lines_around_cursor",
 				visualizer = "hint_start",
 			},
