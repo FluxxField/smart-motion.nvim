@@ -54,4 +54,9 @@ function M.run(collector)
 	end)
 end
 
+M.metadata = {
+	label = "Search Extractor",
+	description = "Extracts searched text to generate targets from collector",
+}
+
 return M

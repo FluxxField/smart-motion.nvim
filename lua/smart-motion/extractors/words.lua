@@ -50,4 +50,9 @@ function M.run(collector)
 	end)
 end
 
+M.metadata = {
+	label = "Word Extractor",
+	description = "Extracts words to generate targets from collector",
+}
+
 return M

@@ -1,4 +1,3 @@
-local lines = require("smart-motion.extractors.lines")
 local words = require("smart-motion.extractors.words")
 local text_search = require("smart-motion.extractors.text_search")
 
@@ -6,35 +5,10 @@ local text_search = require("smart-motion.extractors.text_search")
 local extractors = require("smart-motion.core.registry")("extractors")
 
 --- @type table<string, SmartMotionExtractorModuleEntry>
-local extractor_entries = {
-	lines = {
-		keys = { "l" },
-		run = lines.run,
-		metadata = {
-			label = "Line Extractor",
-			description = "Extracts lines to generate targets from collector",
-			motion_state = {
-				ignore_whitespace = true,
-			},
-		},
-	},
-	words = {
-		keys = { "w" },
-		run = words.run,
-		metadata = {
-			label = "Word Extractor",
-			description = "Extracts words to generate targets from collector",
-		},
-	},
-	text_search = {
-		run = text_search.run,
-		metadata = {
-			label = "Search Extractor",
-			description = "Extracts searched text to generate targets from collector",
-		},
-	},
-}
-
-extractors.register_many(extractor_entries)
+extractors.register_many({
+	lines = require("smart-motion.extractors.lines"),
+	words = require("smart-motion.extractors.words"),
+	text_search = require("smart-motion.extractors.text_search"),
+})
 
 return extractors
