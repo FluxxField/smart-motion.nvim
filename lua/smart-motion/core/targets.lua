@@ -50,6 +50,10 @@ function M.get_targets(ctx, cfg, motion_state, filter_gen)
 		error("Then filter generator must be a coroutine")
 	end
 
+	if motion_state.exit_type then
+		return
+	end
+
 	while true do
 		local ok, data_or_error = coroutine.resume(filter_gen, ctx, cfg, motion_state)
 

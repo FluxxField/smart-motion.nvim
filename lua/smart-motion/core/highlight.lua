@@ -23,9 +23,7 @@ end
 ---@param target Target
 ---@param label string
 ---@param options HintOptions
-function M.apply_single_hint_label(ctx, cfg, motion_state, target, label, options)
-	options = options or {}
-
+function M.apply_single_hint_label(ctx, cfg, motion_state, target, label)
 	local row = target.start_pos.row
 	local col = target.start_pos.col
 

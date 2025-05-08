@@ -6,7 +6,7 @@ local log = require("smart-motion.core.log")
 local motions = require("smart-motion.core.registry")("motions")
 
 --- Fields that every motion pipeline must contain
-local REQUIRED_PIPELINE_FIELDS = { "collector", "visualizer" }
+local REQUIRED_FIELDS = { "collector", "visualizer" }
 
 local error_label = "[Motion Registry] "
 
@@ -23,13 +23,8 @@ function motions._validate_motion_entry(name, motion)
 		return false
 	end
 
-	if not motion.pipeline or type(motion.pipeline) ~= "table" then
-		log.error(error_label .. error_name .. "Motion is missing a valid pipeline.")
-		return false
-	end
-
-	for _, field in ipairs(REQUIRED_PIPELINE_FIELDS) do
-		local module_name = motion.pipeline[field]
+	for _, field in ipairs(REQUIRED_FIELDS) do
+		local module_name = motion[field]
 		if not utils.is_non_empty_string(module_name) then
 			log.error("[Motion Registry] Motion '" .. name .. "' pipeline must specify '" .. field .. "'.")
 			return false

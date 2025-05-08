@@ -67,14 +67,13 @@ end
 ---@param motion_state SmartMotionMotionState
 function M.run(ctx, cfg, motion_state)
 	local targets = motion_state.jump_targets or {}
-	local targets_count = motion_state.jump_target_count
 
-	if targets_count == 0 then
+	if #targets == 0 then
 		log.debug("assign_and_apply_labels: No targets to label")
 		return
 	end
 
-	log.debug(string.format("Assigning and applying labels for %d targets", targets_count))
+	log.debug(string.format("Assigning and applying labels for %d targets", #targets))
 
 	if motion_state.sort_by then
 		local sort_by_key = motion_state.sort_by
@@ -85,7 +84,7 @@ function M.run(ctx, cfg, motion_state)
 			local b_weight = b.metadata and b.metadata[sort_by_key] or math.huge
 
 			if descending then
-				return a_val > b_val
+				return a_weight > b_weight
 			else
 				return a_weight < b_weight
 			end
@@ -94,8 +93,8 @@ function M.run(ctx, cfg, motion_state)
 
 	local label_pool = M.generate_hint_labels(ctx, cfg, motion_state)
 
-	if targets_count > #label_pool then
-		log.debug(string.format("Only %d labels available, but %d targets found", #label_pool, targets_count))
+	if #targets > #label_pool then
+		log.debug(string.format("Only %d labels available, but %d targets found", #label_pool, #targets))
 	end
 
 	highlight.clear(ctx, cfg, motion_state)

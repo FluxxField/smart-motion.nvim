@@ -1,6 +1,9 @@
 local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 
+local TARGET_TYPES = consts.TARGET_TYPES
+local EXIT_TYPE = consts.EXIT_TYPE
+
 ---@type SmartMotionExtractorModuleEntry
 local M = {}
 
@@ -14,7 +17,8 @@ function M.run(collector)
 
 			if not ok then
 				log.error("Collector Coroutine Error: " .. tostring(data_or_error))
-				break
+				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+				return
 			end
 
 			if not data_or_error then
@@ -34,9 +38,12 @@ function M.run(collector)
 				text = line_text,
 				start_pos = { row = line_number, col = col },
 				end_pos = { row = line_number, col = #line_text },
-				type = consts.TARGET_TYPES.LINES,
+				type = TARGET_TYPES.LINES,
 			})
 		end
+
+		-- Finished input, continue to hint selection
+		motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
 	end)
 end
 
