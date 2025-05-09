@@ -45,13 +45,12 @@ function M.apply_single_hint_label(ctx, cfg, motion_state, target, label)
 		col = max(target.end_pos.col - 1, 0)
 	end
 
-	if motion_state.is_searching_mode and motion_state.search_text and #motion_state.search_text >= 1 then
+	if motion_state.should_show_prefix and motion_state.search_text and #motion_state.search_text >= 1 then
 		prefix = motion_state.search_text:sub(1, #motion_state.search_text)
 	end
 
 	if motion_state.is_searching_mode then
 		col = target.start_pos.col
-
 		hint_hl = hint_dim
 		prefix_hl = prefix_dim_highlight
 	end
@@ -107,13 +106,12 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, target, label, option
 		col = max(target.end_pos.col - 1, 0)
 	end
 
-	if motion_state.is_searching_mode and motion_state.search_text and #motion_state.search_text >= 1 then
+	if motion_state.should_show_prefix and motion_state.search_text and #motion_state.search_text >= 1 then
 		prefix = motion_state.search_text:sub(1, #motion_state.search_text)
 	end
 
 	if motion_state.is_searching_mode then
 		col = target.start_pos.col
-
 		first_hl = two_char_hint_dim
 		second_hl = two_char_hint_dim
 		prefix_hl = prefix_dim_highlight

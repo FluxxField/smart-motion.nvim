@@ -69,11 +69,8 @@ function M.run(ctx, cfg, motion_state)
 	local targets = motion_state.jump_targets or {}
 
 	if #targets == 0 then
-		log.debug("assign_and_apply_labels: No targets to label")
 		return
 	end
-
-	log.debug(string.format("Assigning and applying labels for %d targets", #targets))
 
 	if motion_state.sort_by then
 		local sort_by_key = motion_state.sort_by

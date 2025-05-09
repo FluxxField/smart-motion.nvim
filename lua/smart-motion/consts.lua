@@ -55,6 +55,7 @@ M.EXIT_TYPE = {
 	DIRECT_HINT = "direct_hint",
 	AUTO_SELECT = "auto_select",
 	CONTINUE_TO_SELECTION = "continue_to_selection",
+	CONTINUE_LOOP = "continue_loop",
 }
 
 return M

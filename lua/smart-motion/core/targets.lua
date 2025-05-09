@@ -3,6 +3,7 @@ local log = require("smart-motion.core.log")
 
 local TARGET_TYPES = consts.TARGET_TYPES
 local DIRECTION = consts.DIRECTION
+local EXIT_TYPE = consts.EXIT_TYPE
 
 local M = {}
 
@@ -50,10 +51,6 @@ function M.get_targets(ctx, cfg, motion_state, filter_gen)
 		error("Then filter generator must be a coroutine")
 	end
 
-	if motion_state.exit_type then
-		return
-	end
-
 	while true do
 		local ok, data_or_error = coroutine.resume(filter_gen, ctx, cfg, motion_state)
 
@@ -67,6 +64,16 @@ function M.get_targets(ctx, cfg, motion_state, filter_gen)
 		end
 
 		table.insert(targets, M.format_target(ctx, cfg, motion_state, data_or_error))
+	end
+
+	if motion_state.exit_type == EXIT_TYPE.EARLY_EXIT then
+		return
+	end
+
+	if motion_state.exit_type == EXIT_TYPE.CONTINUE_LOOP then
+		if motion_state.search_text == motion_state.last_search_text then
+			return
+		end
 	end
 
 	if motion_state.direction == DIRECTION.BEFORE_CURSOR then

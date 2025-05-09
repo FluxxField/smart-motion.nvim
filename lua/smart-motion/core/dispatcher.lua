@@ -15,7 +15,9 @@ local M = {}
 --- Triggers a motion by its trigger key.
 --- @param trigger_key string
 function M.trigger_motion(trigger_key)
+	--
 	-- Get Registries and motion data
+	--
 	local registries = require("smart-motion.core.registries"):get()
 
 	local motion = require("smart-motion.motions").get_by_key(trigger_key)
@@ -24,6 +26,9 @@ function M.trigger_motion(trigger_key)
 		return
 	end
 
+	--
+	-- Get modules
+	--
 	local collector = registries.collectors.get_by_name(motion.collector)
 	local extractor = registries.extractors.get_by_name(motion.extractor)
 	local visualizer = registries.visualizers.get_by_name(motion.visualizer)
@@ -39,6 +44,9 @@ function M.trigger_motion(trigger_key)
 		filter = registries.filters.get_by_name("default")
 	end
 
+	--
+	-- Initiate state for the motion
+	--
 	local ctx, cfg, motion_state = utils.prepare_motion(extractor.name)
 	if not ctx or not cfg or not motion_state then
 		log.error("Failed to prepare motion - aborting")
@@ -46,6 +54,9 @@ function M.trigger_motion(trigger_key)
 		return
 	end
 
+	--
+	-- Update motion_state from what the modules provide
+	--
 	motion_state =
 		state.merge_motion_state(motion_state, motion, collector, extractor, modifier, filter, visualizer, action)
 
@@ -67,27 +78,68 @@ function M.trigger_motion(trigger_key)
 	--
 	highlight.dim_background(ctx, cfg, motion_state)
 
-	local last_search_text = nil
+	local early_exit_timeout = 2000
+	local continue_timeout = 500
 
 	while true do
+		--
+		-- Multi-pass
+		--
 		if motion_state.is_searching_mode then
-			if motion_state.search_text ~= last_search_text then
-				last_search_text = motion_state.search_text
-				M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
+			local start_time = vim.fn.reltime()
+
+			if motion_state.exit_type == nil then
+				motion_state.exit_type = EXIT_TYPE.CONTINUE_LOOP
 			end
+
+			while motion_state.exit_type == EXIT_TYPE.CONTINUE_LOOP do
+				local timeout = (motion_state.search_text == "" and early_exit_timeout) or continue_timeout
+				local elapsed = vim.fn.reltimefloat(vim.fn.reltime(start_time)) * 1000
+
+				if elapsed > timeout then
+					if motion_state.search_text == "" then
+						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+					else
+						motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
+					end
+
+					break
+				end
+
+				if motion_state.exit_type ~= EXIT_TYPE.CONTINUE_LOOP then
+					break
+				end
+
+				M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
+
+				if motion_state.search_text ~= motion_state.last_search_text and motion_state.search_text ~= "" then
+					start_time = vim.fn.reltime() -- Reset timer
+
+					visualizer.run(ctx, cfg, motion_state)
+					motion_state.last_search_text = motion_state.search_text
+
+					if motion_state.exit_type ~= EXIT_TYPE.CONTINUE_LOOP then
+						local targets = motion_state.jump_targets or {}
+						if #targets == 0 then
+							motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+							break
+						elseif #targets == 1 then
+							motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
+							break
+						end
+					end
+				end
+
+				vim.cmd("sleep 10m")
+			end
+			--
+			-- Single Pass
+			--
 		else
 			M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
-		end
+			visualizer.run(ctx, cfg, motion_state)
 
-		if motion_state.exit_type then
-			break
-		end
-
-		visualizer.run(ctx, cfg, motion_state)
-
-		if not motion_state.exit_type then
 			local targets = motion_state.jump_targets or {}
-
 			if #targets == 0 then
 				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 				break
@@ -96,11 +148,19 @@ function M.trigger_motion(trigger_key)
 				break
 			end
 		end
+
+		if
+			motion_state.exit_type == EXIT_TYPE.EARLY_EXIT
+			or motion_state.exit_type == EXIT_TYPE.CONTINUE_TO_SELECTION
+		then
+			break
+		end
 	end
 
+	--
+	-- Handle exit
+	--
 	M._handle_exit(ctx, cfg, motion_state, action, visualizer)
-
-	-- Clean up
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 
@@ -215,28 +275,89 @@ function M.trigger_action(trigger_key)
 	--
 	highlight.dim_background(ctx, cfg, motion_state)
 
+	local early_exit_timeout = 2000
+	local continue_timeout = 500
+
 	while true do
-		M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
+		--
+		-- Multi-pass
+		--
+		if motion_state.is_searching_mode then
+			local start_time = vim.fn.reltime()
 
-		if motion_state.exit_type then
-			break
-		end
+			if motion_state.exit_type == nil then
+				motion_state.exit_type = EXIT_TYPE.CONTINUE_LOOP
+			end
 
-		visualizer.run(ctx, cfg, motion_state)
+			while motion_state.exit_type == EXIT_TYPE.CONTINUE_LOOP do
+				local timeout = (motion_state.search_text == "" and early_exit_timeout) or continue_timeout
+				local elapsed = vim.fn.reltimefloat(vim.fn.reltime(start_time)) * 1000
 
-		if not motion_state.exit_type then
+				if elapsed > timeout then
+					if motion_state.search_text == "" then
+						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+					else
+						motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
+					end
+
+					break
+				end
+
+				if motion_state.exit_type ~= EXIT_TYPE.CONTINUE_LOOP then
+					break
+				end
+
+				M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
+
+				if motion_state.search_text ~= motion_state.last_search_text and motion_state.search_text ~= "" then
+					start_time = vim.fn.reltime() -- Reset timer
+
+					visualizer.run(ctx, cfg, motion_state)
+					motion_state.last_search_text = motion_state.search_text
+
+					if motion_state.exit_type ~= EXIT_TYPE.CONTINUE_LOOP then
+						local targets = motion_state.jump_targets or {}
+						if #targets == 0 then
+							motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+							break
+						elseif #targets == 1 then
+							motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
+							break
+						end
+					end
+				end
+
+				vim.cmd("sleep 10m")
+			end
+			--
+			-- Single Pass
+			--
+		else
+			M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
+			visualizer.run(ctx, cfg, motion_state)
+
 			local targets = motion_state.jump_targets or {}
-
 			if #targets == 0 then
 				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+				break
 			elseif #targets == 1 then
 				motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
+				break
 			end
+		end
+
+		if
+			motion_state.exit_type == EXIT_TYPE.EARLY_EXIT
+			or motion_state.exit_type == EXIT_TYPE.CONTINUE_TO_SELECTION
+		then
+			break
 		end
 	end
 
+	--
+	-- Handle exit
+	--
 	M._handle_exit(ctx, cfg, motion_state, action, visualizer)
-
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 

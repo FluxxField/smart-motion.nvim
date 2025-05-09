@@ -8,36 +8,17 @@ local M = {}
 
 function M.run(collector_gen)
 	return coroutine.create(function(ctx, cfg, motion_state)
-		motion_state.search_text = motion_state.search_text or ""
-
-		local early_exit_timeout = 2000
-		local continue_timeout = 500
-		local timeout = (motion_state.search_text == "" and early_exit_timeout) or continue_timeout
-		local start_time = vim.fn.reltime()
-
-		--
-		-- Wait for input or timeout
-		--
-		while vim.fn.getchar(1) == 0 do
-			local elapsed = vim.fn.reltimefloat(vim.fn.reltime(start_time)) * 1000
-
-			if elapsed > timeout then
-				if motion_state.search_text == "" then
-					motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
-				else
-					motion_state.is_searching_mode = false
-					motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
-				end
-				return
-			end
-
-			vim.cmd("sleep 50m")
+		if vim.fn.getchar(1) == 0 then
+			motion_state.exit_type = EXIT_TYPE.CONTINUE_LOOP
+			return
 		end
 
-		--
-		-- Got input
-		--
-		local char = vim.fn.getchar()
+		local ok, char = pcall(vim.fn.getchar)
+		if not ok then
+			motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+			return
+		end
+
 		char = type(char) == "number" and vim.fn.nr2char(char) or char
 		vim.api.nvim_feedkeys("", "n", false)
 
@@ -46,16 +27,10 @@ function M.run(collector_gen)
 			return
 		elseif char == "\r" then -- ENTER
 			motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
-			return
 		elseif char == "\b" or char == vim.api.nvim_replace_termcodes("<BS>", true, false, true) then
 			motion_state.search_text = motion_state.search_text:sub(1, -2)
 		else
-			motion_state.search_text = motion_state.search_text .. char
-		end
-
-		if motion_state.search_text == "" then
-			motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
-			return
+			motion_state.search_text = (motion_state.search_text or "") .. char
 		end
 
 		while true do
@@ -85,6 +60,8 @@ function M.run(collector_gen)
 				col = end_col + 1
 			end
 		end
+
+		motion_state.exit_type = EXIT_TYPE.CONTINUE_LOOP
 	end)
 end
 
@@ -92,8 +69,10 @@ M.metadata = {
 	label = "Live Search Extractor",
 	description = "Continuously updates search results as the user types",
 	motion_state = {
+		last_search_text = nil,
 		search_text = "",
 		is_searching_mode = true,
+		should_show_prefix = true,
 	},
 }
 
