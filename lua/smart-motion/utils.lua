@@ -117,4 +117,34 @@ function M.is_non_empty_string(s)
 	return type(s) == "string" and s:gsub("%s+", "") ~= ""
 end
 
+--
+-- Module Wrapper
+--
+function M.module_wrapper(user_fn)
+	return function(input_gen)
+		return coroutine.create(function(ctx, cfg, motion_state)
+			while true do
+				local ok, target = coroutine.resume(input_gen, ctx, cfg, motion_state)
+
+				if not ok then
+					log.error("Input Generator Coroutine Error: " .. tostring(target))
+					break
+				end
+
+				if target == nil then
+					break
+				end
+
+				local result = user_fn(ctx, cfg, motion_state, target)
+
+				if type(result) == "table" then
+					coroutine.yield(result)
+				elseif type(result) == "string" then
+					motion_state.exit_type = result
+				end
+			end
+		end)
+	end
+end
+
 return M

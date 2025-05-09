@@ -25,6 +25,7 @@ function M.run(collector_gen)
 				if motion_state.search_text == "" then
 					motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 				else
+					motion_state.is_searching_mode = false
 					motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
 				end
 				return
