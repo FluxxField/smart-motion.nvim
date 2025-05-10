@@ -93,10 +93,16 @@ function M.trigger_motion(trigger_key)
 			end
 
 			while motion_state.exit_type == EXIT_TYPE.CONTINUE_LOOP do
-				local timeout = (motion_state.search_text == "" and early_exit_timeout) or continue_timeout
-				local elapsed = vim.fn.reltimefloat(vim.fn.reltime(start_time)) * 1000
+				local timeout
 
-				if elapsed > timeout then
+				if motion_state.search_text == "" then
+					timeout = early_exit_timeout
+				else
+					timeout = motion_state.timeout_after_input and 500 or nil
+				end
+
+				local elapsed = vim.fn.reltimefloat(vim.fn.reltime(start_time)) * 1000
+				if timeout and elapsed > timeout then
 					if motion_state.search_text == "" then
 						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 					else
@@ -113,7 +119,9 @@ function M.trigger_motion(trigger_key)
 				M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
 
 				if motion_state.search_text ~= motion_state.last_search_text and motion_state.search_text ~= "" then
-					start_time = vim.fn.reltime() -- Reset timer
+					if motion_state.timeout_after_input then
+						start_time = vim.fn.reltime() -- Reset timer
+					end
 
 					local targets = motion_state.jump_targets or {}
 					if #targets == 0 then
@@ -293,10 +301,16 @@ function M.trigger_action(trigger_key)
 			end
 
 			while motion_state.exit_type == EXIT_TYPE.CONTINUE_LOOP do
-				local timeout = (motion_state.search_text == "" and early_exit_timeout) or continue_timeout
-				local elapsed = vim.fn.reltimefloat(vim.fn.reltime(start_time)) * 1000
+				local timeout
 
-				if elapsed > timeout then
+				if motion_state.search_text == "" then
+					timeout = early_exit_timeout
+				else
+					timeout = motion_state.timeout_after_input and 500 or nil
+				end
+
+				local elapsed = vim.fn.reltimefloat(vim.fn.reltime(start_time)) * 1000
+				if timeout and elapsed > timeout then
 					if motion_state.search_text == "" then
 						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 					else
@@ -313,7 +327,9 @@ function M.trigger_action(trigger_key)
 				M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
 
 				if motion_state.search_text ~= motion_state.last_search_text and motion_state.search_text ~= "" then
-					start_time = vim.fn.reltime() -- Reset timer
+					if motion_state.timeout_after_input then
+						start_time = vim.fn.reltime() -- Reset timer
+					end
 
 					local targets = motion_state.jump_targets or {}
 					if #targets == 0 then
