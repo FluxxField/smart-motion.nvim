@@ -24,6 +24,7 @@ extractors.register_many({
 		metadata = vim.tbl_deep_extend("force", text_search.metadata, {
 			motion_state = {
 				num_of_char = 1,
+				should_show_prefix = false,
 			},
 		}),
 	},

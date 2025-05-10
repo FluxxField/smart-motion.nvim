@@ -6,6 +6,8 @@ local config = require("smart-motion.config")
 local highlight = require("smart-motion.core.highlight")
 local consts = require("smart-motion.consts")
 
+local EXIT_TYPE = consts.EXIT_TYPE
+
 local M = {}
 
 --- Closes all diagnostic and completion floating windows.
@@ -130,7 +132,10 @@ function M.module_wrapper(run_fn, opts)
 
 				if type(result) == "string" then
 					motion_state.exit_type = result
-					return
+
+					if motion_state.exit_type == EXIT_TYPE.EARLY_EXIT then
+						return
+					end
 				end
 			end
 

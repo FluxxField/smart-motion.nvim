@@ -69,6 +69,7 @@ function M.run(ctx, cfg, motion_state)
 	local targets = motion_state.jump_targets or {}
 
 	if #targets == 0 then
+		log.debug("hints: not targets, exiting")
 		return
 	end
 

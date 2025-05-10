@@ -2,6 +2,7 @@ local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 
 local EXIT_TYPE = consts.EXIT_TYPE
+local TARGET_TYPES = consts.TARGET_TYPES
 
 ---@type SmartMotionExtractorModuleEntry
 local M = {}
@@ -47,7 +48,7 @@ function M.run(ctx, cfg, motion_state, data)
 				text = match,
 				start_pos = { row = line_number, col = start_col },
 				end_pos = { row = line_number, col = end_col },
-				type = consts.TARGET_TYPES.SEARCH,
+				type = TARGET_TYPES.SEARCH,
 			})
 
 			col = end_col + 1

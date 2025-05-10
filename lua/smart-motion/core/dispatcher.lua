@@ -115,19 +115,17 @@ function M.trigger_motion(trigger_key)
 				if motion_state.search_text ~= motion_state.last_search_text and motion_state.search_text ~= "" then
 					start_time = vim.fn.reltime() -- Reset timer
 
+					local targets = motion_state.jump_targets or {}
+					if #targets == 0 then
+						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+						break
+					elseif #targets == 1 then
+						motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
+						break
+					end
+
 					visualizer.run(ctx, cfg, motion_state)
 					motion_state.last_search_text = motion_state.search_text
-
-					if motion_state.exit_type ~= EXIT_TYPE.CONTINUE_LOOP then
-						local targets = motion_state.jump_targets or {}
-						if #targets == 0 then
-							motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
-							break
-						elseif #targets == 1 then
-							motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
-							break
-						end
-					end
 				end
 
 				vim.cmd("sleep 10m")
@@ -137,7 +135,6 @@ function M.trigger_motion(trigger_key)
 			--
 		else
 			M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
-			visualizer.run(ctx, cfg, motion_state)
 			motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
 
 			-- No targets, exit motion
@@ -146,12 +143,18 @@ function M.trigger_motion(trigger_key)
 				log.debug("pipeline: no targets exiting")
 				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 				break
+			elseif #targets == 1 then
+				motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
+				break
 			end
+
+			visualizer.run(ctx, cfg, motion_state)
 		end
 
 		if
 			motion_state.exit_type == EXIT_TYPE.EARLY_EXIT
 			or motion_state.exit_type == EXIT_TYPE.CONTINUE_TO_SELECTION
+			or motion_state.exit_type == EXIT_TYPE.AUTO_SELECT
 		then
 			break
 		end
@@ -312,19 +315,17 @@ function M.trigger_action(trigger_key)
 				if motion_state.search_text ~= motion_state.last_search_text and motion_state.search_text ~= "" then
 					start_time = vim.fn.reltime() -- Reset timer
 
+					local targets = motion_state.jump_targets or {}
+					if #targets == 0 then
+						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+						break
+					elseif #targets == 1 then
+						motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
+						break
+					end
+
 					visualizer.run(ctx, cfg, motion_state)
 					motion_state.last_search_text = motion_state.search_text
-
-					if motion_state.exit_type ~= EXIT_TYPE.CONTINUE_LOOP then
-						local targets = motion_state.jump_targets or {}
-						if #targets == 0 then
-							motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
-							break
-						elseif #targets == 1 then
-							motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
-							break
-						end
-					end
 				end
 
 				vim.cmd("sleep 10m")
@@ -334,19 +335,26 @@ function M.trigger_action(trigger_key)
 			--
 		else
 			M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
-			visualizer.run(ctx, cfg, motion_state)
 			motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
 
+			-- No targets, exit motion
 			local targets = motion_state.jump_targets or {}
 			if #targets == 0 then
+				log.debug("pipeline: no targets exiting")
 				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 				break
+			elseif #targets == 1 then
+				motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
+				break
 			end
+
+			visualizer.run(ctx, cfg, motion_state)
 		end
 
 		if
 			motion_state.exit_type == EXIT_TYPE.EARLY_EXIT
 			or motion_state.exit_type == EXIT_TYPE.CONTINUE_TO_SELECTION
+			or motion_state.exit_type == EXIT_TYPE.AUTO_SELECT
 		then
 			break
 		end
@@ -414,6 +422,9 @@ function M._handle_exit(ctx, cfg, motion_state, action, visualizer)
 		if motion_state.selected_jump_target then
 			action.run(ctx, cfg, motion_state)
 		end
+	elseif motion_state.exit_type == EXIT_TYPE.AUTO_SELECT then
+		motion_state.selected_jump_target = motion_state.targets[1]
+		action.run(ctx, cfg, motion_state)
 	end
 end
 
