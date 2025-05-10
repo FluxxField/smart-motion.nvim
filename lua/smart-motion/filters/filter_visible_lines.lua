@@ -1,4 +1,5 @@
 local log = require("smart-motion.core.log")
+
 ---@type SmartMotionFilterModuleEntry
 local M = {}
 

@@ -7,13 +7,13 @@ local modifiers = require("smart-motion.core.registry")("modifiers")
 
 modifiers.register_many({
 	default = {
-      run = utils.module_wrapper(default.run),
-      metadata = default.metadata,
-    },
+		run = utils.module_wrapper(default.run),
+		metadata = default.metadata,
+	},
 	weight_distance = {
-      run = utils.module_wrapper(weight_distance.run),
-      metadata = weight_distance.metadata,
-    },
+		run = utils.module_wrapper(weight_distance.run),
+		metadata = weight_distance.metadata,
+	},
 })
 
 return modifiers

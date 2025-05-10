@@ -43,23 +43,25 @@ end
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
----@param extractor thread
-function M.get_targets(ctx, cfg, motion_state, filter_gen)
+---@param generator thread
+function M.get_targets(ctx, cfg, motion_state, generator)
 	local targets = {}
 
-	if type(filter_gen) ~= "thread" then
-		error("Then filter generator must be a coroutine")
+	if type(generator) ~= "thread" then
+		log.error("get_targets: Then generator must be a coroutine")
+		return
 	end
 
 	while true do
-		local ok, data_or_error = coroutine.resume(filter_gen, ctx, cfg, motion_state)
+		local ok, data_or_error = coroutine.resume(generator, ctx, cfg, motion_state)
 
 		if not ok then
-			log.error("Filter Coroutine Error: " .. tostring(data_or_error))
+			log.error("get_targets: Coroutine Error: " .. tostring(data_or_error))
 			break
 		end
 
 		if not data_or_error then
+			log.debug("get_targets: no data, breaking out of loop")
 			break
 		end
 

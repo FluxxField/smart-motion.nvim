@@ -140,8 +140,10 @@ function M.trigger_motion(trigger_key)
 			visualizer.run(ctx, cfg, motion_state)
 			motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
 
+			-- No targets, exit motion
 			local targets = motion_state.jump_targets or {}
 			if #targets == 0 then
+				log.debug("pipeline: no targets exiting")
 				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 				break
 			end
@@ -366,21 +368,25 @@ end
 function M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
 	local lines_gen = collector.run()
 	if not lines_gen then
+		log.debug("No collector generator. Exiting pipeline")
 		return
 	end
 
 	local extractor_gen = extractor.run(lines_gen)
 	if not extractor_gen then
+		log.debug("No extractor generator. Exiting pipeline")
 		return
 	end
 
 	local modifier_gen = modifier.run(extractor_gen)
 	if not modifier_gen then
+		log.debug("No modifier generator. Exiting pipeline")
 		return
 	end
 
 	local filter_gen = filter.run(modifier_gen)
 	if not filter_gen then
+		log.debug("No filter generator. Exiting pipeline")
 		return
 	end
 

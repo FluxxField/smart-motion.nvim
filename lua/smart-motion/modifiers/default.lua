@@ -4,7 +4,7 @@ local log = require("smart-motion.core.log")
 local M = {}
 
 function M.run(ctx, cfg, motion_state, target)
- return target
+	return target
 end
 
 M.metadata = {

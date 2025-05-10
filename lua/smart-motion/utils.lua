@@ -120,7 +120,7 @@ end
 --
 -- Module Wrapper
 --
-function M.module_wrapper(user_fn, opts)
+function M.module_wrapper(run_fn, opts)
 	opts = opts or {}
 
 	return function(input_gen)
@@ -135,18 +135,18 @@ function M.module_wrapper(user_fn, opts)
 			end
 
 			while true do
-				local ok, target = coroutine.resume(input_gen, ctx, cfg, motion_state)
+				local ok, data = coroutine.resume(input_gen, ctx, cfg, motion_state)
 
 				if not ok then
-					log.error("Input Generator Coroutine Error: " .. tostring(target))
+					log.error("Input Generator Coroutine Error: " .. tostring(data))
 					break
 				end
 
-				if target == nil then
+				if data == nil then
 					break
 				end
 
-				local result = user_fn(ctx, cfg, motion_state, target)
+				local result = run_fn(ctx, cfg, motion_state, data)
 
 				if type(result) == "thread" then
 					while true do
@@ -155,9 +155,10 @@ function M.module_wrapper(user_fn, opts)
 							break
 						end
 
-						if yielded_Target == nil then
+						if yielded_target == nil then
 							break
 						end
+
 						coroutine.yield(yielded_target)
 					end
 				elseif type(result) == "table" then

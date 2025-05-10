@@ -7,10 +7,11 @@ local M = {}
 ---@return SmartMotionFilterModuleEntry
 function M.merge(filters)
 	function run(ctx, cfg, motion_state, target)
-		for _, filter in ipairs(filters) do
-			local ok, result = pcall(filter.run, ctx, cfg, motion_state, target)
+		for _, run_fn in ipairs(filters) do
+			local ok, result = pcall(run_fn, ctx, cfg, motion_state, target)
 
 			if not ok then
+				log.debug("merge_filters: failed to run filter: " .. tostring(result))
 				break
 			end
 
