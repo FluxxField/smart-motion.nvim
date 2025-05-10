@@ -120,9 +120,20 @@ end
 --
 -- Module Wrapper
 --
-function M.module_wrapper(user_fn)
+function M.module_wrapper(user_fn, opts)
+	opts = opts or {}
+
 	return function(input_gen)
 		return coroutine.create(function(ctx, cfg, motion_state)
+			if opts.before_input_loop then
+				local result = opts.before_input_loop(ctx, cfg, motion_state)
+
+				if type(result) == "string" then
+					motion_state.exit_type = result
+					return
+				end
+			end
+
 			while true do
 				local ok, target = coroutine.resume(input_gen, ctx, cfg, motion_state)
 
@@ -137,7 +148,19 @@ function M.module_wrapper(user_fn)
 
 				local result = user_fn(ctx, cfg, motion_state, target)
 
-				if type(result) == "table" then
+				if type(result) == "thread" then
+					while true do
+						local ok2, yielded_target = coroutine.resume(result)
+						if not ok2 then
+							break
+						end
+
+						if yielded_Target == nil then
+							break
+						end
+						coroutine.yield(yielded_target)
+					end
+				elseif type(result) == "table" then
 					coroutine.yield(result)
 				elseif type(result) == "string" then
 					motion_state.exit_type = result

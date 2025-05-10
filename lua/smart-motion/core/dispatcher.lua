@@ -138,13 +138,11 @@ function M.trigger_motion(trigger_key)
 		else
 			M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
 			visualizer.run(ctx, cfg, motion_state)
+			motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
 
 			local targets = motion_state.jump_targets or {}
 			if #targets == 0 then
 				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
-				break
-			elseif #targets == 1 then
-				motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
 				break
 			end
 		end
@@ -335,13 +333,11 @@ function M.trigger_action(trigger_key)
 		else
 			M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
 			visualizer.run(ctx, cfg, motion_state)
+			motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
 
 			local targets = motion_state.jump_targets or {}
 			if #targets == 0 then
 				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
-				break
-			elseif #targets == 1 then
-				motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
 				break
 			end
 		end

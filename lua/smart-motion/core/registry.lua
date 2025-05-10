@@ -41,11 +41,6 @@ return function(module_type)
 		entry.metadata.description = entry.metadata.description or ("SmartMotion: " .. entry.metadata.label)
 		entry.metadata.motion_state = entry.metadata.motion_state or {}
 
-		-- Automatically wrap user function into coroutine if needed
-		if type(entry.run) == "function" and debug.getinfo(entry.run).nparams == 4 then
-			entry.run = utils.module_wrapper(entry.run)
-		end
-
 		registry.by_name[name] = entry
 
 		if entry.keys then
