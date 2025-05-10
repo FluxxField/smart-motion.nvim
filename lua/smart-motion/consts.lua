@@ -50,11 +50,12 @@ M.SELECTION_MODE = {
 	SECOND = "second",
 }
 
-M.SEARCH_EXIT_TYPE = {
+M.EXIT_TYPE = {
 	EARLY_EXIT = "early_exit",
 	DIRECT_HINT = "direct_hint",
 	AUTO_SELECT = "auto_select",
 	CONTINUE_TO_SELECTION = "continue_to_selection",
+	CONTINUE_LOOP = "continue_loop",
 }
 
 return M

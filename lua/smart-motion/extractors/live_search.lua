@@ -1,18 +1,12 @@
-local highlight = require("smart-motion.core.highlight")
-local log = require("smart-motion.core.log")
 local consts = require("smart-motion.consts")
+local log = require("smart-motion.core.log")
 
 local EXIT_TYPE = consts.EXIT_TYPE
-local TARGET_TYPES = consts.TARGET_TYPES
 
 ---@type SmartMotionExtractorModuleEntry
 local M = {}
 
 function M.before_input_loop(ctx, cfg, motion_state)
-	if #motion_state.search_text >= (motion_state.num_of_char or 1) then
-		return EXIT_TYPE.CONTINUE_TO_SELECTION
-	end
-
 	if vim.fn.getchar(1) == 0 then
 		return EXIT_TYPE.CONTINUE_LOOP
 	end
@@ -27,19 +21,18 @@ function M.before_input_loop(ctx, cfg, motion_state)
 
 	if char == "\027" then -- ESC
 		return EXIT_TYPE.EARLY_EXIT
+	elseif char == "\r" then -- ENTER
+		motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
 	elseif char == "\b" or char == vim.api.nvim_replace_termcodes("<BS>", true, false, true) then
 		motion_state.search_text = motion_state.search_text:sub(1, -2)
 	else
-		motion_state.search_text = motion_state.search_text .. char
+		motion_state.search_text = (motion_state.search_text or "") .. char
 	end
 end
 
---- Extracts searched text from given collector.
---- @param collector thread
---- @return thread Coroutine yielding SmartMotionTarget
 function M.run(ctx, cfg, motion_state, data)
-	return coroutine.create(function()
-	 local text, line_number = data.text, data.line_number
+ return coroutine.create(function()
+		local text, line_number = data.text, data.line_number
 		local col = 0
 	
 		while true do
@@ -54,7 +47,7 @@ function M.run(ctx, cfg, motion_state, data)
 				text = match,
 				start_pos = { row = line_number, col = start_col },
 				end_pos = { row = line_number, col = end_col },
-				type = TARGET_TYPES.SEARCH,
+				type = consts.TARGET_TYPES.SEARCH,
 			})
 	
 			col = end_col + 1
@@ -63,8 +56,8 @@ function M.run(ctx, cfg, motion_state, data)
 end
 
 M.metadata = {
-	label = "Text Search Extractor",
-	description = "Extracts searched text to generate targets from collector",
+	label = "Live Search Extractor",
+	description = "Continuously updates search results as the user types",
 	motion_state = {
 		last_search_text = nil,
 		search_text = "",
