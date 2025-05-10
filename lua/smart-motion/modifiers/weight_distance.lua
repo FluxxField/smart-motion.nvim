@@ -1,26 +1,16 @@
 ---@type SmartMotionModifierModuleEntry
 local M = {}
 
-function M.run(input_gen)
-	return coroutine.create(function(ctx, cfg, motion_state)
+function M.run(ctx, cfg, motion_state, target)
 		local cursor_row, cursor_col = ctx.cursor_line, ctx.cursor_col
+		local target_row = target.start_pos.row
+		local target_col = target.start_pos.col
+		local dist = math.abs(target_row - cursor_row) + math.abs(target_col - cursor_col)
 
-		while true do
-			local ok, target = coroutine.resume(input_gen, ctx, cfg, motion_state)
-			if not ok or not target then
-				break
-			end
+		target.metadata = target.metadata or {}
+		target.metadata.sort_weight = dist
 
-			local target_row = target.start_pos.row
-			local target_col = target.start_pos.col
-
-			local dist = math.abs(target_row - cursor_row) + math.abs(target_col - cursor_col)
-			target.metadata = target.metadata or {}
-			target.metadata.sort_weight = dist
-
-			coroutine.yield(target)
-		end
-	end)
+		return target
 end
 
 M.metadata = {
