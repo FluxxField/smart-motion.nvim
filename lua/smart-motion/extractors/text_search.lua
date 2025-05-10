@@ -38,28 +38,28 @@ end
 --- @param collector thread
 --- @return thread Coroutine yielding SmartMotionTarget
 function M.run(ctx, cfg, motion_state, data)
-	local text, line_number = data.text, data.line_number
-	local col = 0
-
-	while true do
-		local match_data = vim.fn.matchstrpos(text, "\\V" .. motion_state.search_text, col)
-		local match, start_col, end_col = match_data[1], match_data[2], match_data[3]
-
-		if start_col == -1 then
-			break
+	return coroutine.create(function()
+	 local text, line_number = data.text, data.line_number
+		local col = 0
+	
+		while true do
+			local match_data = vim.fn.matchstrpos(text, "\\V" .. motion_state.search_text, col)
+			local match, start_col, end_col = match_data[1], match_data[2], match_data[3]
+	
+			if start_col == -1 then
+				break
+			end
+	
+			coroutine.yield({
+				text = match,
+				start_pos = { row = line_number, col = start_col },
+				end_pos = { row = line_number, col = end_col },
+				type = TARGET_TYPES.SEARCH,
+			})
+	
+			col = end_col + 1
 		end
-
-		local target = {
-			text = match,
-			start_pos = { row = line_number, col = start_col },
-			end_pos = { row = line_number, col = end_col },
-			type = TARGET_TYPES.SEARCH,
-		}
-
-		col = end_col + 1
-
-		return target
-	end
+ end)
 end
 
 M.metadata = {
