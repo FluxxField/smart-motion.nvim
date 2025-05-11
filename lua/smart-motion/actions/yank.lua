@@ -13,6 +13,10 @@ function M.run(ctx, cfg, motion_state)
 	local col = target.end_pos.col
 	local line = vim.api.nvim_buf_get_lines(bufnr, row, row + 1, false)[1] or ""
 
+	if motion_state.exclude then
+		col = math.max(0, col - 1)
+	end
+
 	if col == #line then
 		vim.cmd("normal! Y")
 	else

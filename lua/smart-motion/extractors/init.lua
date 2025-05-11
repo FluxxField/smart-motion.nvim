@@ -10,14 +10,21 @@ local extractors = require("smart-motion.core.registry")("extractors")
 --- @type table<string, SmartMotionExtractorModuleEntry>
 extractors.register_many({
 	lines = {
+		keys = { "l" },
 		run = utils.module_wrapper(lines.run),
-		metadata = lines.metadata,
+		metadata = vim.tbl_deep_extend("force", lines.metadata, {
+			motion_state = {
+				quick_action = false,
+			},
+		}),
 	},
 	words = {
+		keys = { "w" },
 		run = utils.module_wrapper(words.run),
 		metadata = words.metadata,
 	},
 	text_search_1_char = {
+		keys = { "f" },
 		run = utils.module_wrapper(text_search.run, {
 			before_input_loop = text_search.before_input_loop,
 		}),
@@ -25,6 +32,19 @@ extractors.register_many({
 			motion_state = {
 				num_of_char = 1,
 				should_show_prefix = false,
+			},
+		}),
+	},
+	text_search_1_char_until = {
+		keys = { "t" },
+		run = utils.module_wrapper(text_search.run, {
+			before_input_loop = text_search.before_input_loop,
+		}),
+		metadata = vim.tbl_deep_extend("force", text_search.metadata, {
+			motion_state = {
+				num_of_char = 1,
+				should_show_prefix = false,
+				exclude = true,
 			},
 		}),
 	},

@@ -182,7 +182,7 @@ function M.trigger_action(trigger_key)
 	local motion = require("smart-motion.motions").get_by_key(trigger_key)
 	local action = registries.actions.get_by_name(motion.action)
 
-	if motion.is_action then
+	if motion.infer then
 		action = registries.actions.get_by_key(trigger_key)
 	end
 
@@ -258,12 +258,14 @@ function M.trigger_action(trigger_key)
 	--
 	-- Quick action on target under cursor
 	--
-	local under_cursor_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
-	if under_cursor_target then
-		motion_state.selected_jump_target = under_cursor_target
-		action.run(ctx, cfg, motion_state)
-		utils.reset_motion(ctx, cfg, motion_state)
-		return
+	if motion_state.quick_action then
+		local under_cursor_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
+		if under_cursor_target then
+			motion_state.selected_jump_target = under_cursor_target
+			action.run(ctx, cfg, motion_state)
+			utils.reset_motion(ctx, cfg, motion_state)
+			return
+		end
 	end
 
 	--
@@ -279,7 +281,13 @@ function M.trigger_action(trigger_key)
 		end
 	end
 
-	action = registries.actions.get_by_name(action.name .. "_jump")
+	-- Should we jump then delete?
+	if consts.JUMP_MOTIONS[motion_key] then
+		action = registries.actions.get_by_name(action.name .. "_jump")
+	-- Are we messing with a line? Then we should jump
+	elseif motion_key == "l" then
+		action = registries.actions.get_by_name(action.name .. "_line")
+	end
 
 	--
 	-- Pipeline Loop

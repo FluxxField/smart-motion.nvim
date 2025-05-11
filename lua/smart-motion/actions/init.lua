@@ -59,16 +59,6 @@ local action_entries = {
 			description = "Changes the entire line at the target",
 		},
 	},
-	change_until = {
-		run = merge({
-			require("smart-motion.actions.until"),
-			require("smart-motion.actions.change"),
-		}),
-		metadata = {
-			label = "Change Until",
-			description = "Changes text until the matched character",
-		},
-	},
 	delete = {
 		keys = { "d" },
 		run = merge({ require("smart-motion.actions.delete") }),
@@ -98,16 +88,6 @@ local action_entries = {
 			description = "Deletes the entire line at the target",
 		},
 	},
-	delete_until = {
-		run = merge({
-			require("smart-motion.actions.until"),
-			require("smart-motion.actions.delete"),
-		}),
-		metadata = {
-			label = "Delete Until",
-			description = "Deletes up to but not including the matched character",
-		},
-	},
 	yank = {
 		keys = { "y" },
 		run = merge({ require("smart-motion.actions.yank") }),
@@ -135,16 +115,6 @@ local action_entries = {
 		metadata = {
 			label = "Yank Line",
 			description = "Yanks the entire line at the target",
-		},
-	},
-	yank_until = {
-		run = merge({
-			require("smart-motion.actions.until"),
-			require("smart-motion.actions.yank"),
-		}),
-		metadata = {
-			label = "Yank Until",
-			description = "Yanks text up to the matched character",
 		},
 	},
 	restore = {

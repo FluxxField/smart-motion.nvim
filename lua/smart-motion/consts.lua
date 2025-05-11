@@ -58,4 +58,15 @@ M.EXIT_TYPE = {
 	CONTINUE_LOOP = "continue_loop",
 }
 
+M.JUMP_MOTIONS = {
+	w = true,
+	e = true,
+	b = true,
+	ge = true,
+	j = true,
+	k = true,
+	["{"] = true,
+	["}"] = true,
+}
+
 return M

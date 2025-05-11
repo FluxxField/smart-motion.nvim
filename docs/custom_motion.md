@@ -166,7 +166,7 @@ Here are the fields you can use when calling `register_motion(name, config)`:
 ```ts
 SmartMotionMotionEntry {
   trigger_key?: string  -- Optional override; defaults to `name`
-  is_action?: boolean   -- Is this an action trigger?
+  infer?: boolean   -- Is this an action trigger?
   pipeline: {
     collector: string
     extractor: string

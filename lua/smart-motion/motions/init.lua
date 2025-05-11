@@ -65,14 +65,14 @@ function motions.register_motion(name, motion, opts)
 	motions.by_key[motion.trigger_key] = motion
 
 	if motion.map then
-		local is_action = motion.is_action or false
+		local infer = motion.infer or false
 		local modes = motion.modes or { "n" }
 		local desc = motion.metadata.label
 
 		for _, mode in ipairs(modes) do
 			local trigger = dispatcher.trigger_motion
 
-			if is_action then
+			if infer then
 				trigger = dispatcher.trigger_action
 			end
 
@@ -140,7 +140,7 @@ function motions.map_motion(name, motion_opts, opts)
 	local trigger_key = motion.trigger_key or name
 
 	local handler = function()
-		local trigger = motion.is_action and dispatcher.trigger_action or dispatcher.trigger_motion
+		local trigger = motion.infer and dispatcher.trigger_action or dispatcher.trigger_motion
 
 		trigger(trigger_key)
 	end

@@ -118,7 +118,7 @@ local extractors = require("smart-motion.core.registries"):get().extractors
 extractors.register("my_extractor", MyModule)
 ```
 
-You can also provide metadata and `keys` to link extractors to motion keys if using `is_action = true`.
+You can also provide metadata and `keys` to link extractors to motion keys if using `infer = true`.
 
 ---
 

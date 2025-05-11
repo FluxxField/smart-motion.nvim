@@ -155,7 +155,7 @@ end
 function presets.delete(exclude)
 	presets._register({
 		d = {
-			is_action = true,
+			infer = true,
 			collector = "lines",
 			filter = "filter_visible",
 			visualizer = "hint_start",
@@ -166,25 +166,12 @@ function presets.delete(exclude)
 				description = "Deletes based on motion provided",
 			},
 		},
-		dt = {
-			collector = "lines",
-			extractor = "text_search_1_char",
-			filter = "filter_words_on_cursor_line_after_cursor",
-			visualizer = "hint_start",
-			action = "delete_until",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Delete Until Searched Text",
-				description = "Deletes until the searched for text",
-			},
-		},
 		dT = {
 			collector = "lines",
-			extractor = "text_search_1_char",
+			extractor = "text_search_1_char_until",
 			filter = "filter_words_on_cursor_line_before_cursor",
 			visualizer = "hint_start",
-			action = "delete_until",
+			action = "delete",
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -227,7 +214,7 @@ end
 function presets.yank(exclude)
 	presets._register({
 		y = {
-			is_action = true,
+			infer = true,
 			collector = "lines",
 			filter = "filter_visible",
 			visualizer = "hint_start",
@@ -238,22 +225,9 @@ function presets.yank(exclude)
 				description = "Yanks based on the motion provided",
 			},
 		},
-		yt = {
-			collector = "lines",
-			extractor = "text_search_1_char",
-			filter = "filter_words_on_cursor_line_after_cursor",
-			visualizer = "hint_start",
-			action = "yank_until",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Yank Until Searched Text After Cursor",
-				description = "Yank until the searched for text",
-			},
-		},
 		yT = {
 			collector = "lines",
-			extractor = "text_search_1_char",
+			extractor = "text_search_1_char_until",
 			filter = "filter_words_on_cursor_line_before_cursor",
 			visualizer = "hint_start",
 			action = "yank_until",
@@ -299,7 +273,7 @@ end
 function presets.change(exclude)
 	presets._register({
 		c = {
-			is_action = true,
+			infer = true,
 			collector = "lines",
 			filter = "filter_visible",
 			visualizer = "hint_start",
@@ -310,22 +284,9 @@ function presets.change(exclude)
 				description = "Deletes the selected word and goes into insert mode",
 			},
 		},
-		ct = {
-			collector = "lines",
-			extractor = "text_search_1_char",
-			filter = "filter_words_on_cursor_line_after_cursor",
-			visualizer = "hint_start",
-			action = "change_until",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Change Until Searched Text After Cursor",
-				description = "Change until the searched for text",
-			},
-		},
 		cT = {
 			collector = "lines",
-			extractor = "text_search_1_char",
+			extractor = "text_search_1_char_until",
 			filter = "filter_words_on_cursor_line_before_cursor",
 			visualizer = "hint_start",
 			action = "change_until",
