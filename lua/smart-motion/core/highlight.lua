@@ -23,9 +23,7 @@ end
 ---@param target Target
 ---@param label string
 ---@param options HintOptions
-function M.apply_single_hint_label(ctx, cfg, motion_state, target, label, options)
-	options = options or {}
-
+function M.apply_single_hint_label(ctx, cfg, motion_state, target, label)
 	local row = target.start_pos.row
 	local col = target.start_pos.col
 
@@ -44,16 +42,15 @@ function M.apply_single_hint_label(ctx, cfg, motion_state, target, label, option
 	log.debug(string.format("Applying single hint '%s' at line %d, col %d", label, row, col))
 
 	if motion_state.hint_position == HINT_POSITION.END then
-		col = target.end_pos.col - 1
+		col = max(target.end_pos.col - 1, 0)
 	end
 
-	if motion_state.is_searching_mode and motion_state.search_text and #motion_state.search_text >= 1 then
+	if motion_state.should_show_prefix and motion_state.search_text and #motion_state.search_text >= 1 then
 		prefix = motion_state.search_text:sub(1, #motion_state.search_text)
 	end
 
 	if motion_state.is_searching_mode then
 		col = target.start_pos.col
-
 		hint_hl = hint_dim
 		prefix_hl = prefix_dim_highlight
 	end
@@ -106,16 +103,15 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, target, label, option
 	log.debug(string.format("Extmark for '%s' at row: %d col: %d", label, row, col))
 
 	if motion_state.hint_position == HINT_POSITION.END then
-		col = target.end_pos.col - 1
+		col = max(target.end_pos.col - 1, 0)
 	end
 
-	if motion_state.is_searching_mode and motion_state.search_text and #motion_state.search_text >= 1 then
+	if motion_state.should_show_prefix and motion_state.search_text and #motion_state.search_text >= 1 then
 		prefix = motion_state.search_text:sub(1, #motion_state.search_text)
 	end
 
 	if motion_state.is_searching_mode then
 		col = target.start_pos.col
-
 		first_hl = two_char_hint_dim
 		second_hl = two_char_hint_dim
 		prefix_hl = prefix_dim_highlight

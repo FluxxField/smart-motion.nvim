@@ -4,7 +4,7 @@ SmartMotion allows you to register new motions and actions using a flexible and 
 
 - How motion registration works
 - What options are available
-- How to use `is_action`
+- How to use `infer`
 - How to register multiple motions at once
 - How presets work under the hood
 - How module registries work and why they're powerful
@@ -56,19 +56,19 @@ Each motion supports the following fields:
 
 ---
 
-## 🔁 `is_action` and Trigger Behavior
+## 🔁 `infer` and Trigger Behavior
 
-When registering a motion, the `is_action` flag controls how the dispatcher interprets the first keypress:
+When registering a motion, the `infer` flag controls how the dispatcher interprets the first keypress:
 
-- If `is_action = false` (default), the motion key **is the motion**.
-- If `is_action = true`, the key is treated as a **trigger for an action**, and the **next key** determines the motion to apply it to.
+- If `infer = false` (default), the motion key **is the motion**.
+- If `infer = true`, the key is treated as a **trigger for an action**, and the **next key** determines the motion to apply it to.
 
 This is how SmartMotion mimics `dw`, `ct)`, etc. without you needing to define every combo.
 
 ```lua
 -- `d` is registered as an action:
 require("smart-motion").register_motion("d", {
-  is_action = true,
+  infer = true,
   action = "delete",
 })
 ```
@@ -126,7 +126,7 @@ Each registry supports:
 
 - `register(name, module)` — add a module
 - `get_by_name(name)` — look up a module by string
-- `get_by_key(key)` — lookup by motion key (used for inference in `is_action` behavior)
+- `get_by_key(key)` — lookup by motion key (used for inference in `infer` behavior)
 
 This system is what powers:
 

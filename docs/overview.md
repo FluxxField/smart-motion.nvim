@@ -13,7 +13,7 @@ Learn how to register your own motions and presets.
 Covers:
 - How motion definitions work
 - How to register single or multiple motions
-- is_action behavior for supporting native-style operations (like dw, ciw)
+- infer behavior for supporting native-style operations (like dw, ciw)
 - Metadata and mapping options
 
 ➡️ View [registering.md](registering.md)

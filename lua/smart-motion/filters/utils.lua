@@ -6,46 +6,24 @@ local M = {}
 ---@param filters (fun(input_gen: thread): thread)[]
 ---@return SmartMotionFilterModuleEntry
 function M.merge(filters)
-	function run(input_gen)
-		return coroutine.create(function(ctx, cfg, motion_state)
-			while true do
-				local ok, target = coroutine.resume(input_gen, ctx, cfg, motion_state)
+	return function(ctx, cfg, motion_state, data)
+		for _, run_fn in ipairs(filters) do
+			local ok, result = pcall(run_fn, ctx, cfg, motion_state, data)
 
-				if not ok then
-					log.error("Filter Merge input_gen Error: " .. tostring(target))
-					break
-				end
-
-				if not target then
-					break
-				end
-
-				local intermediate = target
-				local accepted = true
-
-				for _, filter in ipairs(filters) do
-					local filter_gen = filter.run(coroutine.create(function()
-						coroutine.yield(intermediate)
-					end))
-
-					local passed, filtered = coroutine.resume(filter_gen, ctx, cfg, motion_state)
-
-					if not passed or not filtered then
-						accepted = false
-						break
-					end
-
-					intermediate = filtered
-				end
-
-				if accepted then
-					coroutine.yield(intermediate)
-				end
+			if not ok then
+				log.debug("merge_filters: failed to run filter: " .. tostring(result))
+				break
 			end
-		end)
-	end
 
-	return run
+			if result == nil or type(result) == "string" then
+				return result
+			end
+
+			data = result
+		end
+
+		return data
+	end
 end
 
 return M

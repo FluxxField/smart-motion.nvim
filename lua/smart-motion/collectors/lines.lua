@@ -37,4 +37,9 @@ function M.run()
 	end)
 end
 
+M.metadata = {
+	label = "Line Collector",
+	description = "Collects full lines forward or backward from the cursor",
+}
+
 return M

@@ -6,7 +6,7 @@ local log = require("smart-motion.core.log")
 local motions = require("smart-motion.core.registry")("motions")
 
 --- Fields that every motion pipeline must contain
-local REQUIRED_PIPELINE_FIELDS = { "collector", "visualizer" }
+local REQUIRED_FIELDS = { "collector", "visualizer" }
 
 local error_label = "[Motion Registry] "
 
@@ -23,13 +23,8 @@ function motions._validate_motion_entry(name, motion)
 		return false
 	end
 
-	if not motion.pipeline or type(motion.pipeline) ~= "table" then
-		log.error(error_label .. error_name .. "Motion is missing a valid pipeline.")
-		return false
-	end
-
-	for _, field in ipairs(REQUIRED_PIPELINE_FIELDS) do
-		local module_name = motion.pipeline[field]
+	for _, field in ipairs(REQUIRED_FIELDS) do
+		local module_name = motion[field]
 		if not utils.is_non_empty_string(module_name) then
 			log.error("[Motion Registry] Motion '" .. name .. "' pipeline must specify '" .. field .. "'.")
 			return false
@@ -70,14 +65,14 @@ function motions.register_motion(name, motion, opts)
 	motions.by_key[motion.trigger_key] = motion
 
 	if motion.map then
-		local is_action = motion.is_action or false
+		local infer = motion.infer or false
 		local modes = motion.modes or { "n" }
 		local desc = motion.metadata.label
 
 		for _, mode in ipairs(modes) do
 			local trigger = dispatcher.trigger_motion
 
-			if is_action then
+			if infer then
 				trigger = dispatcher.trigger_action
 			end
 
@@ -145,7 +140,7 @@ function motions.map_motion(name, motion_opts, opts)
 	local trigger_key = motion.trigger_key or name
 
 	local handler = function()
-		local trigger = motion.is_action and dispatcher.trigger_action or dispatcher.trigger_motion
+		local trigger = motion.infer and dispatcher.trigger_action or dispatcher.trigger_motion
 
 		trigger(trigger_key)
 	end

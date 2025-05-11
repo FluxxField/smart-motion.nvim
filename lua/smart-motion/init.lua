@@ -21,7 +21,6 @@ function M.setup(user_config)
 		filters = require("smart-motion.filters"),
 		visualizers = require("smart-motion.visualizers"),
 		actions = require("smart-motion.actions"),
-		pipeline_wrappers = require("smart-motion.pipeline_wrappers"),
 		motions = require("smart-motion.motions"),
 	})
 
@@ -111,13 +110,6 @@ function M.setup(user_config)
 		register_many = registries.actions.register_many,
 		get_by_key = registries.actions.get_by_key,
 		get_by_name = registries.actions.get_by_name,
-	}
-
-	M.pipeline_wrappers = {
-		register = registries.pipeline_wrappers.register,
-		register_many = registries.pipeline_wrappers.register_many,
-		get_by_key = registries.pipeline_wrappers.get_by_key,
-		get_by_name = registries.pipeline_wrappers.get_by_name,
 	}
 end
 

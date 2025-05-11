@@ -5,8 +5,9 @@ local targets = require("smart-motion.core.targets")
 local state = require("smart-motion.core.state")
 local flow_state = require("smart-motion.core.flow-state")
 local selection = require("smart-motion.core.selection")
+local highlight = require("smart-motion.core.highlight")
 
-local SEARCH_EXIT_TYPE = consts.SEARCH_EXIT_TYPE
+local EXIT_TYPE = consts.EXIT_TYPE
 
 --- @class Dispatcher
 local M = {}
@@ -14,7 +15,9 @@ local M = {}
 --- Triggers a motion by its trigger key.
 --- @param trigger_key string
 function M.trigger_motion(trigger_key)
+	--
 	-- Get Registries and motion data
+	--
 	local registries = require("smart-motion.core.registries"):get()
 
 	local motion = require("smart-motion.motions").get_by_key(trigger_key)
@@ -23,61 +26,152 @@ function M.trigger_motion(trigger_key)
 		return
 	end
 
-	local pipeline = motion.pipeline
-	local collector = registries.collectors.get_by_name(pipeline.collector)
-	local extractor = registries.extractors.get_by_name(pipeline.extractor)
-	local visualizer = registries.visualizers.get_by_name(pipeline.visualizer)
+	--
+	-- Get modules
+	--
+	local collector = registries.collectors.get_by_name(motion.collector)
+	local extractor = registries.extractors.get_by_name(motion.extractor)
+	local visualizer = registries.visualizers.get_by_name(motion.visualizer)
 	local action = registries.actions.get_by_name(motion.action)
 
-	local modifier = registries.modifiers.get_by_name(pipeline.modifier or "default")
+	local modifier = registries.modifiers.get_by_name(motion.modifier or "default")
 	if not modifier or not modifier.run then
 		modifier = registries.modifiers.get_by_name("default")
 	end
 
-	local filter = registries.filters.get_by_name(pipeline.filter or "default")
+	local filter = registries.filters.get_by_name(motion.filter or "default")
 	if not filter or not filter.run then
 		filter = registries.filters.get_by_name("default")
 	end
 
-	-- Build ctx, cfg, motion_state
+	--
+	-- Initiate state for the motion
+	--
 	local ctx, cfg, motion_state = utils.prepare_motion(extractor.name)
 	if not ctx or not cfg or not motion_state then
 		log.error("Failed to prepare motion - aborting")
+		utils.reset_motion(ctx, cfg, motion_state)
 		return
 	end
 
+	--
+	-- Update motion_state from what the modules provide
+	--
 	motion_state =
 		state.merge_motion_state(motion_state, motion, collector, extractor, modifier, filter, visualizer, action)
-	utils.reset_motion(ctx, cfg, motion_state)
 
+	--
 	-- Evaluate flow state
+	--
 	if flow_state.evaluate_flow_at_motion_start() then
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
+		M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
 
 		if motion_state.selected_jump_target then
 			action.run(ctx, cfg, motion_state)
 			utils.reset_motion(ctx, cfg, motion_state)
-
 			return
 		end
 	end
 
-	-- Check if wrapper needs fallback
-	local pipeline_wrapper = registries.pipeline_wrappers.get_by_name(motion.pipeline_wrapper or "default")
-	if not pipeline_wrapper or not pipeline_wrapper.run then
-		pipeline_wrapper = registries.pipeline_wrappers.get_by_name("default")
+	--
+	-- Pipeline Loop
+	--
+	highlight.dim_background(ctx, cfg, motion_state)
+
+	local early_exit_timeout = 2000
+	local continue_timeout = 500
+
+	while true do
+		--
+		-- Multi-pass
+		--
+		if motion_state.is_searching_mode then
+			local start_time = vim.fn.reltime()
+
+			if motion_state.exit_type == nil then
+				motion_state.exit_type = EXIT_TYPE.CONTINUE_LOOP
+			end
+
+			while motion_state.exit_type == EXIT_TYPE.CONTINUE_LOOP do
+				local timeout
+
+				if motion_state.search_text == "" then
+					timeout = early_exit_timeout
+				else
+					timeout = motion_state.timeout_after_input and 500 or nil
+				end
+
+				local elapsed = vim.fn.reltimefloat(vim.fn.reltime(start_time)) * 1000
+				if timeout and elapsed > timeout then
+					if motion_state.search_text == "" then
+						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+					else
+						motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
+					end
+
+					break
+				end
+
+				if motion_state.exit_type ~= EXIT_TYPE.CONTINUE_LOOP then
+					break
+				end
+
+				M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
+
+				if motion_state.search_text ~= motion_state.last_search_text and motion_state.search_text ~= "" then
+					if motion_state.timeout_after_input then
+						start_time = vim.fn.reltime() -- Reset timer
+					end
+
+					local targets = motion_state.jump_targets or {}
+					if #targets == 0 then
+						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+						break
+					elseif #targets == 1 then
+						motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
+						break
+					end
+
+					visualizer.run(ctx, cfg, motion_state)
+					motion_state.last_search_text = motion_state.search_text
+				end
+
+				vim.cmd("sleep 10m")
+			end
+			--
+			-- Single Pass
+			--
+		else
+			M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
+			motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
+
+			-- No targets, exit motion
+			local targets = motion_state.jump_targets or {}
+			if #targets == 0 then
+				log.debug("pipeline: no targets exiting")
+				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+				break
+			elseif #targets == 1 then
+				motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
+				break
+			end
+
+			visualizer.run(ctx, cfg, motion_state)
+		end
+
+		if
+			motion_state.exit_type == EXIT_TYPE.EARLY_EXIT
+			or motion_state.exit_type == EXIT_TYPE.CONTINUE_TO_SELECTION
+			or motion_state.exit_type == EXIT_TYPE.AUTO_SELECT
+		then
+			break
+		end
 	end
 
-	motion_state = vim.tbl_deep_extend("force", motion_state, pipeline_wrapper.metadata.motion_state)
-
-	-- Build and run the pipeline
-	local run_pipeline = M._build_pipeline(collector, extractor, modifier, filter, visualizer)
-	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state)
-
-	-- Handle pipeline early exits
-	M._handle_exit(ctx, cfg, motion_state, exit_type, action, visualizer)
-
-	-- Clean up
+	--
+	-- Handle exit
+	--
+	M._handle_exit(ctx, cfg, motion_state, action, visualizer)
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 
@@ -88,7 +182,7 @@ function M.trigger_action(trigger_key)
 	local motion = require("smart-motion.motions").get_by_key(trigger_key)
 	local action = registries.actions.get_by_name(motion.action)
 
-	if motion.is_action then
+	if motion.infer then
 		action = registries.actions.get_by_key(trigger_key)
 	end
 
@@ -98,16 +192,15 @@ function M.trigger_action(trigger_key)
 		return
 	end
 
-	local pipeline = motion.pipeline
-	local collector = registries.collectors.get_by_name(pipeline.collector)
-	local visualizer = registries.visualizers.get_by_name(pipeline.visualizer)
+	local collector = registries.collectors.get_by_name(motion.collector)
+	local visualizer = registries.visualizers.get_by_name(motion.visualizer)
 
-	local modifier = registries.modifiers.get_by_name(pipeline.modifier or "default")
+	local modifier = registries.modifiers.get_by_name(motion.modifier or "default")
 	if not modifier or not modifier.run then
 		modifier = registries.modifiers.get_by_name("default")
 	end
 
-	local filter = registries.filters.get_by_name(pipeline.filter or "default")
+	local filter = registries.filters.get_by_name(motion.filter or "default")
 	if not filter or not filter.run then
 		filter = registries.filters.get_by_name("default")
 	end
@@ -115,11 +208,11 @@ function M.trigger_action(trigger_key)
 	local ctx, cfg, motion_state = utils.prepare_motion("")
 	if not ctx or not cfg or not motion_state then
 		log.error("Failde to prepare motion - aborting")
+		utils.reset_motion(ctx, cfg, motion_state)
 		return
 	end
 
 	motion_state = state.merge_motion_state(motion_state, motion, collector, modifier, filter, visualizer, action)
-	utils.reset_motion(ctx, cfg, motion_state)
 
 	-- Get motion_key
 	local motion_key = vim.fn.nr2char(motion_char)
@@ -127,9 +220,13 @@ function M.trigger_action(trigger_key)
 
 	motion_state.target_type = consts.TARGET_TYPES_BY_KEY[motion_key] or ""
 
+	--
 	-- Fallback to native behavior if no extractor exists
+	--
 	if not extractor or not extractor.run then
+		--
 		-- Is this a short-curcit double key?
+		--
 		if motion_key == trigger_key then
 			motion_state.target_type = "lines"
 
@@ -137,6 +234,7 @@ function M.trigger_action(trigger_key)
 
 			if not line_action or not line_action.run then
 				vim.api.nvim_feedkeys(trigger_key .. motion_key, "n", false)
+				utils.reset_motion(ctx, cfg, motion_state)
 				return
 			end
 
@@ -146,26 +244,35 @@ function M.trigger_action(trigger_key)
 				line_action.run(ctx, cfg, motion_state)
 			end
 
+			utils.reset_motion(ctx, cfg, motion_state)
 			return
 		end
 
 		vim.api.nvim_feedkeys(trigger_key .. motion_key, "n", false)
+		utils.reset_motion(ctx, cfg, motion_state)
 		return
 	end
 
 	motion_state = state.merge_motion_state(motion_state, extractor)
 
-	local under_cursor_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
-
-	if under_cursor_target then
-		motion_state.selected_jump_target = under_cursor_target
-		action.run(ctx, cfg, motion_state)
-		utils.reset_motion(ctx, cfg, motion_state)
-		return
+	--
+	-- Quick action on target under cursor
+	--
+	if motion_state.quick_action then
+		local under_cursor_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
+		if under_cursor_target then
+			motion_state.selected_jump_target = under_cursor_target
+			action.run(ctx, cfg, motion_state)
+			utils.reset_motion(ctx, cfg, motion_state)
+			return
+		end
 	end
 
+	--
+	-- Evaluate flow state
+	--
 	if flow_state.evaluate_flow_at_motion_start() then
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, filter)
+		M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, filter)
 
 		if motion_state.selected_jump_target then
 			action.run(ctx, cfg, motion_state)
@@ -174,21 +281,113 @@ function M.trigger_action(trigger_key)
 		end
 	end
 
-	action = registries.actions.get_by_name(action.name .. "_jump")
-
-	-- Check if wrapper needs fallback
-	local pipeline_wrapper = registries.pipeline_wrappers.get_by_name(motion.pipeline_wrapper or "default")
-	if not pipeline_wrapper or not pipeline_wrapper.run then
-		pipeline_wrapper = registries.pipeline_wrappers.get_by_name("default")
+	-- Should we jump then delete?
+	if consts.JUMP_MOTIONS[motion_key] then
+		action = registries.actions.get_by_name(action.name .. "_jump")
+	-- Are we messing with a line? Then we should jump
+	elseif motion_key == "l" then
+		action = registries.actions.get_by_name(action.name .. "_line")
 	end
 
-	motion_state = state.merge_motion_state(motion_state, pipeline_wrapper)
+	--
+	-- Pipeline Loop
+	--
+	highlight.dim_background(ctx, cfg, motion_state)
 
-	local run_pipeline = M._build_pipeline(collector, extractor, modifier, filter, visualizer)
-	local exit_type = pipeline_wrapper.run(run_pipeline, ctx, cfg, motion_state)
+	local early_exit_timeout = 2000
+	local continue_timeout = 500
 
-	M._handle_exit(ctx, cfg, motion_state, exit_type, action, visualizer)
+	while true do
+		--
+		-- Multi-pass
+		--
+		if motion_state.is_searching_mode then
+			local start_time = vim.fn.reltime()
 
+			if motion_state.exit_type == nil then
+				motion_state.exit_type = EXIT_TYPE.CONTINUE_LOOP
+			end
+
+			while motion_state.exit_type == EXIT_TYPE.CONTINUE_LOOP do
+				local timeout
+
+				if motion_state.search_text == "" then
+					timeout = early_exit_timeout
+				else
+					timeout = motion_state.timeout_after_input and 500 or nil
+				end
+
+				local elapsed = vim.fn.reltimefloat(vim.fn.reltime(start_time)) * 1000
+				if timeout and elapsed > timeout then
+					if motion_state.search_text == "" then
+						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+					else
+						motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
+					end
+
+					break
+				end
+
+				if motion_state.exit_type ~= EXIT_TYPE.CONTINUE_LOOP then
+					break
+				end
+
+				M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
+
+				if motion_state.search_text ~= motion_state.last_search_text and motion_state.search_text ~= "" then
+					if motion_state.timeout_after_input then
+						start_time = vim.fn.reltime() -- Reset timer
+					end
+
+					local targets = motion_state.jump_targets or {}
+					if #targets == 0 then
+						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+						break
+					elseif #targets == 1 then
+						motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
+						break
+					end
+
+					visualizer.run(ctx, cfg, motion_state)
+					motion_state.last_search_text = motion_state.search_text
+				end
+
+				vim.cmd("sleep 10m")
+			end
+			--
+			-- Single Pass
+			--
+		else
+			M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
+			motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
+
+			-- No targets, exit motion
+			local targets = motion_state.jump_targets or {}
+			if #targets == 0 then
+				log.debug("pipeline: no targets exiting")
+				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
+				break
+			elseif #targets == 1 then
+				motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
+				break
+			end
+
+			visualizer.run(ctx, cfg, motion_state)
+		end
+
+		if
+			motion_state.exit_type == EXIT_TYPE.EARLY_EXIT
+			or motion_state.exit_type == EXIT_TYPE.CONTINUE_TO_SELECTION
+			or motion_state.exit_type == EXIT_TYPE.AUTO_SELECT
+		then
+			break
+		end
+	end
+
+	--
+	-- Handle exit
+	--
+	M._handle_exit(ctx, cfg, motion_state, action, visualizer)
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 
@@ -198,24 +397,28 @@ end
 --- @param motion_state SmartMotionMotionState
 --- @param collector SmartMotionCollectorModuleEntry
 --- @param extractor SmartMotionExtractorModuleEntry
-function M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
+function M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
 	local lines_gen = collector.run()
 	if not lines_gen then
+		log.debug("No collector generator. Exiting pipeline")
 		return
 	end
 
 	local extractor_gen = extractor.run(lines_gen)
 	if not extractor_gen then
+		log.debug("No extractor generator. Exiting pipeline")
 		return
 	end
 
 	local modifier_gen = modifier.run(extractor_gen)
 	if not modifier_gen then
+		log.debug("No modifier generator. Exiting pipeline")
 		return
 	end
 
 	local filter_gen = filter.run(modifier_gen)
 	if not filter_gen then
+		log.debug("No filter generator. Exiting pipeline")
 		return
 	end
 
@@ -223,38 +426,29 @@ function M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, modif
 	state.finalize_motion_state(motion_state)
 end
 
---- Builds the pipeline runner function
---- @param collector SmartMotionCollectorModuleEntry
---- @param extractor SmartMotionExtractorModuleEntry
---- @param filter SmartMotionFilterModuleEntry
---- @param visualizer SmartMotionVisualizerModuleEntry
---- @return fun(ctx: SmartMotionContext, cfg: SmartMotionConfig, motion_state: SmartMotionMotionState): nil
-function M._build_pipeline(collector, extractor, modifier, filter, visualizer)
-	local function run_pipeline(ctx, cfg, motion_state)
-		utils.reset_motion(ctx, cfg, motion_state)
-		M._prepare_pipeline(ctx, cfg, motion_state, collector, extractor, modifier, filter)
-		visualizer.run(ctx, cfg, motion_state)
-	end
-
-	return run_pipeline
-end
-
-function M._handle_exit(ctx, cfg, motion_state, exit_type, action, visualizer)
-	if exit_type == SEARCH_EXIT_TYPE.EARLY_EXIT then
+--
+-- Handle Exit
+--
+function M._handle_exit(ctx, cfg, motion_state, action, visualizer)
+	if motion_state.exit_type == EXIT_TYPE.EARLY_EXIT then
 		return
 	end
 
-	if exit_type == SEARCH_EXIT_TYPE.DIRECT_HINT or exit_type == SEARCH_EXIT_TYPE.AUTO_SELECT then
+	if motion_state.exit_type == EXIT_TYPE.DIRECT_HINT or motion_state.exit_type == EXIT_TYPE.AUTO_SELECT then
 		if motion_state.selected_jump_target then
 			action.run(ctx, cfg, motion_state)
 		end
-	elseif exit_type == SEARCH_EXIT_TYPE.CONTINUE_TO_SELECTION then
+	elseif motion_state.exit_type == EXIT_TYPE.CONTINUE_TO_SELECTION then
+		motion_state.is_searching_mode = false
 		visualizer.run(ctx, cfg, motion_state)
 		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 
 		if motion_state.selected_jump_target then
 			action.run(ctx, cfg, motion_state)
 		end
+	elseif motion_state.exit_type == EXIT_TYPE.AUTO_SELECT then
+		motion_state.selected_jump_target = motion_state.targets[1]
+		action.run(ctx, cfg, motion_state)
 	end
 end
 

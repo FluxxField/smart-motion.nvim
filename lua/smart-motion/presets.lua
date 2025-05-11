@@ -7,13 +7,10 @@ local presets = {}
 function presets.words(exclude)
 	presets._register({
 		w = {
-			pipeline = {
-				collector = "lines",
-				extractor = "words",
-				filter = "filter_words_after_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "default",
+			collector = "lines",
+			extractor = "words",
+			filter = "filter_words_after_cursor",
+			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
 			modes = { "n", "v" },
@@ -23,13 +20,10 @@ function presets.words(exclude)
 			},
 		},
 		b = {
-			pipeline = {
-				collector = "lines",
-				extractor = "words",
-				filter = "filter_words_before_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "default",
+			collector = "lines",
+			extractor = "words",
+			filter = "filter_words_before_cursor",
+			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
 			modes = { "n", "v" },
@@ -39,13 +33,10 @@ function presets.words(exclude)
 			},
 		},
 		e = {
-			pipeline = {
-				collector = "lines",
-				extractor = "words",
-				filter = "filter_words_after_cursor",
-				visualizer = "hint_end",
-			},
-			pipeline_wrapper = "default",
+			collector = "lines",
+			extractor = "words",
+			filter = "filter_words_after_cursor",
+			visualizer = "hint_end",
 			action = "jump_centered",
 			map = true,
 			modes = { "n", "v" },
@@ -55,13 +46,10 @@ function presets.words(exclude)
 			},
 		},
 		ge = {
-			pipeline = {
-				collector = "lines",
-				extractor = "words",
-				filter = "filter_words_before_cursor",
-				visualizer = "hint_end",
-			},
-			pipeline_wrapper = "default",
+			collector = "lines",
+			extractor = "words",
+			filter = "filter_words_before_cursor",
+			visualizer = "hint_end",
 			action = "jump_centered",
 			map = true,
 			modes = { "n", "v" },
@@ -77,13 +65,10 @@ end
 function presets.lines(exclude)
 	presets._register({
 		j = {
-			pipeline = {
-				collector = "lines",
-				extractor = "lines",
-				filter = "filter_lines_after_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "default",
+			collector = "lines",
+			extractor = "lines",
+			filter = "filter_lines_after_cursor",
+			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
 			modes = { "n", "v" },
@@ -93,13 +78,10 @@ function presets.lines(exclude)
 			},
 		},
 		k = {
-			pipeline = {
-				collector = "lines",
-				extractor = "lines",
-				filter = "filter_lines_before_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "default",
+			collector = "lines",
+			extractor = "lines",
+			filter = "filter_lines_before_cursor",
+			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
 			modes = { "n", "v" },
@@ -115,13 +97,10 @@ end
 function presets.search(exclude)
 	presets._register({
 		s = {
-			pipeline = {
-				collector = "lines",
-				extractor = "text_search",
-				filter = "filter_words_after_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "live_search",
+			collector = "lines",
+			extractor = "live_search",
+			filter = "filter_words_after_cursor",
+			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
 			modes = { "n" },
@@ -131,13 +110,10 @@ function presets.search(exclude)
 			},
 		},
 		S = {
-			pipeline = {
-				collector = "lines",
-				extractor = "text_search",
-				filter = "filter_words_before_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "live_search",
+			collector = "lines",
+			extractor = "live_search",
+			filter = "filter_words_before_cursor",
+			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
 			modes = { "n" },
@@ -147,13 +123,10 @@ function presets.search(exclude)
 			},
 		},
 		f = {
-			pipeline = {
-				collector = "lines",
-				extractor = "text_search",
-				filter = "filter_words_after_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "text_search_2_char",
+			collector = "lines",
+			extractor = "text_search_2_char",
+			filter = "filter_words_after_cursor",
+			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
 			modes = { "n" },
@@ -163,13 +136,10 @@ function presets.search(exclude)
 			},
 		},
 		F = {
-			pipeline = {
-				collector = "lines",
-				extractor = "text_search",
-				filter = "filter_words_before_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "text_search_2_char",
+			collector = "lines",
+			extractor = "text_search_2_char",
+			filter = "filter_words_before_cursor",
+			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
 			modes = { "n" },
@@ -185,12 +155,10 @@ end
 function presets.delete(exclude)
 	presets._register({
 		d = {
-			is_action = true,
-			pipeline = {
-				collector = "lines",
-				filter = "filter_visible",
-				visualizer = "hint_start",
-			},
+			infer = true,
+			collector = "lines",
+			filter = "filter_visible",
+			visualizer = "hint_start",
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -198,31 +166,12 @@ function presets.delete(exclude)
 				description = "Deletes based on motion provided",
 			},
 		},
-		dt = {
-			pipeline = {
-				collector = "lines",
-				extractor = "text_search",
-				filter = "filter_words_on_cursor_line_after_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "text_search_1_char",
-			action = "delete_until",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Delete Until Searched Text",
-				description = "Deletes until the searched for text",
-			},
-		},
 		dT = {
-			pipeline = {
-				collector = "lines",
-				extractor = "text_search",
-				filter = "filter_words_on_cursor_line_before_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "text_search_1_char",
-			action = "delete_until",
+			collector = "lines",
+			extractor = "text_search_1_char_until",
+			filter = "filter_words_on_cursor_line_before_cursor",
+			visualizer = "hint_start",
+			action = "delete",
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -231,14 +180,11 @@ function presets.delete(exclude)
 			},
 		},
 		rdw = {
-			pipeline = {
-				collector = "lines",
-				extractor = "words",
-				modifier = "distance_metadata",
-				filter = "filter_lines_around_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "default",
+			collector = "lines",
+			extractor = "words",
+			modifier = "weight_distance",
+			filter = "filter_lines_around_cursor",
+			visualizer = "hint_start",
 			action = "remote_delete",
 			map = true,
 			modes = { "n" },
@@ -248,14 +194,11 @@ function presets.delete(exclude)
 			},
 		},
 		rdl = {
-			pipeline = {
-				collector = "lines",
-				extractor = "lines",
-				modifier = "distance_metadata",
-				filter = "filter_lines_around_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "default",
+			collector = "lines",
+			extractor = "lines",
+			modifier = "weight_distance",
+			filter = "filter_lines_around_cursor",
+			visualizer = "hint_start",
 			action = "remote_delete",
 			map = true,
 			modes = { "n" },
@@ -271,12 +214,10 @@ end
 function presets.yank(exclude)
 	presets._register({
 		y = {
-			is_action = true,
-			pipeline = {
-				collector = "lines",
-				filter = "filter_visible",
-				visualizer = "hint_start",
-			},
+			infer = true,
+			collector = "lines",
+			filter = "filter_visible",
+			visualizer = "hint_start",
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -284,30 +225,11 @@ function presets.yank(exclude)
 				description = "Yanks based on the motion provided",
 			},
 		},
-		yt = {
-			pipeline = {
-				collector = "lines",
-				extractor = "text_search",
-				filter = "filter_words_on_cursor_line_after_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "text_search_1_char",
-			action = "yank_until",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Yank Until Searched Text After Cursor",
-				description = "Yank until the searched for text",
-			},
-		},
 		yT = {
-			pipeline = {
-				collector = "lines",
-				extractor = "text_search",
-				filter = "filter_words_on_cursor_line_before_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "text_search_1_char",
+			collector = "lines",
+			extractor = "text_search_1_char_until",
+			filter = "filter_words_on_cursor_line_before_cursor",
+			visualizer = "hint_start",
 			action = "yank_until",
 			map = true,
 			modes = { "n" },
@@ -317,14 +239,11 @@ function presets.yank(exclude)
 			},
 		},
 		ryw = {
-			pipeline = {
-				collector = "lines",
-				extractor = "words",
-				modifier = "distance_metadata",
-				filter = "filter_lines_around_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "default",
+			collector = "lines",
+			extractor = "words",
+			modifier = "weight_distance",
+			filter = "filter_lines_around_cursor",
+			visualizer = "hint_start",
 			action = "remote_yank",
 			map = true,
 			modes = { "n" },
@@ -334,14 +253,11 @@ function presets.yank(exclude)
 			},
 		},
 		ryl = {
-			pipeline = {
-				collector = "lines",
-				extractor = "lines",
-				modifier = "distance_metadata",
-				filter = "filter_lines_around_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "default",
+			collector = "lines",
+			extractor = "lines",
+			modifier = "weight_distance",
+			filter = "filter_lines_around_cursor",
+			visualizer = "hint_start",
 			action = "remote_yank",
 			map = true,
 			modes = { "n" },
@@ -357,12 +273,10 @@ end
 function presets.change(exclude)
 	presets._register({
 		c = {
-			is_action = true,
-			pipeline = {
-				collector = "lines",
-				filter = "filter_visible",
-				visualizer = "hint_start",
-			},
+			infer = true,
+			collector = "lines",
+			filter = "filter_visible",
+			visualizer = "hint_start",
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -370,30 +284,11 @@ function presets.change(exclude)
 				description = "Deletes the selected word and goes into insert mode",
 			},
 		},
-		ct = {
-			pipeline = {
-				collector = "lines",
-				extractor = "text_search",
-				filter = "filter_words_on_cursor_line_after_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "text_search_1_char",
-			action = "change_until",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Change Until Searched Text After Cursor",
-				description = "Change until the searched for text",
-			},
-		},
 		cT = {
-			pipeline = {
-				collector = "lines",
-				extractor = "text_search",
-				filter = "filter_words_on_cursor_line_before_cursor",
-				visualizer = "hint_start",
-			},
-			pipeline_wrapper = "text_search_1_char",
+			collector = "lines",
+			extractor = "text_search_1_char_until",
+			filter = "filter_words_on_cursor_line_before_cursor",
+			visualizer = "hint_start",
 			action = "change_until",
 			map = true,
 			modes = { "n" },

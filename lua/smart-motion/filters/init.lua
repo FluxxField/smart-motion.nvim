@@ -1,3 +1,4 @@
+local utils = require("smart-motion.utils")
 local merge = require("smart-motion.filters.utils").merge
 
 ---@type SmartMotionRegistry<SmartMotionFilterModuleEntry>
@@ -8,31 +9,31 @@ local DIRECTION = require("smart-motion.consts").DIRECTION
 ---@type table<string, SmartMotionFilterModuleEntry>
 local filter_entries = {
 	default = {
-		run = require("smart-motion.filters.default").run,
+		run = utils.module_wrapper(require("smart-motion.filters.default").run),
 		metadata = {
 			label = "Default Passthrough",
 			description = "Yields all targets unchanged",
 		},
 	},
 	filter_visible = {
-		run = require("smart-motion.filters.filter_visible_lines").run,
+		run = utils.module_wrapper(require("smart-motion.filters.filter_visible_lines").run),
 		metadata = {
 			label = "Visible Only",
 			description = "Filters to targets visible in the current window.",
 		},
 	},
 	filter_cursor_line_only = {
-		run = require("smart-motion.filters.filter_cursor_line_only").run,
+		run = utils.module_wrapper(require("smart-motion.filters.filter_cursor_line_only").run),
 		metadata = {
 			label = "Cursor Line Only",
 			description = "Filters targets to the ones only on the cursor line",
 		},
 	},
 	filter_lines_after_cursor = {
-		run = merge({
-			require("smart-motion.filters.filter_visible_lines"),
-			require("smart-motion.filters.filter_lines_after_cursor"),
-		}),
+		run = utils.module_wrapper(merge({
+			require("smart-motion.filters.filter_visible_lines").run,
+			require("smart-motion.filters.filter_lines_after_cursor").run,
+		})),
 		metadata = {
 			label = "Lines After Cursor",
 			description = "Visible lines after the cursor.",
@@ -44,10 +45,10 @@ local filter_entries = {
 		},
 	},
 	filter_lines_before_cursor = {
-		run = merge({
-			require("smart-motion.filters.filter_visible_lines"),
-			require("smart-motion.filters.filter_lines_before_cursor"),
-		}),
+		run = utils.module_wrapper(merge({
+			require("smart-motion.filters.filter_visible_lines").run,
+			require("smart-motion.filters.filter_lines_before_cursor").run,
+		})),
 		metadata = {
 			label = "Lines Before Cursor",
 			description = "Visible lines before the cursor.",
@@ -59,10 +60,10 @@ local filter_entries = {
 		},
 	},
 	filter_words_after_cursor = {
-		run = merge({
-			require("smart-motion.filters.filter_visible_lines"),
-			require("smart-motion.filters.filter_words_after_cursor"),
-		}),
+		run = utils.module_wrapper(merge({
+			require("smart-motion.filters.filter_visible_lines").run,
+			require("smart-motion.filters.filter_words_after_cursor").run,
+		})),
 		metadata = {
 			label = "Words After Cursor",
 			description = "Visible words after the cursor using hint_position.",
@@ -74,10 +75,10 @@ local filter_entries = {
 		},
 	},
 	filter_words_before_cursor = {
-		run = merge({
-			require("smart-motion.filters.filter_visible_lines"),
-			require("smart-motion.filters.filter_words_before_cursor"),
-		}),
+		run = utils.module_wrapper(merge({
+			require("smart-motion.filters.filter_visible_lines").run,
+			require("smart-motion.filters.filter_words_before_cursor").run,
+		})),
 		metadata = {
 			label = "Words Before Cursor",
 			description = "Visible words before the cursor using hint_position.",
@@ -89,10 +90,10 @@ local filter_entries = {
 		},
 	},
 	filter_words_around_cursor = {
-		run = merge({
-			require("smart-motion.filters.filter_visible_lines"),
-			require("smart-motion.filters.filter_words_around_cursor"),
-		}),
+		run = utils.module_wrapper(merge({
+			require("smart-motion.filters.filter_visible_lines").run,
+			require("smart-motion.filters.filter_words_around_cursor").run,
+		})),
 		metadata = {
 			label = "Words Around Cursor",
 			description = "Visible words around (before and after) the cursor.",
@@ -104,10 +105,10 @@ local filter_entries = {
 		},
 	},
 	filter_lines_around_cursor = {
-		run = merge({
-			require("smart-motion.filters.filter_visible_lines"),
-			require("smart-motion.filters.filter_lines_around_cursor"),
-		}),
+		run = utils.module_wrapper(merge({
+			require("smart-motion.filters.filter_visible_lines").run,
+			require("smart-motion.filters.filter_lines_around_cursor").run,
+		})),
 		metadata = {
 			label = "Lines Around Cursor",
 			description = "Visible lines around (before and after) the cursor.",
@@ -119,10 +120,10 @@ local filter_entries = {
 		},
 	},
 	filter_words_on_cursor_line_after_cursor = {
-		run = merge({
-			require("smart-motion.filters.filter_cursor_line_only"),
-			require("smart-motion.filters.filter_words_after_cursor"),
-		}),
+		run = utils.module_wrapper(merge({
+			require("smart-motion.filters.filter_cursor_line_only").run,
+			require("smart-motion.filters.filter_words_after_cursor").run,
+		})),
 		metadata = {
 			label = "Filter Words On Cursor Line After Cursor",
 			description = "Keeps word targets only on the cursor line after the cursor position.",
@@ -131,10 +132,10 @@ local filter_entries = {
 		},
 	},
 	filter_words_on_cursor_line_before_cursor = {
-		run = merge({
-			require("smart-motion.filters.filter_cursor_line_only"),
-			require("smart-motion.filters.filter_words_before_cursor"),
-		}),
+		run = utils.module_wrapper(merge({
+			require("smart-motion.filters.filter_cursor_line_only").run,
+			require("smart-motion.filters.filter_words_before_cursor").run,
+		})),
 		metadata = {
 			label = "Filter Words On Cursor Line Before Cursor",
 			description = "Keeps word targets only on the cursor line before the cursor position.",
