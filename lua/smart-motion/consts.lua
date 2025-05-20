@@ -43,6 +43,8 @@ M.TARGET_TYPES_BY_KEY = {
 }
 
 M.WORD_PATTERN = [[\k\+]]
+M.WORD_WITH_PUNCTUATION_PATTERN = [[\k\+|[](){}.,=+%-]]
+M.BIG_WORD_PATTERN = [[[^ \t]\+]]
 
 ---@type table<string, SelectionMode>
 M.SELECTION_MODE = {
