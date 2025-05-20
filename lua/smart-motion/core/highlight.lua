@@ -42,7 +42,7 @@ function M.apply_single_hint_label(ctx, cfg, motion_state, target, label)
 	log.debug(string.format("Applying single hint '%s' at line %d, col %d", label, row, col))
 
 	if motion_state.hint_position == HINT_POSITION.END then
-		col = max(target.end_pos.col - 1, 0)
+		col = math.max(target.end_pos.col - 1, 0)
 	end
 
 	if motion_state.should_show_prefix and motion_state.search_text and #motion_state.search_text >= 1 then
@@ -103,7 +103,7 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, target, label, option
 	log.debug(string.format("Extmark for '%s' at row: %d col: %d", label, row, col))
 
 	if motion_state.hint_position == HINT_POSITION.END then
-		col = max(target.end_pos.col - 1, 0)
+		col = math.max(target.end_pos.col - 1, 0)
 	end
 
 	if motion_state.should_show_prefix and motion_state.search_text and #motion_state.search_text >= 1 then
