@@ -13,4 +13,9 @@ function M.run(ctx, cfg, motion_state, target)
 	end
 end
 
+M.metadata = {
+	label = "Visible Only",
+	description = "Filters to targets visible in the current window.",
+}
+
 return M
