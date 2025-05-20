@@ -10,8 +10,6 @@ local M = {}
 --- @class Target
 --- @field bufnr integer
 --- @field winid integer
---- @field row integer
---- @field col integer
 --- @field text? string
 --- @field start_pos { row: integer, col: integer }
 --- @field end_pos { row: integer, col: integer }
