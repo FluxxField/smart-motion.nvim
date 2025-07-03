@@ -118,7 +118,7 @@ function M.is_expired()
 
 	local now = M.get_timestamp()
 	local elapsed = now - M.last_motion_timestamp
-	local flow_state_timeout_ms = config.validate.flow_state_timeout_ms or FLOW_STATE_TIMEOUT_MS
+	local flow_state_timeout_ms = config.validated.flow_state_timeout_ms or FLOW_STATE_TIMEOUT_MS
 
 	if elapsed > flow_state_timeout_ms then
 		log.debug(string.format("Flow expired after %dms (timeout: %dms)", elapsed, flow_state_timeout_ms))
