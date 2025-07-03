@@ -44,7 +44,7 @@ extractors.register_many({
 			motion_state = {
 				num_of_char = 1,
 				should_show_prefix = false,
-				until = true,
+				exclude_target = true,
 			},
 		}),
 	},

@@ -16,7 +16,7 @@ function M.run(ctx, cfg, motion_state)
 	if col == #line then
 		vim.cmd("normal! Y")
 	else
-		if motion_state.until then
+		if motion_state.exclude_target then
 			col = math.max(0, col - 1)
 		end
 

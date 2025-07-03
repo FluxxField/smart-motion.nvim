@@ -76,7 +76,7 @@
 --- @field search_text? string
 --- @field last_search_text? string | nil
 --- @field is_searching_mode? boolean
---- @field until? boolean -- Used to exclude hinted character and act like "until"
+--- @field exclude_target? boolean -- Used to exclude hinted character and act like "until"
 --- @field num_of_char? number
 --- @field should_show_prefix? boolean
 --- @field quick_action? boolean -- Used to control if we should run action on target under cursor

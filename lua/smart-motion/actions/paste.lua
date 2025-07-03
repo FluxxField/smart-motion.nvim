@@ -12,7 +12,7 @@ function M.run(ctx, cfg, motion_state)
 	local row = target.end_pos.row
 	local col = target.end_pos.col
 
-	if motion_state.exclude then
+	if motion_state.exclude_target then
 		col = math.max(0, col - 1)
 	end
 

@@ -13,10 +13,6 @@ function M.run(ctx, cfg, motion_state)
 	local row = target.end_pos.row
 	local col = target.end_pos.col
 
-	if motion_state.exclude then
-		col = math.max(0, col - 1)
-	end
-
 	local line = vim.api.nvim_buf_get_lines(bufnr, row, row + 1, false)[1] or ""
 
 	if col >= #line then
@@ -27,6 +23,10 @@ function M.run(ctx, cfg, motion_state)
 
 		if ok and pos then
 			local cur_row, cur_col = unpack(pos)
+
+			if motion_state.exclude_target then
+				col = math.max(0, col - 1)
+			end
 
 			vim.api.nvim_buf_set_mark(bufnr, ">", row + 1, col, {})
 			vim.cmd("normal! c`>")
