@@ -61,8 +61,8 @@ function motions.register_motion(name, motion, opts)
 	motion.metadata.description = motion.metadata.description or ("SmartMotion: " .. motion.metadata.label)
 	motion.metadata.motion_state = motion.metadata.motion_state or {}
 
-	motion.metadata.motion_state.name = name
-	motion.metadata.motion_state.trigger_key = motion.trigger_key
+	motion.metadata.motion_state.motion_name = name
+	motion.metadata.motion_state.motion_trigger_key = motion.trigger_key
 
 	motions.by_name[name] = motion
 	motions.by_key[motion.trigger_key] = motion

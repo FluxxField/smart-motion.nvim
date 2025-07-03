@@ -86,8 +86,9 @@
 --- @field word_pattern? string
 --- @field paste_mode? 'before' | 'after'
 --- @field keys? fun(motion_state: SmartMotionMotionState): string[]
---- @field name string
---- @field trigger_key? string
+--- @field motion_name string
+--- @field motion_trigger_key? string
+--- @field registered_at_keys? string[]
 
 ---@class SmartMotionTarget
 ---@field bufnr integer
