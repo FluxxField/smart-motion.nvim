@@ -59,6 +59,10 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 
 		log.debug("No matching hint found for input: " .. char)
 		motion_state.selected_jump_target = nil
+
+		-- Fallthrough - We assume the key the user pressed is a motion if it doesn't match a label
+		vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(char, true, fales, true), "m", true)
+
 		return
 	elseif motion_state.selection_mode == consts.SELECTION_MODE.SECOND then
 		local first_char = motion_state.selection_first_char
