@@ -2,50 +2,6 @@
 local log = require("smart-motion.core.log")
 local consts = require("smart-motion.consts")
 
---- @class SmartMotionMotionState
---- @field total_keys integer
---- @field max_lines integer
---- @field max_labels integer
---- @field direction Direction
---- @field hint_position HintPosition
---- @field target_type TargetType
---- @field ignore_whitespace boolean
-
--- Target tracking
---- @field jump_target_count integer
---- @field jump_targets JumpTarget[]  -- Replace `any` with a concrete `JumpTarget` type later
---- @field selected_jump_target? JumpTarget
-
--- Hint labeling
---- @field hint_labels string[]  -- Possibly just strings or label metadata?
---- @field assigned_hint_labels table<string, HintEntry>
-
--- Label logic
---- @field single_label_count integer
---- @field double_label_count integer
---- @field sacrificed_keys_count integer
-
--- Selection
---- @field selection_mode SelectionMode
---- @field selection_first_char? string
-
--- Optional (Usually motion specific)
---- @field auto_select_target? boolean
---- @field virt_text_pos? "eol" | "overlay" | "right_align" | "inline"
---- @field exit_type? SearchExitType
---- @field search_text? string
---- @field last_search_text? string | nil
---- @field is_searching_mode? boolean
---- @field until? boolean -- Used to exclude hinted character and act like "until"
---- @field num_of_char? number
---- @field should_show_prefix? boolean
---- @field quick_action? boolean -- Used to control if we should run action on target under cursor
---- @field sort_by? "sort_weight"
---- @field sort_descending? boolean
---- @field timeout_after_input? boolean
---- @field word_pattern? string
---- @field paste_mode? 'before' | 'after'
-
 local M = {}
 
 M.static = {}
