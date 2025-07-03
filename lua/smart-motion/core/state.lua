@@ -44,6 +44,7 @@ local consts = require("smart-motion.consts")
 --- @field sort_descending? boolean
 --- @field timeout_after_input? boolean
 --- @field word_pattern? string
+--- @field paste_mode? 'before' | 'after'
 
 local M = {}
 
