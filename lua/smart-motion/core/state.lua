@@ -10,9 +10,6 @@ local consts = require("smart-motion.consts")
 --- @field hint_position HintPosition
 --- @field target_type TargetType
 --- @field ignore_whitespace boolean
---- @field auto_select_target boolean
---- @field virt_text_pos "eol" | "overlay" | "right_align" | "inline"
---- @field exit_type SearchExitType
 
 -- Target tracking
 --- @field jump_target_count integer
@@ -31,6 +28,19 @@ local consts = require("smart-motion.consts")
 -- Selection
 --- @field selection_mode SelectionMode
 --- @field selection_first_char? string
+
+-- Optional (Usually permotion specific)
+--- @field auto_select_target boolean
+--- @field virt_text_pos "eol" | "overlay" | "right_align" | "inline"
+--- @field exit_type SearchExitType
+--- @field search_text string
+--- @field is_searching_mode boolean
+--- @field until boolean -- Used to exclude hinted character and act like "until"
+--- @field num_of_char number
+--- @field should_show_prefix boolean
+--- @field quick_action boolean -- Used to control if we should run action on target under cursor
+--- @field sort_by "sort_weight"
+--- @field sort_descending boolean
 
 local M = {}
 
