@@ -12,6 +12,7 @@ local consts = require("smart-motion.consts")
 --- @field ignore_whitespace boolean
 --- @field auto_select_target boolean
 --- @field virt_text_pos "eol" | "overlay" | "right_align" | "inline"
+--- @field exit_type SearchExitType
 
 -- Target tracking
 --- @field jump_target_count integer

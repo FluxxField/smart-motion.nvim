@@ -52,6 +52,7 @@ M.SELECTION_MODE = {
 	SECOND = "second",
 }
 
+---@type table<string, SearchExitType>
 M.EXIT_TYPE = {
 	EARLY_EXIT = "early_exit",
 	DIRECT_HINT = "direct_hint",
