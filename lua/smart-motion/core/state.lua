@@ -26,11 +26,10 @@ function M.init_motion_state(cfg)
 
 	log.debug(
 		string.format(
-			"Static state initialized - total_keys: %d, max_labels: %d, max_lines: %d, keys: %d",
+			"Static state initialized - total_keys: %d, max_labels: %d, max_lines: %d",
 			M.static.total_keys,
 			M.static.max_lines,
-			M.static.max_labels,
-			M.static.keys,
+			M.static.max_labels
 		)
 	)
 end
@@ -89,7 +88,7 @@ function M.finalize_motion_state(ctx, cfg, motion_state)
 	end
 
 	-- Allows for the filtering of keys
-	if motion_state.keys and type(motion_state.keys) == 'function' then
+	if motion_state.keys and type(motion_state.keys) == "function" then
 		local keys = motion_state.keys(motion_state)
 		local total_keys = #keys
 		local keys_squared = total_keys * total_keys
