@@ -63,7 +63,7 @@ function M.apply_single_hint_label(ctx, cfg, motion_state, target, label)
 
 	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, row, col, {
 		virt_text = virt_text,
-		virt_text_pos = "overlay",
+		virt_text_pos = motion_state.virt_text_pos or "overlay",
 		hl_mode = "combine",
 	})
 end
@@ -131,7 +131,7 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, target, label, option
 
 	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, row, col, {
 		virt_text = virt_text,
-		virt_text_pos = "overlay",
+		virt_text_pos = motion_state.virt_text_pos or "overlay",
 		hl_mode = "combine",
 	})
 end
