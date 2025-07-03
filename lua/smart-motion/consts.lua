@@ -71,4 +71,6 @@ M.JUMP_MOTIONS = {
 	["}"] = true,
 }
 
+M.FLOW_STATE_TIMEOUT_MS = 300
+
 return M
