@@ -52,7 +52,7 @@ local action_entries = {
 		keys = { "C" },
 		run = merge({
 			require("smart-motion.actions.jump"),
-			require("smart-motion.actions.change-line"),
+			require("smart-motion.actions.change_line"),
 		}),
 		metadata = {
 			label = "Change Line",
@@ -81,7 +81,7 @@ local action_entries = {
 		keys = { "D" },
 		run = merge({
 			require("smart-motion.actions.jump"),
-			require("smart-motion.actions.delete-line"),
+			require("smart-motion.actions.delete_line"),
 		}),
 		metadata = {
 			label = "Delete Line",
@@ -110,7 +110,7 @@ local action_entries = {
 		keys = { "Y" },
 		run = merge({
 			require("smart-motion.actions.jump"),
-			require("smart-motion.actions.yank-line"),
+			require("smart-motion.actions.yank_line"),
 		}),
 		metadata = {
 			label = "Yank Line",
@@ -138,7 +138,7 @@ local action_entries = {
 	remote_delete_line = {
 		run = merge({
 			require("smart-motion.actions.jump"),
-			require("smart-motion.actions.delete-line"),
+			require("smart-motion.actions.delete_line"),
 			require("smart-motion.actions.restore"),
 		}),
 		metadata = {
@@ -160,12 +160,40 @@ local action_entries = {
 	remote_yank_line = {
 		run = merge({
 			require("smart-motion.actions.jump"),
-			require("smart-motion.actions.yank-line"),
+			require("smart-motion.actions.yank_line"),
 			require("smart-motion.actions.restore"),
 		}),
 		metadata = {
 			label = "Remote Yank Line",
 			description = "Yanks the entire line at the target without moving the cursor",
+		},
+	},
+	paste = {
+		keys = { "p", "P" },
+		run = merge({ require("smart-motion.actions.paste") }),
+		metadata = {
+			label = "Paste",
+			description = "Paste the selected text",
+		},
+	},
+	paste_jump = {
+		run = merge({
+			require("smart-motion.actions.jump"),
+			require("smart-motion.actions.paste"),
+		}),
+		metadata = {
+			label = "Jump and Paste",
+			description = "Jumps to the target and paste it",
+		},
+	},
+	paste_line = {
+		run = merge({
+			require("smart-motion.actions.jump"),
+			require("smart-motion.actions.paste_line"),
+		}),
+		metadata = {
+			label = "Paste Line",
+			description = "Paste the entire line at the target",
 		},
 	},
 }

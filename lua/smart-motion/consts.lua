@@ -43,6 +43,8 @@ M.TARGET_TYPES_BY_KEY = {
 }
 
 M.WORD_PATTERN = [[\k\+]]
+M.WORD_WITH_PUNCTUATION_PATTERN = [[\k\+|[](){}.,=+%-]]
+M.BIG_WORD_PATTERN = [[[^ \t]\+]]
 
 ---@type table<string, SelectionMode>
 M.SELECTION_MODE = {
@@ -50,6 +52,7 @@ M.SELECTION_MODE = {
 	SECOND = "second",
 }
 
+---@type table<string, SearchExitType>
 M.EXIT_TYPE = {
 	EARLY_EXIT = "early_exit",
 	DIRECT_HINT = "direct_hint",
@@ -68,5 +71,7 @@ M.JUMP_MOTIONS = {
 	["{"] = true,
 	["}"] = true,
 }
+
+M.FLOW_STATE_TIMEOUT_MS = 300
 
 return M

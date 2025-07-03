@@ -2,33 +2,6 @@
 local log = require("smart-motion.core.log")
 local consts = require("smart-motion.consts")
 
---- @class SmartMotionMotionState
---- @field total_keys integer
---- @field max_lines integer
---- @field max_labels integer
---- @field direction Direction
---- @field hint_position HintPosition
---- @field target_type TargetType
---- @field ignore_whitespace boolean
-
--- Target tracking
---- @field jump_target_count integer
---- @field jump_targets JumpTarget[]  -- Replace `any` with a concrete `JumpTarget` type later
---- @field selected_jump_target? JumpTarget
-
--- Hint labeling
---- @field hint_labels string[]  -- Possibly just strings or label metadata?
---- @field assigned_hint_labels table<string, HintEntry>
-
--- Label logic
---- @field single_label_count integer
---- @field double_label_count integer
---- @field sacrificed_keys_count integer
-
--- Selection
---- @field selection_mode SelectionMode
---- @field selection_first_char? string
-
 local M = {}
 
 M.static = {}
@@ -48,6 +21,7 @@ function M.init_motion_state(cfg)
 		total_keys = #cfg.keys,
 		max_labels = keys_squared,
 		max_lines = keys_squared,
+		keys = cfg.keys,
 	}
 
 	log.debug(
@@ -96,8 +70,10 @@ function M.create_motion_state(target_type)
 end
 
 --- Finalizes the motion state after target collection.
----@param motion_state SmartMotionMotionState
-function M.finalize_motion_state(motion_state)
+--- @param ctx SmartMotionContext
+--- @param cfg SmartMotionConfig
+--- @param motion_state SmartMotionMotionState
+function M.finalize_motion_state(ctx, cfg, motion_state)
 	if motion_state.total_keys == 0 then
 		log.error("finalize_motion_state called before static state was initialized")
 		return
@@ -109,6 +85,18 @@ function M.finalize_motion_state(motion_state)
 	if type(jump_target_count) ~= "number" or jump_target_count < 0 then
 		log.error("finalize_motion_state received invalid jump_target_count: " .. tostring(jump_target_count))
 		return
+	end
+
+	-- Allows for the filtering of keys
+	if motion_state.keys and type(motion_state.keys) == "function" then
+		local keys = motion_state.keys(motion_state)
+		local total_keys = #keys
+		local keys_squared = total_keys * total_keys
+
+		motion_state.total_keys = total_keys
+		motion_state.max_lines = keys_squared
+		motion_state.max_labels = keys_squared
+		motion_state.keys = keys
 	end
 
 	if jump_target_count <= M.static.total_keys then

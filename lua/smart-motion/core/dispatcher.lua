@@ -127,7 +127,7 @@ function M.trigger_motion(trigger_key)
 					if #targets == 0 then
 						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 						break
-					elseif #targets == 1 then
+					elseif #targets == 1 and motion_state.auto_select_target ~= false then
 						motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
 						break
 					end
@@ -151,7 +151,7 @@ function M.trigger_motion(trigger_key)
 				log.debug("pipeline: no targets exiting")
 				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 				break
-			elseif #targets == 1 then
+			elseif #targets == 1 and motion_state.auto_select_target ~= false then
 				motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
 				break
 			end
@@ -192,6 +192,12 @@ function M.trigger_action(trigger_key)
 		return
 	end
 
+	motion_char = type(motion_char) == "number" and vim.fn.nr2char(motion_char) or motion_char
+	if motion_char == "\027" then
+		-- ESC was pressed
+		return
+	end
+
 	local collector = registries.collectors.get_by_name(motion.collector)
 	local visualizer = registries.visualizers.get_by_name(motion.visualizer)
 
@@ -213,12 +219,9 @@ function M.trigger_action(trigger_key)
 	end
 
 	motion_state = state.merge_motion_state(motion_state, motion, collector, modifier, filter, visualizer, action)
+	local extractor = registries.extractors.get_by_key(motion_char)
 
-	-- Get motion_key
-	local motion_key = vim.fn.nr2char(motion_char)
-	local extractor = registries.extractors.get_by_key(motion_key)
-
-	motion_state.target_type = consts.TARGET_TYPES_BY_KEY[motion_key] or ""
+	motion_state.target_type = consts.TARGET_TYPES_BY_KEY[motion_char] or ""
 
 	--
 	-- Fallback to native behavior if no extractor exists
@@ -227,13 +230,13 @@ function M.trigger_action(trigger_key)
 		--
 		-- Is this a short-curcit double key?
 		--
-		if motion_key == trigger_key then
+		if motion_char == trigger_key then
 			motion_state.target_type = "lines"
 
 			local line_action = registries.actions.get_by_name(action.name .. "_line")
 
 			if not line_action or not line_action.run then
-				vim.api.nvim_feedkeys(trigger_key .. motion_key, "n", false)
+				vim.api.nvim_feedkeys(trigger_key .. motion_char, "n", false)
 				utils.reset_motion(ctx, cfg, motion_state)
 				return
 			end
@@ -248,7 +251,7 @@ function M.trigger_action(trigger_key)
 			return
 		end
 
-		vim.api.nvim_feedkeys(trigger_key .. motion_key, "n", false)
+		vim.api.nvim_feedkeys(trigger_key .. motion_char, "n", false)
 		utils.reset_motion(ctx, cfg, motion_state)
 		return
 	end
@@ -282,10 +285,10 @@ function M.trigger_action(trigger_key)
 	end
 
 	-- Should we jump then delete?
-	if consts.JUMP_MOTIONS[motion_key] then
+	if consts.JUMP_MOTIONS[motion_char] then
 		action = registries.actions.get_by_name(action.name .. "_jump")
 	-- Are we messing with a line? Then we should jump
-	elseif motion_key == "l" then
+	elseif motion_char == "l" then
 		action = registries.actions.get_by_name(action.name .. "_line")
 	end
 
@@ -343,7 +346,7 @@ function M.trigger_action(trigger_key)
 					if #targets == 0 then
 						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 						break
-					elseif #targets == 1 then
+					elseif #targets == 1 and motion_state.auto_select_target ~= false then
 						motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
 						break
 					end
@@ -367,7 +370,7 @@ function M.trigger_action(trigger_key)
 				log.debug("pipeline: no targets exiting")
 				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 				break
-			elseif #targets == 1 then
+			elseif #targets == 1 and motion_state.auto_select_target ~= false then
 				motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
 				break
 			end
@@ -423,7 +426,7 @@ function M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modi
 	end
 
 	targets.get_targets(ctx, cfg, motion_state, filter_gen)
-	state.finalize_motion_state(motion_state)
+	state.finalize_motion_state(ctx, cfg, motion_state)
 end
 
 --

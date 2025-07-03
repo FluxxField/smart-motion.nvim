@@ -77,18 +77,15 @@ end
 ---@return SmartMotionContext?, SmartMotionConfig?, SmartMotionMotionState?
 function M.prepare_motion(target_type)
 	local ctx = context.get()
-
 	local cfg = config.validated
 
 	if not cfg or type(cfg) ~= "table" then
 		log.error("prepare_motion: Config is missing or invalid")
-
 		return nil, nil, nil
 	end
 
 	if type(cfg.keys) ~= "table" or #cfg.keys == 0 then
 		log.error("prepare_motion: Config `keys` is missing or improperly formatted")
-
 		return nil, nil, nil
 	end
 

@@ -22,6 +22,8 @@ local default_config = {
     search_prefix_dim = "SmartMotionSearchPrefixDim",
   },
   presets = {},
+  flow_state_timeout_ms = 300,
+  disable_dim_background = false,
 }
 ```
 

@@ -1,5 +1,7 @@
 local log = require("smart-motion.core.log")
 
+local FLOW_STATE_TIMEOUT_MS = require("smart-motion.consts").FLOW_STATE_TIMEOUT_MS
+
 local M = {}
 
 -- Default highlight group names
@@ -19,6 +21,8 @@ M.defaults = {
 	use_background_highlights = false,
 	highlight = default_highlight_groups,
 	presets = {},
+	flow_state_timeout_ms = FLOW_STATE_TIMEOUT_MS,
+	disable_dim_background = false,
 }
 
 ---@type SmartMotionConfig
@@ -110,6 +114,20 @@ function M.validate(user_config)
 				end
 			end
 		end
+	end
+
+	--
+	-- Validate flow_state_timeout_ms
+	--
+	if config.flow_state_timeout_ms == nil or type(config.flow_state_timeout_ms) ~= "number" then
+		config.flow_state_timeout_ms = FLOW_STATE_TIMEOUT_MS
+	end
+
+	--
+	-- Validate disable_dim_background
+	--
+	if config.disable_dim_background == nil or type(config.disable_dim_background) ~= "boolean" then
+		config.disable_dim_background = false
 	end
 
 	M.validated = config

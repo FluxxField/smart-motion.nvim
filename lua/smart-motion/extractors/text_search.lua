@@ -1,4 +1,3 @@
-local highlight = require("smart-motion.core.highlight")
 local log = require("smart-motion.core.log")
 local consts = require("smart-motion.consts")
 

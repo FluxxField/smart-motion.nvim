@@ -42,7 +42,7 @@ function M.apply_single_hint_label(ctx, cfg, motion_state, target, label)
 	log.debug(string.format("Applying single hint '%s' at line %d, col %d", label, row, col))
 
 	if motion_state.hint_position == HINT_POSITION.END then
-		col = max(target.end_pos.col - 1, 0)
+		col = math.max(target.end_pos.col - 1, 0)
 	end
 
 	if motion_state.should_show_prefix and motion_state.search_text and #motion_state.search_text >= 1 then
@@ -63,7 +63,7 @@ function M.apply_single_hint_label(ctx, cfg, motion_state, target, label)
 
 	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, row, col, {
 		virt_text = virt_text,
-		virt_text_pos = "overlay",
+		virt_text_pos = motion_state.virt_text_pos or "overlay",
 		hl_mode = "combine",
 	})
 end
@@ -103,7 +103,7 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, target, label, option
 	log.debug(string.format("Extmark for '%s' at row: %d col: %d", label, row, col))
 
 	if motion_state.hint_position == HINT_POSITION.END then
-		col = max(target.end_pos.col - 1, 0)
+		col = math.max(target.end_pos.col - 1, 0)
 	end
 
 	if motion_state.should_show_prefix and motion_state.search_text and #motion_state.search_text >= 1 then
@@ -131,7 +131,7 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, target, label, option
 
 	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, row, col, {
 		virt_text = virt_text,
-		virt_text_pos = "overlay",
+		virt_text_pos = motion_state.virt_text_pos or "overlay",
 		hl_mode = "combine",
 	})
 end
@@ -141,6 +141,10 @@ end
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
 function M.dim_background(ctx, cfg, motion_state)
+	if cfg.disable_dim_background ~= false then
+		return
+	end
+
 	local total_lines = vim.api.nvim_buf_line_count(ctx.bufnr)
 
 	-- Dim the entire buffer by applying the dim highlight group to every line.

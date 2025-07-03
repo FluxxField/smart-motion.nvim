@@ -41,9 +41,13 @@ return function(module_type)
 		entry.metadata.description = entry.metadata.description or ("SmartMotion: " .. entry.metadata.label)
 		entry.metadata.motion_state = entry.metadata.motion_state or {}
 
+		entry.metadata.motion_state.motion_name = name
+
 		registry.by_name[name] = entry
 
 		if entry.keys then
+			entry.metadata.motion_state.registered_at_keys = entry.keys
+
 			for _, key in ipairs(entry.keys) do
 				registry.by_key[key] = entry
 			end
@@ -75,7 +79,7 @@ return function(module_type)
 	end
 
 	--- Gets a module by name.
-	function registry.get_by_name(name)
+	function registry.get_by_name(name, motion_state)
 		local entry = registry.by_name[name]
 
 		if not entry then

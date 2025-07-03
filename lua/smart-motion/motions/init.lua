@@ -61,6 +61,9 @@ function motions.register_motion(name, motion, opts)
 	motion.metadata.description = motion.metadata.description or ("SmartMotion: " .. motion.metadata.label)
 	motion.metadata.motion_state = motion.metadata.motion_state or {}
 
+	motion.metadata.motion_state.motion_name = name
+	motion.metadata.motion_state.motion_trigger_key = motion.trigger_key
+
 	motions.by_name[name] = motion
 	motions.by_key[motion.trigger_key] = motion
 
@@ -82,7 +85,7 @@ function motions.register_motion(name, motion, opts)
 
 			if package.loaded["which-key"] then
 				local wk = require("which-key")
-				wk.register({ [motion.trigger_key] = { name = desc } }, { mode = mode })
+				wk.add({ motion.trigger_key, desc = desc, mode = mode })
 			end
 
 			local ok, err = pcall(
@@ -148,7 +151,7 @@ function motions.map_motion(name, motion_opts, opts)
 	if opts.which_key ~= false and package.loaded["which-key"] then
 		local wk = require("which-key")
 		for _, mode in ipairs(modes) do
-			wk.register({ [trigger_key] = { name = desc } }, { mode = mode })
+			wk.register({ trigger_key, desc = desc, mode = mode })
 		end
 	end
 

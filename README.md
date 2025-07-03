@@ -24,6 +24,7 @@ With SmartMotion, you build exactly what _you_ need - using composable modules, 
 For deep dives into modules, flow state, action merging, or highlight customization, see the [docs folder](./docs).
 
 > [!WARNING]
+>
 > **Early Stage Warning:** This plugin is under active development. Breaking changes are expected as it matures.
 
 ---
@@ -51,6 +52,8 @@ return {
       search = true,
       delete = true,
     },
+    flow_state_timeout_ms = 300,
+    disable_dim_background = false,
   },
 }
 ```
@@ -78,6 +81,8 @@ M.defaults = {
     search_prefix_dim = "SmartMotionSearchPrefixDim",
   },
   presets = {},
+  flow_state_timeout_ms = 300,
+  disable_dim_background = false,
 }
 ```
 

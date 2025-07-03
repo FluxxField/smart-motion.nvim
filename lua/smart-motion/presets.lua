@@ -157,6 +157,7 @@ function presets.delete(exclude)
 		d = {
 			infer = true,
 			collector = "lines",
+			modifier = "weight_distance",
 			filter = "filter_visible",
 			visualizer = "hint_start",
 			map = true,
@@ -164,6 +165,9 @@ function presets.delete(exclude)
 			metadata = {
 				label = "Delete Action",
 				description = "Deletes based on motion provided",
+				motion_state = {
+					quick_action = true,
+				},
 			},
 		},
 		dT = {
@@ -216,6 +220,7 @@ function presets.yank(exclude)
 		y = {
 			infer = true,
 			collector = "lines",
+			modifier = "weight_distance",
 			filter = "filter_visible",
 			visualizer = "hint_start",
 			map = true,
@@ -223,6 +228,9 @@ function presets.yank(exclude)
 			metadata = {
 				label = "Yank Action",
 				description = "Yanks based on the motion provided",
+				motion_state = {
+					quick_action = true,
+				},
 			},
 		},
 		yT = {
@@ -275,6 +283,7 @@ function presets.change(exclude)
 		c = {
 			infer = true,
 			collector = "lines",
+			modifier = "weight_distance",
 			filter = "filter_visible",
 			visualizer = "hint_start",
 			map = true,
@@ -282,6 +291,9 @@ function presets.change(exclude)
 			metadata = {
 				label = "Change Word",
 				description = "Deletes the selected word and goes into insert mode",
+				motion_state = {
+					quick_action = true,
+				},
 			},
 		},
 		cT = {
@@ -295,6 +307,43 @@ function presets.change(exclude)
 			metadata = {
 				label = "Change Until Searched Text Before Cursor",
 				description = "Change until the searched for text",
+			},
+		},
+	}, exclude)
+end
+
+function presets.paste(exclude)
+	presets._register({
+		p = {
+			infer = true,
+			collector = "lines",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Paste",
+				description = "Paste data",
+				motion_state = {
+					paste_mode = "after",
+				},
+			},
+		},
+		P = {
+			infer = true,
+			collector = "lines",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Paste",
+				description = "Paste data",
+				motion_state = {
+					paste_mode = "before",
+				},
 			},
 		},
 	}, exclude)
