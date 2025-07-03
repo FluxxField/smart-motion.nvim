@@ -18,6 +18,7 @@
 ---@field highlight table<string, string | table>
 ---@field presets SmartMotionPresets
 ---@field flow_state_timeout_ms number
+---@field disable_dim_background boolean
 
 ---@class SmartMotionPresets
 ---@field words? true | SmartMotionPresetKey.Words[]
