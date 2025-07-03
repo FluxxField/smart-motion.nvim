@@ -127,7 +127,7 @@ function M.trigger_motion(trigger_key)
 					if #targets == 0 then
 						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 						break
-					elseif #targets == 1 then
+					elseif #targets == 1 and motion_state.auto_select_target ~= false then
 						motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
 						break
 					end
@@ -151,7 +151,7 @@ function M.trigger_motion(trigger_key)
 				log.debug("pipeline: no targets exiting")
 				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 				break
-			elseif #targets == 1 then
+			elseif #targets == 1 and motion_state.auto_select_target ~= false then
 				motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
 				break
 			end
@@ -346,7 +346,7 @@ function M.trigger_action(trigger_key)
 					if #targets == 0 then
 						motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 						break
-					elseif #targets == 1 then
+					elseif #targets == 1 and motion_state.auto_select_target ~= false then
 						motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
 						break
 					end
@@ -370,7 +370,7 @@ function M.trigger_action(trigger_key)
 				log.debug("pipeline: no targets exiting")
 				motion_state.exit_type = EXIT_TYPE.EARLY_EXIT
 				break
-			elseif #targets == 1 then
+			elseif #targets == 1 and motion_state.auto_select_target ~= false then
 				motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
 				break
 			end
