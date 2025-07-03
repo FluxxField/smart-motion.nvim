@@ -141,6 +141,10 @@ end
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
 function M.dim_background(ctx, cfg, motion_state)
+	if cfg.disable_dim_background ~= false then
+		return
+	end
+
 	local total_lines = vim.api.nvim_buf_line_count(ctx.bufnr)
 
 	-- Dim the entire buffer by applying the dim highlight group to every line.

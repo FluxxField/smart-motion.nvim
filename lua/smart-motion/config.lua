@@ -22,6 +22,7 @@ M.defaults = {
 	highlight = default_highlight_groups,
 	presets = {},
 	flow_state_timeout_ms = FLOW_STATE_TIMEOUT_MS,
+	disable_dim_background = false,
 }
 
 ---@type SmartMotionConfig
@@ -120,6 +121,13 @@ function M.validate(user_config)
 	--
 	if config.flow_state_timeout_ms == nil or type(config.flow_state_timeout_ms) ~= "number" then
 		config.flow_state_timeout_ms = FLOW_STATE_TIMEOUT_MS
+	end
+
+	--
+	-- Validate disable_dim_background
+	--
+	if config.disable_dim_background == nil or type(config.disable_dim_background) ~= "boolean" then
+		config.disable_dim_background = false
 	end
 
 	M.validated = config
