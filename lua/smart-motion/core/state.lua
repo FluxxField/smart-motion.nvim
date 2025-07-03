@@ -10,6 +10,8 @@ local consts = require("smart-motion.consts")
 --- @field hint_position HintPosition
 --- @field target_type TargetType
 --- @field ignore_whitespace boolean
+--- @field auto_select_target boolean
+--- @field virt_text_pos "eol" | "overlay" | "right_align" | "inline"
 
 -- Target tracking
 --- @field jump_target_count integer
@@ -48,6 +50,7 @@ function M.init_motion_state(cfg)
 		total_keys = #cfg.keys,
 		max_labels = keys_squared,
 		max_lines = keys_squared,
+		keys = cfg.keys,
 	}
 
 	log.debug(
