@@ -426,7 +426,7 @@ function M._run_core_pipeline(ctx, cfg, motion_state, collector, extractor, modi
 	end
 
 	targets.get_targets(ctx, cfg, motion_state, filter_gen)
-	state.finalize_motion_state(motion_state)
+	state.finalize_motion_state(ctx, cfg, motion_state)
 end
 
 --

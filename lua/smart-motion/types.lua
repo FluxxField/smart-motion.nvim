@@ -85,6 +85,9 @@
 --- @field timeout_after_input? boolean
 --- @field word_pattern? string
 --- @field paste_mode? 'before' | 'after'
+--- @field keys? fun(motion_state: SmartMotionMotionState): string[]
+--- @field name string
+--- @field trigger_key? string
 
 ---@class SmartMotionTarget
 ---@field bufnr integer

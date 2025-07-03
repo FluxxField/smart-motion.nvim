@@ -26,10 +26,11 @@ function M.init_motion_state(cfg)
 
 	log.debug(
 		string.format(
-			"Static state initialized - total_keys: %d, max_labels: %d, max_lines: %d",
+			"Static state initialized - total_keys: %d, max_labels: %d, max_lines: %d, keys: %d",
 			M.static.total_keys,
 			M.static.max_lines,
-			M.static.max_labels
+			M.static.max_labels,
+			M.static.keys,
 		)
 	)
 end
@@ -70,8 +71,10 @@ function M.create_motion_state(target_type)
 end
 
 --- Finalizes the motion state after target collection.
----@param motion_state SmartMotionMotionState
-function M.finalize_motion_state(motion_state)
+--- @param ctx SmartMotionContext
+--- @param cfg SmartMotionConfig
+--- @param motion_state SmartMotionMotionState
+function M.finalize_motion_state(ctx, cfg, motion_state)
 	if motion_state.total_keys == 0 then
 		log.error("finalize_motion_state called before static state was initialized")
 		return
@@ -83,6 +86,18 @@ function M.finalize_motion_state(motion_state)
 	if type(jump_target_count) ~= "number" or jump_target_count < 0 then
 		log.error("finalize_motion_state received invalid jump_target_count: " .. tostring(jump_target_count))
 		return
+	end
+
+	-- Allows for the filtering of keys
+	if motion_state.keys and type(motion_state.keys) == 'function' then
+		local keys = motion_state.keys(motion_state)
+		local total_keys = #keys
+		local keys_squared = total_keys * total_keys
+
+		motion_state.total_keys = total_keys
+		motion_state.max_lines = keys_squared
+		motion_state.max_labels = keys_squared
+		motion_state.keys = keys
 	end
 
 	if jump_target_count <= M.static.total_keys then
