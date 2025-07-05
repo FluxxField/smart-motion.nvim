@@ -3,8 +3,8 @@ local log = require("smart-motion.core.log")
 ---@type SmartMotionModifierModuleEntry
 local M = {}
 
-function M.run(ctx, cfg, motion_state, target)
-	return target
+function M.run(ctx, cfg, motion_state)
+	return
 end
 
 M.metadata = {
