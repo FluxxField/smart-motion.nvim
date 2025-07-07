@@ -137,6 +137,10 @@ function M.module_wrapper(run_fn, opts)
 			end
 
 			while true do
+				if motion_state.exit_type == EXIT_TYPE.EARLY_EXIT then
+					break
+				end
+
 				local ok, data = coroutine.resume(input_gen, ctx, cfg, motion_state)
 
 				if not ok then
