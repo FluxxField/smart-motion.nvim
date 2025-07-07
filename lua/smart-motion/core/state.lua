@@ -2,6 +2,9 @@
 local log = require("smart-motion.core.log")
 local consts = require("smart-motion.consts")
 
+local HINT_POSITION = consts.HINT_POSITION
+local SELECTION_MODE = consts.SELECTION_MODE
+
 local M = {}
 
 M.static = {}
@@ -47,6 +50,7 @@ function M.create_motion_state(target_type)
 		max_lines = M.static.max_lines,
 		max_labels = M.static.max_labels,
 		ignore_whitespace = true,
+		hint_position = HINT_POSITION.START,
 
 		-- Motion Intent
 		target_type = target_type,
@@ -63,7 +67,7 @@ function M.create_motion_state(target_type)
 		sacrificed_keys_count = 0,
 
 		-- Selection
-		selection_mode = consts.SELECTION_MODE.FIRST,
+		selection_mode = SELECTION_MODE.FIRST,
 		selection_first_char = nil,
 		selected_jump_target = nil,
 	}
@@ -137,7 +141,7 @@ function M.reset(motion_state)
 	motion_state.hint_labels = {}
 	motion_state.assigned_hint_labels = {}
 
-	motion_state.selection_mode = consts.SELECTION_MODE.FIRST
+	motion_state.selection_mode = SELECTION_MODE.FIRST
 	motion_state.selection_first_char = nil
 	motion_state.selected_jump_target = nil
 end

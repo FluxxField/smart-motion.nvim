@@ -21,9 +21,6 @@ function M.run(ctx, cfg, motion_state, target)
 			if target.end_pos.col > cursor_col then
 				return target
 			end
-		else
-			-- Fallback case: always yield
-			return target
 		end
 	end
 end
