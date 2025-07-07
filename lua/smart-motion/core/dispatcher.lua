@@ -6,6 +6,7 @@ local state = require("smart-motion.core.state")
 local flow_state = require("smart-motion.core.flow_state")
 local selection = require("smart-motion.core.selection")
 local highlight = require("smart-motion.core.highlight")
+local history = require("smart-motion.core.history")
 
 local EXIT_TYPE = consts.EXIT_TYPE
 
@@ -174,6 +175,15 @@ function M.trigger_motion(trigger_key)
 	-- Handle exit
 	--
 	M._handle_exit(ctx, cfg, motion_state, action, visualizer)
+
+	history.add({
+		motion = motion,
+		target = motion_state.selected_jump_target,
+		metadata = {
+			time_stamp = os.time(),
+		},
+	})
+
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 
@@ -393,6 +403,15 @@ function M.trigger_action(trigger_key)
 	-- Handle exit
 	--
 	M._handle_exit(ctx, cfg, motion_state, action, visualizer)
+
+	history.add({
+		motion = motion,
+		target = motion_state.selected_jump_target,
+		metadata = {
+			time_stamp = os.time(),
+		},
+	})
+
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 
