@@ -3,7 +3,7 @@ local consts = require("smart-motion.consts")
 local utils = require("smart-motion.utils")
 local targets = require("smart-motion.core.targets")
 local state = require("smart-motion.core.state")
-local flow_state = require("smart-motion.core.flow-state")
+local flow_state = require("smart-motion.core.flow_state")
 local selection = require("smart-motion.core.selection")
 local highlight = require("smart-motion.core.highlight")
 
@@ -76,7 +76,9 @@ function M.trigger_motion(trigger_key)
 	--
 	-- Pipeline Loop
 	--
-	highlight.dim_background(ctx, cfg, motion_state)
+	if visualizer.name ~= "pass_through" then
+		highlight.dim_background(ctx, cfg, motion_state)
+	end
 
 	local early_exit_timeout = 2000
 	local continue_timeout = 500

@@ -1,5 +1,5 @@
 local hints = require("smart-motion.visualizers.hints")
-local pass_through = require("smart-motion.visualizers.pass-through")
+local pass_through = require("smart-motion.visualizers.pass_through")
 
 local HINT_POSITION = require("smart-motion.consts").HINT_POSITION
 
