@@ -1,6 +1,8 @@
 local log = require("smart-motion.core.log")
+local consts = require("smart-motion.consts")
 
-local FLOW_STATE_TIMEOUT_MS = require("smart-motion.consts").FLOW_STATE_TIMEOUT_MS
+local FLOW_STATE_TIMEOUT_MS = consts.FLOW_STATE_TIMEOUT_MS
+local HISTORY_MAX_SIZE = consts.HISTORY_MAX_SIZE
 
 local M = {}
 
@@ -23,6 +25,7 @@ M.defaults = {
 	presets = {},
 	flow_state_timeout_ms = FLOW_STATE_TIMEOUT_MS,
 	disable_dim_background = false,
+	history_max_size = HISTORY_MAX_SIZE,
 }
 
 ---@type SmartMotionConfig
@@ -128,6 +131,13 @@ function M.validate(user_config)
 	--
 	if config.disable_dim_background == nil or type(config.disable_dim_background) ~= "boolean" then
 		config.disable_dim_background = false
+	end
+
+	--
+	-- Validate history_max_size
+	--
+	if config.history_max_size == nil or type(config.history_max_size) ~= "number" then
+		config.history_max_size = HISTORY_MAX_SIZE
 	end
 
 	M.validated = config

@@ -3,6 +3,7 @@ local lines = require("smart-motion.extractors.lines")
 local words = require("smart-motion.extractors.words")
 local text_search = require("smart-motion.extractors.text_search")
 local live_search = require("smart-motion.extractors.live_search")
+local pass_through = require("smart-motion.extractors.pass_through")
 
 ---@type SmartMotionRegistry<SmartMotionExtractorModuleEntry>
 local extractors = require("smart-motion.core.registry")("extractors")
@@ -63,6 +64,10 @@ extractors.register_many({
 			before_input_loop = live_search.before_input_loop,
 		}),
 		metadata = live_search.metadata,
+	},
+	pass_through = {
+		run = utils.module_wrapper(pass_through.run),
+		metadata = pass_through.metadata,
 	},
 })
 

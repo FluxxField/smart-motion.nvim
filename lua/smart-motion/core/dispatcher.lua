@@ -3,7 +3,7 @@ local consts = require("smart-motion.consts")
 local utils = require("smart-motion.utils")
 local targets = require("smart-motion.core.targets")
 local state = require("smart-motion.core.state")
-local flow_state = require("smart-motion.core.flow-state")
+local flow_state = require("smart-motion.core.flow_state")
 local selection = require("smart-motion.core.selection")
 local highlight = require("smart-motion.core.highlight")
 
@@ -59,6 +59,7 @@ function M.trigger_motion(trigger_key)
 	--
 	motion_state =
 		state.merge_motion_state(motion_state, motion, collector, extractor, modifier, filter, visualizer, action)
+	motion_state.motion = motion
 
 	--
 	-- Evaluate flow state
@@ -76,7 +77,9 @@ function M.trigger_motion(trigger_key)
 	--
 	-- Pipeline Loop
 	--
-	highlight.dim_background(ctx, cfg, motion_state)
+	if visualizer.name ~= "pass_through" then
+		highlight.dim_background(ctx, cfg, motion_state)
+	end
 
 	local early_exit_timeout = 2000
 	local continue_timeout = 500
@@ -172,6 +175,7 @@ function M.trigger_motion(trigger_key)
 	-- Handle exit
 	--
 	M._handle_exit(ctx, cfg, motion_state, action, visualizer)
+
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 
@@ -219,6 +223,8 @@ function M.trigger_action(trigger_key)
 	end
 
 	motion_state = state.merge_motion_state(motion_state, motion, collector, modifier, filter, visualizer, action)
+	motion_state.motion = motion
+
 	local extractor = registries.extractors.get_by_key(motion_char)
 
 	motion_state.target_type = consts.TARGET_TYPES_BY_KEY[motion_char] or ""
@@ -391,6 +397,7 @@ function M.trigger_action(trigger_key)
 	-- Handle exit
 	--
 	M._handle_exit(ctx, cfg, motion_state, action, visualizer)
+
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 

@@ -1,6 +1,8 @@
 local utils = require("smart-motion.utils")
 local merge = require("smart-motion.filters.utils").merge
 
+local first_target = require("smart-motion.filters.first_target")
+
 ---@type SmartMotionRegistry<SmartMotionFilterModuleEntry>
 local filters = require("smart-motion.core.registry")("filters")
 
@@ -142,6 +144,10 @@ local filter_entries = {
 			merged = true,
 			module_names = { "filter_words", "cursor_line_only", "before_cursor" },
 		},
+	},
+	first_target = {
+		run = utils.module_wrapper(first_target.run),
+		metadata = first_target.metadata,
 	},
 }
 

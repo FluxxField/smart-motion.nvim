@@ -1,3 +1,6 @@
+local hints = require("smart-motion.visualizers.hints")
+local pass_through = require("smart-motion.visualizers.pass_through")
+
 local HINT_POSITION = require("smart-motion.consts").HINT_POSITION
 
 ---@type SmartMotionRegistry<SmartMotionVisualizerModuleEntry>
@@ -6,7 +9,7 @@ local visualizers = require("smart-motion.core.registry")("visualizers")
 --- @type table<string, SmartMotionVisualizerModuleEntry>
 local visualizer_entries = {
 	hint_start = {
-		run = require("smart-motion.visualizers.hints").run,
+		run = hints.run,
 		metadata = {
 			label = "Hint Start Visualizer",
 			description = "Applies hints to the start of targets",
@@ -16,7 +19,7 @@ local visualizer_entries = {
 		},
 	},
 	hint_end = {
-		run = require("smart-motion.visualizers.hints").run,
+		run = hints.run,
 		metadata = {
 			label = "Hint End Visualizer",
 			description = "Applies hints to the end of targets",
@@ -24,6 +27,10 @@ local visualizer_entries = {
 				hint_position = HINT_POSITION.END,
 			},
 		},
+	},
+	pass_through = {
+		run = pass_through.run,
+		metadata = pass_through.metadata,
 	},
 }
 

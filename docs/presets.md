@@ -69,6 +69,14 @@ This reference documents all the motions included in the default SmartMotion pre
 
 ---
 
+## Preset: `misc`
+
+| Key | Description                |
+| --- | -------------------------- |
+| `.` | Repeat the previous motion |
+
+---
+
 # Configuring Presets
 
 You can enable, disable, or customize presets during setup using the `presets` field.

@@ -5,6 +5,7 @@ local state = require("smart-motion.core.state")
 local config = require("smart-motion.config")
 local highlight = require("smart-motion.core.highlight")
 local consts = require("smart-motion.consts")
+local history = require("smart-motion.core.history")
 
 local EXIT_TYPE = consts.EXIT_TYPE
 
@@ -99,6 +100,24 @@ end
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
 function M.reset_motion(ctx, cfg, motion_state)
+	if motion_state.motion.action == "dispatch_motion" then
+		history.add({
+			motion = motion_state.selected_jump_target.motion,
+			target = motion_state.selected_jump_target,
+			metadata = {
+				time_stamp = os.time(),
+			},
+		})
+	else
+		history.add({
+			motion = motion_state.motion,
+			target = motion_state.selected_jump_target,
+			metadata = {
+				time_stamp = os.time(),
+			},
+		})
+	end
+
 	-- Clear any virtual text and extmarks.
 	highlight.clear(ctx, cfg, motion_state)
 
@@ -137,6 +156,13 @@ function M.module_wrapper(run_fn, opts)
 			end
 
 			while true do
+				if
+					motion_state.exit_type == EXIT_TYPE.EARLY_EXIT
+					or motion_state.exit_type == EXIT_TYPE.AUTO_SELECT
+				then
+					break
+				end
+
 				local ok, data = coroutine.resume(input_gen, ctx, cfg, motion_state)
 
 				if not ok then

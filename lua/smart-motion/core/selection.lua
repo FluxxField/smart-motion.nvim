@@ -1,7 +1,7 @@
 local log = require("smart-motion.core.log")
 local highlight = require("smart-motion.core.highlight")
 local consts = require("smart-motion.consts")
-local flow_state = require("smart-motion.core.flow-state")
+local flow_state = require("smart-motion.core.flow_state")
 
 local M = {}
 
