@@ -1,3 +1,4 @@
+local exit = require("smart-motion.core.events.exit")
 local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 
@@ -44,18 +45,9 @@ end
 function M.get_targets(ctx, cfg, motion_state, generator)
 	local targets = {}
 
-	if type(generator) ~= "thread" then
-		log.error("get_targets: Then generator must be a coroutine")
-		return
-	end
-
 	while true do
-		local ok, data_or_error = coroutine.resume(generator, ctx, cfg, motion_state)
-
-		if not ok then
-			log.error("get_targets: Coroutine Error: " .. tostring(data_or_error))
-			break
-		end
+		local ok, data_or_error = exit.safe(coroutine.resume(generator, ctx, cfg, motion_state))
+		exit.throw_if(not ok, EXIT_TYPE.EARLY_EXIT)
 
 		if not data_or_error then
 			log.debug("get_targets: no data, breaking out of loop")
@@ -63,16 +55,6 @@ function M.get_targets(ctx, cfg, motion_state, generator)
 		end
 
 		table.insert(targets, M.format_target(ctx, cfg, motion_state, data_or_error))
-	end
-
-	if motion_state.exit_type == EXIT_TYPE.EARLY_EXIT then
-		return
-	end
-
-	if motion_state.exit_type == EXIT_TYPE.CONTINUE_LOOP then
-		if motion_state.search_text == motion_state.last_search_text then
-			return
-		end
 	end
 
 	if motion_state.direction == DIRECTION.BEFORE_CURSOR then
