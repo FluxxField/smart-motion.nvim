@@ -349,6 +349,25 @@ function presets.paste(exclude)
 	}, exclude)
 end
 
+function presets.misc(exclude)
+	presets._register({
+		["."] = {
+			collector = "history",
+			extractor = "pass_through",
+			modifier = "default",
+			filter = "first_target",
+			visualizer = "pass_through",
+			action = "dispatch_motion",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Repeat Motion",
+				description = "Repeat previous motion",
+			},
+		},
+	}, exclude)
+end
+
 --- Internal registration logic with optional filtering.
 --- @param motions_list table<string, SmartMotionModule>
 --- @param exclude? string[]
