@@ -9,8 +9,6 @@ local M = {}
 function M.run()
 	local history = require("smart-motion.core.history")
 
-	log.info("history: " .. tostring(#history.entries))
-
 	return coroutine.create(function(ctx, cfg, motion_state)
 		for _, entry in ipairs(history.entries) do
 			coroutine.yield(vim.tbl_extend("force", entry, {
