@@ -1,5 +1,3 @@
-local registries = require("smart-motion.core.registries")
-
 local M = {}
 
 --- Returns a map of module key -> resolved module from motion_state.motion
@@ -7,6 +5,7 @@ local M = {}
 --- @param motion_state SmartMotionMotionState
 --- @param keys string[] | nil -- optional list of keys to resolve (defaults to all standard types)
 function M.get_modules(ctx, cfg, motion_state, keys)
+	local registries = require("smart-motion.core.registries"):get()
 	local motion = motion_state.motion
 	local trigger_key = motion.trigger_key
 	local modules = {}
@@ -39,8 +38,8 @@ function M.get_modules(ctx, cfg, motion_state, keys)
 end
 
 --- Shortcut for getting one module by key
-function M.get_module(motion_state, key)
-	return M.get_modules(motion_state, { key })[key]
+function M.get_module(ctx, cfg, motion_state, key)
+	return M.get_modules(ctx, cfg, motion_state, { key })[key]
 end
 
 return M
