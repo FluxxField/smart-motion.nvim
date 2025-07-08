@@ -3,6 +3,7 @@ local consts = require("smart-motion.consts")
 local targets = require("smart-motion.core.targets")
 local state = require("smart-motion.core.state")
 local module_loader = require("smart-motion.utils.module_loader")
+local log = require("smart-motion.core.log")
 
 local EXIT_TYPE = consts.EXIT_TYPE
 

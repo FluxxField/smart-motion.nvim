@@ -20,10 +20,6 @@ function M.run(ctx, cfg, motion_state, exit_type)
 		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 	end
 
-	if exit_type == EXIT_TYPE.AUTO_SELECT then
-		motion_state.selected_jump_target = motion_state.targets[1]
-	end
-
 	if motion_state.selected_jump_target then
 		modules.action.run(ctx, cfg, motion_state)
 	end
