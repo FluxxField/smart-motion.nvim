@@ -8,6 +8,7 @@ local M = {}
 --- @param keys string[] | nil -- optional list of keys to resolve (defaults to all standard types)
 function M.get_modules(ctx, cfg, motion_state, keys)
 	local motion = motion_state.motion
+	local trigger_key = motion.trigger_key
 	local modules = {}
 
 	local default_keys = { "collector", "extractor", "modifier", "filter", "visualizer", "action" }
@@ -18,13 +19,19 @@ function M.get_modules(ctx, cfg, motion_state, keys)
 
 		if registry then
 			local name = motion[key] or "default"
-			local mod = registry.get_by_name(name)
+			local module
 
-			if (not mod or not mod.run) and registry.get_by_name("default") then
-				mod = registry.get_by_name("default")
+			if key == "action" and motion.infer and trigger_key then
+				module = registry.get_by_key(trigger_key)
+			else
+				module = registry.get_by_name(name)
 			end
 
-			modules[key] = mod
+			if (not module or not module.run) and registry.get_by_name("default") then
+				module = registry.get_by_name("default")
+			end
+
+			modules[key] = module
 		end
 	end
 
