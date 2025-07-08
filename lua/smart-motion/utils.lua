@@ -74,9 +74,8 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 end
 
 --- Prepares the motion by gathering context, config, and initializing state.
----@param target_type TargetType
 ---@return SmartMotionContext?, SmartMotionConfig?, SmartMotionMotionState?
-function M.prepare_motion(target_type)
+function M.prepare_motion()
 	local ctx = context.get()
 	local cfg = config.validated
 
@@ -90,7 +89,7 @@ function M.prepare_motion(target_type)
 		return nil, nil, nil
 	end
 
-	local motion_state = state.create_motion_state(target_type)
+	local motion_state = state.create_motion_state()
 
 	return ctx, cfg, motion_state
 end
