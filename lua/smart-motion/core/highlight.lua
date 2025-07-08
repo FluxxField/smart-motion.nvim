@@ -141,7 +141,8 @@ end
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
 function M.dim_background(ctx, cfg, motion_state)
-	if cfg.disable_dim_background ~= false then
+	-- NOTE: Rename config to dim_background
+	if cfg.disable_dim_background ~= false or motion_state.dim_background == false then
 		return
 	end
 
