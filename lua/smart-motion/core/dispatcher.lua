@@ -6,7 +6,6 @@ local state = require("smart-motion.core.state")
 local flow_state = require("smart-motion.core.flow_state")
 local selection = require("smart-motion.core.selection")
 local highlight = require("smart-motion.core.highlight")
-local history = require("smart-motion.core.history")
 
 local EXIT_TYPE = consts.EXIT_TYPE
 
@@ -60,6 +59,7 @@ function M.trigger_motion(trigger_key)
 	--
 	motion_state =
 		state.merge_motion_state(motion_state, motion, collector, extractor, modifier, filter, visualizer, action)
+	motion_state.motion = motion
 
 	--
 	-- Evaluate flow state
@@ -176,14 +176,6 @@ function M.trigger_motion(trigger_key)
 	--
 	M._handle_exit(ctx, cfg, motion_state, action, visualizer)
 
-	history.add({
-		motion = motion,
-		target = motion_state.selected_jump_target,
-		metadata = {
-			time_stamp = os.time(),
-		},
-	})
-
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 
@@ -231,6 +223,8 @@ function M.trigger_action(trigger_key)
 	end
 
 	motion_state = state.merge_motion_state(motion_state, motion, collector, modifier, filter, visualizer, action)
+	motion_state.motion = motion
+
 	local extractor = registries.extractors.get_by_key(motion_char)
 
 	motion_state.target_type = consts.TARGET_TYPES_BY_KEY[motion_char] or ""
@@ -403,14 +397,6 @@ function M.trigger_action(trigger_key)
 	-- Handle exit
 	--
 	M._handle_exit(ctx, cfg, motion_state, action, visualizer)
-
-	history.add({
-		motion = motion,
-		target = motion_state.selected_jump_target,
-		metadata = {
-			time_stamp = os.time(),
-		},
-	})
 
 	utils.reset_motion(ctx, cfg, motion_state)
 end
