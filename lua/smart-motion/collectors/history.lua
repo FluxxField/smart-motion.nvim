@@ -23,6 +23,9 @@ end
 M.metadata = {
 	label = "Motion History Collector",
 	description = "Collects entries from the smart-motion history",
+	motion_state = {
+		target_type = "history",
+	},
 }
 
 return M
