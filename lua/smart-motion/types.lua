@@ -72,7 +72,6 @@
 --- @field selection_first_char? string
 --- @field auto_select_target? boolean
 --- @field virt_text_pos? "eol" | "overlay" | "right_align" | "inline"
---- @field exit_type? SearchExitType
 --- @field search_text? string
 --- @field last_search_text? string | nil
 --- @field is_searching_mode? boolean

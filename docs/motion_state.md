@@ -47,14 +47,13 @@ This page lists _all known properties_ of `motion_state`, including _required fi
 
 ## 🔍 Search-Specific Fields
 
-| Field                | Type             | Description                                                                            |
-| -------------------- | ---------------- | -------------------------------------------------------------------------------------- |
-| `is_searching_mode?` | `boolean`        | Enables a search mode that updates `search_text` in real time.                         |
-| `search_text?`       | `string`         | Current search text being typed.                                                       |
-| `last_search_text?`  | `string`         | Last used search term, if any.                                                         |
-| `exit_type?`         | `SearchExitType` | `"timeout"`, `"input_done"`, `"cancelled"`, etc.                                       |
-| `num_of_char?`       | `number`         | Used in motions like `f`/`t` to restrict input length.                                 |
-| `exclude_target?`    | `boolean`        | If true, the hinted target will be excluded from the final range (like `dt` behavior). |
+| Field                | Type      | Description                                                                            |
+| -------------------- | --------- | -------------------------------------------------------------------------------------- |
+| `is_searching_mode?` | `boolean` | Enables a search mode that updates `search_text` in real time.                         |
+| `search_text?`       | `string`  | Current search text being typed.                                                       |
+| `last_search_text?`  | `string`  | Last used search term, if any.                                                         |
+| `num_of_char?`       | `number`  | Used in motions like `f`/`t` to restrict input length.                                 |
+| `exclude_target?`    | `boolean` | If true, the hinted target will be excluded from the final range (like `dt` behavior). |
 
 ---
 

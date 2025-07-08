@@ -1,3 +1,4 @@
+local exit = require("smart-motion.core.events.exit")
 local log = require("smart-motion.core.log")
 
 local EXIT_TYPE = require("smart-motion.consts").EXIT_TYPE
@@ -6,8 +7,8 @@ local EXIT_TYPE = require("smart-motion.consts").EXIT_TYPE
 local M = {}
 
 function M.run(ctx, cfg, motion_state, target)
-	motion_state.exit_type = EXIT_TYPE.AUTO_SELECT
-	return target
+	motion_state.selected_jump_target = target
+	exit.throw(EXIT_TYPE.AUTO_SELECT)
 end
 
 M.metadata = {

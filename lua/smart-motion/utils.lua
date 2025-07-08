@@ -6,6 +6,7 @@ local config = require("smart-motion.config")
 local highlight = require("smart-motion.core.highlight")
 local consts = require("smart-motion.consts")
 local history = require("smart-motion.core.history")
+local exit = require("smart-motion.core.events.exit")
 
 local EXIT_TYPE = consts.EXIT_TYPE
 
@@ -144,30 +145,11 @@ function M.module_wrapper(run_fn, opts)
 		return coroutine.create(function(ctx, cfg, motion_state)
 			if opts.before_input_loop then
 				local result = opts.before_input_loop(ctx, cfg, motion_state)
-
-				if type(result) == "string" then
-					motion_state.exit_type = result
-
-					if motion_state.exit_type == EXIT_TYPE.EARLY_EXIT then
-						return
-					end
-				end
 			end
 
 			while true do
-				if
-					motion_state.exit_type == EXIT_TYPE.EARLY_EXIT
-					or motion_state.exit_type == EXIT_TYPE.AUTO_SELECT
-				then
-					break
-				end
-
-				local ok, data = coroutine.resume(input_gen, ctx, cfg, motion_state)
-
-				if not ok then
-					log.error("Input Generator Coroutine Error: " .. tostring(data))
-					break
-				end
+				local ok, data = exit.safe(coroutine.resume(input_gen, ctx, cfg, motion_state))
+				exit.throw_if(not ok, EXIT_TYPE.EARLY_EXIT)
 
 				if data == nil then
 					break
@@ -177,10 +159,8 @@ function M.module_wrapper(run_fn, opts)
 
 				if type(result) == "thread" then
 					while true do
-						local ok2, yielded_target = coroutine.resume(result)
-						if not ok2 then
-							break
-						end
+						local ok2, yielded_target = exit.safe(coroutine.resume(result))
+						exit.throw_if(not ok2, EXIT_TYPE.EARLY_EXIT)
 
 						if yielded_target == nil then
 							break
@@ -190,8 +170,6 @@ function M.module_wrapper(run_fn, opts)
 					end
 				elseif type(result) == "table" then
 					coroutine.yield(result)
-				elseif type(result) == "string" then
-					motion_state.exit_type = result
 				end
 			end
 		end)
