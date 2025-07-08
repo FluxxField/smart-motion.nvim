@@ -1,0 +1,32 @@
+local consts = require("smart-motion.consts")
+local selection = require("smart-motion.core.selection")
+local setup = require("smart-motion.core.engine.setup")
+local module_loader = require("smart-motion.utils.module_loader")
+
+local EXIT_TYPE = consts.EXIT_TYPE
+
+local M = {}
+
+function M.run(ctx, cfg, motion_state, exit_type)
+	local modules = module_loader.get_modules(ctx, cfg, motion_state, { "visualizer", "action" })
+
+	if exit_type == EXIT_TYPE.EARLY_EXIT then
+		return
+	end
+
+	if exit_type == EXIT_TYPE.CONTINUE_TO_SELECTION then
+		motion_state.is_searching_mode = false
+		modules.visualizer.run(ctx, cfg, motion_state)
+		selection.wait_for_hint_selection(ctx, cfg, motion_state)
+	end
+
+	if exit_type == EXIT_TYPE.AUTO_SELECT then
+		motion_state.selected_jump_target = motion_state.targets[1]
+	end
+
+	if motion_state.selected_jump_target then
+		modules.action.run(ctx, cfg, motion_state)
+	end
+end
+
+return M
