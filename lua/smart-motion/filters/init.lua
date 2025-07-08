@@ -146,7 +146,7 @@ local filter_entries = {
 		},
 	},
 	first_target = {
-		run = utils.module_wrapper(first_target.run)
+		run = utils.module_wrapper(first_target.run),
 		metadata = first_target.metadata,
 	},
 }
