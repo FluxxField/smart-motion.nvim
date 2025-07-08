@@ -24,17 +24,16 @@ local M = {}
 ---@param raw_data table
 ---@return Target
 function M.format_target(ctx, cfg, motion_state, raw_data)
-	return {
-		text = raw_data.text,
-		start_pos = raw_data.start_pos,
-		end_pos = raw_data.end_pos,
+	local metadata = vim.tbl_deep_extend("force", raw_data.metadata or {}, {
+		bufnr = ctx.bufnr,
+		winid = ctx.winid,
+		filetype = vim.bo[ctx.bufnr].filetype,
+	})
+
+	return vim.tbl_extend("force", {}, raw_data, {
 		type = raw_data.type or "unknown",
-		metadata = vim.tbl_deep_extend("force", raw_data.metadata or {}, {
-			bufnr = ctx.bufnr,
-			winid = ctx.winid,
-			filetype = vim.bo[ctx.bufnr].filetype,
-		}),
-	}
+		metadata = metadata,
+	})
 end
 
 --- Extracts and formats jump targets using the provided extractor.
