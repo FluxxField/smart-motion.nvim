@@ -1,3 +1,5 @@
+local dispatch_motion = require("smart-motion.actions.dispatch_motion")
+
 local merge = require("smart-motion.actions.utils").merge
 
 ---@type SmartMotionRegistry<SmartMotionActionModuleEntry>
@@ -196,6 +198,7 @@ local action_entries = {
 			description = "Paste the entire line at the target",
 		},
 	},
+	dispatch_motion = dispatch_motion,
 }
 
 actions.register_many(action_entries)
