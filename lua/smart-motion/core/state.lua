@@ -38,12 +38,8 @@ function M.init_motion_state(cfg)
 end
 
 --- Creates a fresh motion state (per motion)
----@param direction Direction
----@param hint_position HintPosition
----@param target_type TargetType
----@param ignore_whitespace boolean
 ---@return SmartMotionMotionState
-function M.create_motion_state(target_type)
+function M.create_motion_state()
 	---@type SmartMotionMotionState
 	return {
 		total_keys = M.static.total_keys,
@@ -150,13 +146,13 @@ function M.module_has_motion_state(module)
 	return module.metadata and module.metadata.motion_state
 end
 
-function M.merge_motion_state(motion_state, motion, ...)
+function M.merge_motion_state(motion_state, motion, modules)
 	motion_state = vim.tbl_deep_extend("force", motion_state, motion.metadata.motion_state)
 
 	-- Add the motion data to motion_state so that it is passed around to the modules
 	motion_state.motion = motion
 
-	for _, module in ipairs({ ... }) do
+	for _, module in ipairs(modules) do
 		if M.module_has_motion_state(module) then
 			motion_state = vim.tbl_deep_extend("force", motion_state, module.metadata.motion_state)
 		end
