@@ -20,7 +20,14 @@ function M.run(ctx, cfg, motion_state)
 
 		local targets = motion_state.jump_targets or {}
 		exit_event.throw_if(#targets == 0, EXIT_TYPE.EARLY_EXIT)
-		exit_event.throw_if(#targets == 1 and motion_state.auto_select_target, EXIT_TYPE.AUTO_SELECT)
+
+		if #targets == 1 then
+			if cfg.auto_select_target then
+				exit_event.throw(EXIT_TYPE.AUTO_SELECT)
+			else
+				exit_event.throw(EXIT_TYPE.CONTINUE_TO_SELECTION)
+			end
+		end
 
 		visualizer.run(ctx, cfg, motion_state)
 		exit_event.throw(EXIT_TYPE.CONTINUE_TO_SELECTION)
@@ -53,9 +60,10 @@ function M.run(ctx, cfg, motion_state)
 				local exit_type = exit_event.wrap(function()
 					pipeline.run(ctx, cfg, motion_state)
 				end)
-
 				exit_event.throw_if(exit_type and exit_type ~= EXIT_TYPE.PIPELINE_EXIT, exit_type)
 
+				-- NOTE: Check if we are even hitting this use case? I think the pipeline exit is
+				-- skipping this
 				if
 					type(motion_state.search_text) == "string"
 					and motion_state.search_text ~= ""
@@ -67,7 +75,14 @@ function M.run(ctx, cfg, motion_state)
 
 					local targets = motion_state.jump_targets or {}
 					exit_event.throw_if(#targets == 0, EXIT_TYPE.EARLY_EXIT)
-					exit_event.throw_if(#targets == 1 and motion_state.auto_select_target, EXIT_TYPE.AUTO_SELECT)
+
+					if #targets == 1 then
+						if cfg.auto_select_target then
+							exit_event.throw(EXIT_TYPE.AUTO_SELECT)
+						else
+							exit_event.throw(EXIT_TYPE.CONTINUE_TO_SELECTION)
+						end
+					end
 
 					visualizer.run(ctx, cfg, motion_state)
 					motion_state.last_search_text = motion_state.search_text

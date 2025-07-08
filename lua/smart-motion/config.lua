@@ -26,6 +26,7 @@ M.defaults = {
 	flow_state_timeout_ms = FLOW_STATE_TIMEOUT_MS,
 	disable_dim_background = false,
 	history_max_size = HISTORY_MAX_SIZE,
+	auto_select_target = false,
 }
 
 ---@type SmartMotionConfig
@@ -138,6 +139,13 @@ function M.validate(user_config)
 	--
 	if config.history_max_size == nil or type(config.history_max_size) ~= "number" then
 		config.history_max_size = HISTORY_MAX_SIZE
+	end
+
+	--
+	-- Validate auto_select_target
+	--
+	if config.auto_select_target == nil or type(config.auto_select_target) ~= "boolean" then
+		config.auto_select_target = false
 	end
 
 	M.validated = config
