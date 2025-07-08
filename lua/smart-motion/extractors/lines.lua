@@ -35,6 +35,7 @@ M.metadata = {
 	description = "Extracts lines to generate targets from collector",
 	motion_state = {
 		ignore_whitespace = true,
+		target_type = "lines",
 	},
 }
 

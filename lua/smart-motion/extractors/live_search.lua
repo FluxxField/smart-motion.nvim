@@ -65,6 +65,7 @@ M.metadata = {
 		is_searching_mode = true,
 		should_show_prefix = true,
 		timeout_after_input = true,
+		target_type = "words",
 	},
 }
 

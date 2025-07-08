@@ -46,6 +46,7 @@ M.metadata = {
 	description = "Extracts words to generate targets from collector",
 	motion_state = {
 		word_pattern = WORD_PATTERN,
+		target_type = "words",
 	},
 }
 
