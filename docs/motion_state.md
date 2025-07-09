@@ -41,7 +41,7 @@ This page lists _all known properties_ of `motion_state`, including _required fi
 | `selection_mode`        | `SelectionMode` | `"single"`, `"double"`, `"stepwise"`, etc.                                            |
 | `selection_first_char?` | `string`        | First char of a 2-char label, if selected.                                            |
 | `auto_select_target?`   | `boolean`       | Whether SmartMotion should jump automatically if only one target exists.              |
-| `quick_action?`         | `boolean`       | If true, allows immediate execution on target under cursor without waiting for input. |
+| `allow_quick_action?`         | `boolean`       | If true, allows immediate execution on target under cursor without waiting for input. |
 
 ---
 

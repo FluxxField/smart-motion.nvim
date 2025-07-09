@@ -15,7 +15,7 @@ extractors.register_many({
 		run = utils.module_wrapper(lines.run),
 		metadata = vim.tbl_deep_extend("force", lines.metadata, {
 			motion_state = {
-				quick_action = false,
+				allow_quick_action = false,
 			},
 		}),
 	},

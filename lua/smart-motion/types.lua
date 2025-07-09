@@ -78,7 +78,7 @@
 --- @field exclude_target? boolean -- Used to exclude hinted character and act like "until"
 --- @field num_of_char? number
 --- @field should_show_prefix? boolean
---- @field quick_action? boolean -- Used to control if we should run action on target under cursor
+--- @field allow_quick_action? boolean -- Used to control if we should run action on target under cursor
 --- @field sort_by? "sort_weight"
 --- @field sort_descending? boolean
 --- @field timeout_after_input? boolean
