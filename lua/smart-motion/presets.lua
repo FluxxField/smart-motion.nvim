@@ -166,7 +166,7 @@ function presets.delete(exclude)
 				label = "Delete Action",
 				description = "Deletes based on motion provided",
 				motion_state = {
-					quick_action = true,
+					allow_quick_action = true,
 				},
 			},
 		},
@@ -229,7 +229,7 @@ function presets.yank(exclude)
 				label = "Yank Action",
 				description = "Yanks based on the motion provided",
 				motion_state = {
-					quick_action = true,
+					allow_quick_action = true,
 				},
 			},
 		},
@@ -292,7 +292,7 @@ function presets.change(exclude)
 				label = "Change Word",
 				description = "Deletes the selected word and goes into insert mode",
 				motion_state = {
-					quick_action = true,
+					allow_quick_action = true,
 				},
 			},
 		},
@@ -357,7 +357,7 @@ function presets.misc(exclude)
 			modifier = "default",
 			filter = "first_target",
 			visualizer = "pass_through",
-			action = "dispatch_motion",
+			action = "run_motion",
 			map = true,
 			modes = { "n" },
 			metadata = {

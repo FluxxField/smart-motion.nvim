@@ -6,6 +6,7 @@ local config = require("smart-motion.config")
 local highlight = require("smart-motion.core.highlight")
 local consts = require("smart-motion.consts")
 local history = require("smart-motion.core.history")
+local exit = require("smart-motion.core.events.exit")
 
 local EXIT_TYPE = consts.EXIT_TYPE
 
@@ -74,9 +75,8 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 end
 
 --- Prepares the motion by gathering context, config, and initializing state.
----@param target_type TargetType
 ---@return SmartMotionContext?, SmartMotionConfig?, SmartMotionMotionState?
-function M.prepare_motion(target_type)
+function M.prepare_motion()
 	local ctx = context.get()
 	local cfg = config.validated
 
@@ -90,7 +90,7 @@ function M.prepare_motion(target_type)
 		return nil, nil, nil
 	end
 
-	local motion_state = state.create_motion_state(target_type)
+	local motion_state = state.create_motion_state()
 
 	return ctx, cfg, motion_state
 end
@@ -100,7 +100,7 @@ end
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
 function M.reset_motion(ctx, cfg, motion_state)
-	if motion_state.motion.action == "dispatch_motion" then
+	if motion_state.motion.action == "run_motion" then
 		history.add({
 			motion = motion_state.selected_jump_target.motion,
 			target = motion_state.selected_jump_target,
@@ -145,30 +145,11 @@ function M.module_wrapper(run_fn, opts)
 		return coroutine.create(function(ctx, cfg, motion_state)
 			if opts.before_input_loop then
 				local result = opts.before_input_loop(ctx, cfg, motion_state)
-
-				if type(result) == "string" then
-					motion_state.exit_type = result
-
-					if motion_state.exit_type == EXIT_TYPE.EARLY_EXIT then
-						return
-					end
-				end
 			end
 
 			while true do
-				if
-					motion_state.exit_type == EXIT_TYPE.EARLY_EXIT
-					or motion_state.exit_type == EXIT_TYPE.AUTO_SELECT
-				then
-					break
-				end
-
-				local ok, data = coroutine.resume(input_gen, ctx, cfg, motion_state)
-
-				if not ok then
-					log.error("Input Generator Coroutine Error: " .. tostring(data))
-					break
-				end
+				local ok, data = exit.safe(coroutine.resume(input_gen, ctx, cfg, motion_state))
+				exit.throw_if(not ok, EXIT_TYPE.EARLY_EXIT)
 
 				if data == nil then
 					break
@@ -178,10 +159,8 @@ function M.module_wrapper(run_fn, opts)
 
 				if type(result) == "thread" then
 					while true do
-						local ok2, yielded_target = coroutine.resume(result)
-						if not ok2 then
-							break
-						end
+						local ok2, yielded_target = exit.safe(coroutine.resume(result))
+						exit.throw_if(not ok2, EXIT_TYPE.EARLY_EXIT)
 
 						if yielded_target == nil then
 							break
@@ -191,8 +170,6 @@ function M.module_wrapper(run_fn, opts)
 					end
 				elseif type(result) == "table" then
 					coroutine.yield(result)
-				elseif type(result) == "string" then
-					motion_state.exit_type = result
 				end
 			end
 		end)

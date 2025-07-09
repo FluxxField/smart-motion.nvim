@@ -1,5 +1,8 @@
+local exit = require("smart-motion.core.events.exit")
 local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
+
+local EXIT_TYPE = consts.EXIT_TYPE
 
 ---@class SmartMotionLineData
 ---@field line_number integer
@@ -12,10 +15,7 @@ local M = {}
 --- @return thread A coroutine generator yielding SmartMotionLineData objects
 function M.run()
 	return coroutine.create(function(ctx, cfg, motion_state)
-		if not vim.api.nvim_buf_is_valid(ctx.bufnr) then
-			log.error("lines_collector received an invalid buffer: " .. tostring(ctx.bufnr))
-			return
-		end
+		exit.throw_if(not vim.api.nvim_buf_is_valid(ctx.bufnr), EXIT_TYPE.EARLY_EXIT)
 
 		local cursor_line = ctx.cursor_line
 		local total_lines = vim.api.nvim_buf_line_count(ctx.bufnr)

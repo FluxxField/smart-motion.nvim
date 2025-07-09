@@ -1,4 +1,4 @@
-local dispatcher = require("smart-motion.core.dispatcher")
+local engine = require("smart-motion.core.engine")
 local utils = require("smart-motion.utils")
 local log = require("smart-motion.core.log")
 
@@ -70,14 +70,8 @@ function motions.register_motion(name, motion, opts)
 		local desc = motion.metadata.label
 
 		for _, mode in ipairs(modes) do
-			local trigger = dispatcher.trigger_motion
-
-			if infer then
-				trigger = dispatcher.trigger_action
-			end
-
 			local handler = function()
-				trigger(motion.trigger_key)
+				engine.run(motion.trigger_key)
 			end
 
 			if package.loaded["which-key"] then
@@ -140,9 +134,7 @@ function motions.map_motion(name, motion_opts, opts)
 	local trigger_key = motion.trigger_key or name
 
 	local handler = function()
-		local trigger = motion.infer and dispatcher.trigger_action or dispatcher.trigger_motion
-
-		trigger(trigger_key)
+		engine.run(trigger_key)
 	end
 
 	if opts.which_key ~= false and package.loaded["which-key"] then

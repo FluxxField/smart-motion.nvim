@@ -41,20 +41,19 @@ This page lists _all known properties_ of `motion_state`, including _required fi
 | `selection_mode`        | `SelectionMode` | `"single"`, `"double"`, `"stepwise"`, etc.                                            |
 | `selection_first_char?` | `string`        | First char of a 2-char label, if selected.                                            |
 | `auto_select_target?`   | `boolean`       | Whether SmartMotion should jump automatically if only one target exists.              |
-| `quick_action?`         | `boolean`       | If true, allows immediate execution on target under cursor without waiting for input. |
+| `allow_quick_action?`         | `boolean`       | If true, allows immediate execution on target under cursor without waiting for input. |
 
 ---
 
 ## 🔍 Search-Specific Fields
 
-| Field                | Type             | Description                                                                            |
-| -------------------- | ---------------- | -------------------------------------------------------------------------------------- |
-| `is_searching_mode?` | `boolean`        | Enables a search mode that updates `search_text` in real time.                         |
-| `search_text?`       | `string`         | Current search text being typed.                                                       |
-| `last_search_text?`  | `string`         | Last used search term, if any.                                                         |
-| `exit_type?`         | `SearchExitType` | `"timeout"`, `"input_done"`, `"cancelled"`, etc.                                       |
-| `num_of_char?`       | `number`         | Used in motions like `f`/`t` to restrict input length.                                 |
-| `exclude_target?`    | `boolean`        | If true, the hinted target will be excluded from the final range (like `dt` behavior). |
+| Field                | Type      | Description                                                                            |
+| -------------------- | --------- | -------------------------------------------------------------------------------------- |
+| `is_searching_mode?` | `boolean` | Enables a search mode that updates `search_text` in real time.                         |
+| `search_text?`       | `string`  | Current search text being typed.                                                       |
+| `last_search_text?`  | `string`  | Last used search term, if any.                                                         |
+| `num_of_char?`       | `number`  | Used in motions like `f`/`t` to restrict input length.                                 |
+| `exclude_target?`    | `boolean` | If true, the hinted target will be excluded from the final range (like `dt` behavior). |
 
 ---
 

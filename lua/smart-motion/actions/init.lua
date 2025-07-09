@@ -1,4 +1,4 @@
-local dispatch_motion = require("smart-motion.actions.dispatch_motion")
+local run_motion = require("smart-motion.actions.run_motion")
 
 local merge = require("smart-motion.actions.utils").merge
 
@@ -198,7 +198,7 @@ local action_entries = {
 			description = "Paste the entire line at the target",
 		},
 	},
-	dispatch_motion = dispatch_motion,
+	run_motion = run_motion,
 }
 
 actions.register_many(action_entries)

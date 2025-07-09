@@ -1,3 +1,4 @@
+local exit = require("smart-motion.core.events.exit")
 local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 
@@ -8,23 +9,18 @@ local TARGET_TYPES = consts.TARGET_TYPES
 local M = {}
 
 function M.before_input_loop(ctx, cfg, motion_state)
-	if vim.fn.getchar(1) == 0 then
-		return EXIT_TYPE.CONTINUE_LOOP
-	end
+	exit.throw_if(vim.fn.getchar(1) == 0, EXIT_TYPE.PIPELINE_EXIT)
 
-	local ok, char = pcall(vim.fn.getchar)
-	if not ok then
-		return EXIT_TYPE.EARLY_EXIT
-	end
+	local ok, char = exit.safe(pcall(vim.fn.getchar))
+	exit.throw_if(not ok, EXIT_TYPE.EARLY_EXIT)
 
 	char = type(char) == "number" and vim.fn.nr2char(char) or char
 	vim.api.nvim_feedkeys("", "n", false)
 
-	if char == "\027" then -- ESC
-		return EXIT_TYPE.EARLY_EXIT
-	elseif char == "\r" then -- ENTER
-		motion_state.exit_type = EXIT_TYPE.CONTINUE_TO_SELECTION
-	elseif char == "\b" or char == vim.api.nvim_replace_termcodes("<BS>", true, false, true) then
+	exit.throw_if(char == "\027", EXIT_TYPE.EARLY_EXIT)
+	exit.throw_if(char == "\r", EXIT_TYPE.CONTINUE_TO_SELECTION)
+
+	if char == "\b" or char == vim.api.nvim_replace_termcodes("<BS>", true, false, true) then
 		motion_state.search_text = motion_state.search_text:sub(1, -2)
 	else
 		motion_state.search_text = (motion_state.search_text or "") .. char
@@ -65,6 +61,7 @@ M.metadata = {
 		is_searching_mode = true,
 		should_show_prefix = true,
 		timeout_after_input = true,
+		target_type = "words",
 	},
 }
 
