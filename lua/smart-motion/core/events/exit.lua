@@ -1,3 +1,5 @@
+local log = require("smart-motion.core.log")
+
 local M = {}
 
 local EXIT_FLAG = "__smart_motion_exit__"
