@@ -6,8 +6,9 @@ local pipeline = require("smart-motion.core.engine.pipeline")
 local consts = require("smart-motion.consts")
 local highlight = require("smart-motion.core.highlight")
 local loop = require("smart-motion.core.engine.loop")
-local utils = require("smart-motion.utils")
 local log = require("smart-motion.core.log")
+local infer = require("smart-motion.core.engine.infer")
+local utils = require("smart-motion.utils")
 
 local EXIT_TYPE = consts.EXIT_TYPE
 
@@ -19,6 +20,8 @@ function M.run(trigger_key)
 
 	local exit_type = exit_event.wrap(function()
 		ctx, cfg, motion_state = setup.run(trigger_key)
+
+		infer.run(ctx, cfg, motion_state)
 
 		if flow_state.evaluate_flow_at_motion_start() then
 			pipeline.run(ctx, cfg, motion_state)
