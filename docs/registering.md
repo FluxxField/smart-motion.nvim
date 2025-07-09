@@ -58,7 +58,7 @@ Each motion supports the following fields:
 
 ## 🔁 `infer` and Trigger Behavior
 
-When registering a motion, the `infer` flag controls how the dispatcher interprets the first keypress:
+When registering a motion, the `infer` flag controls how the motion engine interprets the first keypress:
 
 - If `infer = false` (default), the motion key **is the motion**.
 - If `infer = true`, the key is treated as a **trigger for an action**, and the **next key** determines the motion to apply it to.

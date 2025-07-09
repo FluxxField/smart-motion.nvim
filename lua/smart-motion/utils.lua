@@ -100,7 +100,7 @@ end
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
 function M.reset_motion(ctx, cfg, motion_state)
-	if motion_state.motion.action == "dispatch_motion" then
+	if motion_state.motion.action == "run_motion" then
 		history.add({
 			motion = motion_state.selected_jump_target.motion,
 			target = motion_state.selected_jump_target,

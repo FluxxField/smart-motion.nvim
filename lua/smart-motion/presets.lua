@@ -357,7 +357,7 @@ function presets.misc(exclude)
 			modifier = "default",
 			filter = "first_target",
 			visualizer = "pass_through",
-			action = "dispatch_motion",
+			action = "run_motion",
 			map = true,
 			modes = { "n" },
 			metadata = {
