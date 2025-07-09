@@ -8,11 +8,11 @@ local EXIT_TYPE = consts.EXIT_TYPE
 local M = {}
 
 function M.run(ctx, cfg, motion_state, exit_type)
-	local modules = module_loader.get_modules(ctx, cfg, motion_state, { "visualizer", "action" })
-
 	if exit_type == EXIT_TYPE.EARLY_EXIT then
 		return
 	end
+
+	local modules = module_loader.get_modules(ctx, cfg, motion_state, { "visualizer", "action" })
 
 	if exit_type == EXIT_TYPE.CONTINUE_TO_SELECTION then
 		motion_state.is_searching_mode = false
