@@ -18,7 +18,7 @@ function M.run(ctx, cfg, motion_state, target)
 				return target
 			end
 		elseif hint_position == HINT_POSITION.END then
-			if target.end_pos.col > cursor_col then
+			if target.end_pos.col - 1 > cursor_col then
 				return target
 			end
 		end
