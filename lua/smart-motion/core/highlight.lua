@@ -6,14 +6,22 @@ local HINT_POSITION = consts.HINT_POSITION
 
 local M = {}
 
---- Clears all SmartMotion highlights in the current buffer.
+--- Clears all SmartMotion highlights in all affected buffers.
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
 function M.clear(ctx, cfg, motion_state)
-	log.debug("Clearing all highlights in buffer " .. ctx.bufnr)
-
-	vim.api.nvim_buf_clear_namespace(ctx.bufnr, consts.ns_id, 0, -1)
+	if motion_state.affected_buffers and next(motion_state.affected_buffers) then
+		for bufnr, _ in pairs(motion_state.affected_buffers) do
+			if vim.api.nvim_buf_is_valid(bufnr) then
+				log.debug("Clearing highlights in buffer " .. bufnr)
+				vim.api.nvim_buf_clear_namespace(bufnr, consts.ns_id, 0, -1)
+			end
+		end
+	else
+		log.debug("Clearing all highlights in buffer " .. ctx.bufnr)
+		vim.api.nvim_buf_clear_namespace(ctx.bufnr, consts.ns_id, 0, -1)
+	end
 end
 
 --- Applies a single-character hint label at a given position.
@@ -61,7 +69,16 @@ function M.apply_single_hint_label(ctx, cfg, motion_state, target, label)
 
 	table.insert(virt_text, { label, hint_hl })
 
-	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, row, col, {
+	local bufnr = (target.metadata and target.metadata.bufnr) or ctx.bufnr
+	motion_state.affected_buffers = motion_state.affected_buffers or {}
+	motion_state.affected_buffers[bufnr] = true
+
+	local line_text = vim.api.nvim_buf_get_lines(bufnr, row, row + 1, false)[1]
+	if line_text then
+		col = math.min(col, #line_text)
+	end
+
+	vim.api.nvim_buf_set_extmark(bufnr, consts.ns_id, row, col, {
 		virt_text = virt_text,
 		virt_text_pos = motion_state.virt_text_pos or "overlay",
 		hl_mode = "combine",
@@ -129,7 +146,16 @@ function M.apply_double_hint_label(ctx, cfg, motion_state, target, label, option
 	table.insert(virt_text, { first_char, first_hl })
 	table.insert(virt_text, { second_char, second_hl })
 
-	vim.api.nvim_buf_set_extmark(ctx.bufnr, consts.ns_id, row, col, {
+	local bufnr = (target.metadata and target.metadata.bufnr) or ctx.bufnr
+	motion_state.affected_buffers = motion_state.affected_buffers or {}
+	motion_state.affected_buffers[bufnr] = true
+
+	local line_text = vim.api.nvim_buf_get_lines(bufnr, row, row + 1, false)[1]
+	if line_text then
+		col = math.min(col, #line_text)
+	end
+
+	vim.api.nvim_buf_set_extmark(bufnr, consts.ns_id, row, col, {
 		virt_text = virt_text,
 		virt_text_pos = motion_state.virt_text_pos or "overlay",
 		hl_mode = "combine",
@@ -146,11 +172,24 @@ function M.dim_background(ctx, cfg, motion_state)
 		return
 	end
 
-	local total_lines = vim.api.nvim_buf_line_count(ctx.bufnr)
+	-- Collect unique buffers to dim
+	local buffers_to_dim = { [ctx.bufnr] = true }
+	if motion_state.multi_window and ctx.windows then
+		for _, win in ipairs(ctx.windows) do
+			buffers_to_dim[win.bufnr] = true
+		end
+	end
 
-	-- Dim the entire buffer by applying the dim highlight group to every line.
-	for line = 0, total_lines - 1 do
-		vim.api.nvim_buf_add_highlight(ctx.bufnr, consts.ns_id, cfg.highlight.dim or "SmartMotionDim", line, 0, -1)
+	motion_state.affected_buffers = motion_state.affected_buffers or {}
+
+	for bufnr, _ in pairs(buffers_to_dim) do
+		if vim.api.nvim_buf_is_valid(bufnr) then
+			motion_state.affected_buffers[bufnr] = true
+			local total_lines = vim.api.nvim_buf_line_count(bufnr)
+			for line = 0, total_lines - 1 do
+				vim.api.nvim_buf_add_highlight(bufnr, consts.ns_id, cfg.highlight.dim or "SmartMotionDim", line, 0, -1)
+			end
+		end
 	end
 
 	vim.cmd("redraw")

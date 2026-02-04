@@ -67,6 +67,16 @@ Collects all `vim.diagnostic.get()` results for the buffer. Supports optional se
 
 ---
 
+## 🪟 Multi-Window Collection
+
+When `motion_state.multi_window` is true and there are multiple visible windows, the pipeline automatically wraps the collector to run once per window. Each yielded item gets `metadata.bufnr` and `metadata.winid` injected so downstream stages (filters, visualizers, actions) know which window each target belongs to.
+
+This is transparent to collectors — they don't need any changes. The pipeline creates a fresh collector coroutine for each window with a per-window sub-context (overriding `bufnr`, `winid`, `cursor_line`, `cursor_col`, `last_line`).
+
+Multi-window collection is disabled in operator-pending mode, since vim operators expect cursor movement within the same buffer.
+
+---
+
 ## 🧱 Example Use
 
 In a motion definition:

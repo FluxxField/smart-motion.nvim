@@ -6,32 +6,31 @@ This reference documents all the motions included in the default SmartMotion pre
 
 ## Preset: `words`
 
-| Key  | Description                         |
-| ---- | ----------------------------------- |
-| `w`  | Jump to Start of Word after cursor  |
-| `b`  | Jump to Start of Word before cursor |
-| `e`  | Jump to End of Word after cursor    |
-| `ge` | Jump to End of Word before cursor   |
+| Key  | Mode    | Description                         |
+| ---- | ------- | ----------------------------------- |
+| `w`  | n, v, o | Jump to Start of Word after cursor  |
+| `b`  | n, v, o | Jump to Start of Word before cursor |
+| `e`  | n, v, o | Jump to End of Word after cursor    |
+| `ge` | n, v, o | Jump to End of Word before cursor   |
 
 ---
 
 ## Preset: `lines`
 
-| Key | Description                |
-| --- | -------------------------- |
-| `j` | Jump to Line after cursor  |
-| `k` | Jump to Line before cursor |
+| Key | Mode    | Description                |
+| --- | ------- | -------------------------- |
+| `j` | n, v, o | Jump to Line after cursor  |
+| `k` | n, v, o | Jump to Line before cursor |
 
 ---
 
 ## Preset: `search`
 
-| Key | Description                    |
-| --- | ------------------------------ |
-| `s` | Live Search Jump After Cursor  |
-| `S` | Live Search Jump Before Cursor |
-| `f` | 2 Character Find After Cursor  |
-| `F` | 2 Character Find Before Cursor |
+| Key | Mode | Multi-window | Description                                     |
+| --- | ---- | ------------ | ----------------------------------------------- |
+| `s` | n, o | yes          | Live search across all visible text with labels |
+| `f` | n, o | yes          | 2 Character Find After Cursor                   |
+| `F` | n, o | yes          | 2 Character Find Before Cursor                  |
 
 ---
 
@@ -82,23 +81,23 @@ This reference documents all the motions included in the default SmartMotion pre
 
 ### Navigation
 
-| Key  | Description                                          |
-| ---- | ---------------------------------------------------- |
-| `]]` | Jump to next function definition after cursor        |
-| `[[` | Jump to previous function definition before cursor   |
-| `]c` | Jump to next class/struct definition after cursor    |
-| `[c` | Jump to previous class/struct definition before cursor |
+| Key  | Mode | Multi-window | Description                                          |
+| ---- | ---- | ------------ | ---------------------------------------------------- |
+| `]]` | n, o | yes          | Jump to next function definition after cursor        |
+| `[[` | n, o | yes          | Jump to previous function definition before cursor   |
+| `]c` | n, o | yes          | Jump to next class/struct definition after cursor    |
+| `[c` | n, o | yes          | Jump to previous class/struct definition before cursor |
 
 ### Editing
 
-| Key   | Description                                     |
-| ----- | ----------------------------------------------- |
-| `daa` | Delete around argument (includes separator)     |
-| `caa` | Change around argument                          |
-| `yaa` | Yank around argument                            |
-| `dfn` | Delete function name                            |
-| `cfn` | Change function name (rename)                   |
-| `yfn` | Yank function name                              |
+| Key   | Mode | Description                                     |
+| ----- | ---- | ----------------------------------------------- |
+| `daa` | n    | Delete around argument (includes separator)     |
+| `caa` | n    | Change around argument                          |
+| `yaa` | n    | Yank around argument                            |
+| `dfn` | n    | Delete function name                            |
+| `cfn` | n    | Change function name (rename)                   |
+| `yfn` | n    | Yank function name                              |
 
 > [!NOTE]
 > Treesitter presets use broad node type lists that work across many languages (Lua, Python, JavaScript, TypeScript, Rust, Go, C/C++, Java, Ruby). Non-matching types are safely ignored.
@@ -107,12 +106,12 @@ This reference documents all the motions included in the default SmartMotion pre
 
 ## Preset: `diagnostics`
 
-| Key  | Description                                     |
-| ---- | ----------------------------------------------- |
-| `]d` | Jump to next diagnostic after cursor            |
-| `[d` | Jump to previous diagnostic before cursor       |
-| `]e` | Jump to next error diagnostic after cursor      |
-| `[e` | Jump to previous error diagnostic before cursor |
+| Key  | Mode | Multi-window | Description                                     |
+| ---- | ---- | ------------ | ----------------------------------------------- |
+| `]d` | n, o | yes          | Jump to next diagnostic after cursor            |
+| `[d` | n, o | yes          | Jump to previous diagnostic before cursor       |
+| `]e` | n, o | yes          | Jump to next error diagnostic after cursor      |
+| `[e` | n, o | yes          | Jump to previous error diagnostic before cursor |
 
 ---
 
@@ -121,6 +120,27 @@ This reference documents all the motions included in the default SmartMotion pre
 | Key | Description                |
 | --- | -------------------------- |
 | `.` | Repeat the previous motion |
+
+---
+
+---
+
+## Mode Reference
+
+| Mode | Description |
+| ---- | ----------- |
+| `n`  | Normal mode |
+| `v`  | Visual mode |
+| `o`  | Operator-pending mode — works with any vim operator (`>`, `<`, `gU`, `gu`, `=`, `gq`, `!`, `zf`, etc.) |
+
+> [!NOTE]
+> In operator-pending mode, SmartMotion performs a plain jump (no centering) so the operator receives the cursor movement correctly. Multi-window is disabled in operator-pending mode since vim operators expect movement within the same buffer.
+
+## Multi-Window Support
+
+Motions marked with **Multi-window: yes** collect targets from all visible (non-floating) windows in the current tabpage. Labels from the current window get priority — nearby targets get single-character labels. Selecting a label in another window switches to that window.
+
+Word and line motions (`w`, `b`, `e`, `ge`, `j`, `k`) stay single-window because directional motions within one window are the natural UX.
 
 ---
 
