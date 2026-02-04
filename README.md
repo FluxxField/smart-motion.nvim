@@ -373,9 +373,6 @@ Licensed under [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html).
 ## 👤 Author
 
 Built by [FluxxField](https://github.com/FluxxField)
-Business inquiries: [keenanjj13@protonmail.com](mailto:keenanjj13@protonmail.com)
-
-> ✨ Also builds premium websites: [SLP Custom Built](https://www.slpcustombuilt.com), [Cornerstone Homes](https://www.cornerstonehomesok.com)
 
 ---
 
