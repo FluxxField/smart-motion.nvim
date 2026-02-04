@@ -19,6 +19,7 @@
 ---@field presets SmartMotionPresets
 ---@field flow_state_timeout_ms number
 ---@field disable_dim_background boolean
+---@field native_search? boolean
 
 ---@class SmartMotionPresets
 ---@field words? true | SmartMotionPresetKey.Words[]
