@@ -28,15 +28,20 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 - 🔀 **Composable d/y/c/p** — `d` + any motion deletes, `y` + any motion yanks, `c` + any motion changes, with visual feedback at every step
 - ✂️ **Until motions** — `dt`, `yt`, `ct` operate from cursor to a labeled character on the current line
 - 📡 **Remote operations** — `rdw`, `rdl`, `ryw`, `ryl` delete or yank words and lines without moving the cursor
-- 🌳 **Treesitter-aware motions** — jump to functions (`]]`/`[[`), classes (`]c`/`[c`), delete/change/yank function names (`dfn`, `cfn`, `yfn`), and arguments (`daa`, `caa`, `yaa`)
+- 🌳 **Treesitter-aware motions** — jump to functions (`]]`/`[[`), classes (`]c`/`[c`), scopes/blocks (`]b`/`[b`), delete/change/yank function names (`dfn`, `cfn`, `yfn`), and arguments (`daa`, `caa`, `yaa`)
 - 🩺 **Diagnostics jumping** — navigate all diagnostics (`]d`/`[d`) or errors only (`]e`/`[e`)
 - 🔎 **2-char find** — `f`/`F` for leap-style two-character search with labels
 - 🔍 **Live search** — `s` for incremental search with labeled results across all visible text
+- 🎯 **Till motions** — `t`/`T` for single-character till (jump to just before/after the match), with `;`/`,` to repeat
+- 🔎 **Native search labels** — `<C-s>` during `/` search toggles label overlay on matches
 - 🪟 **Multi-window jumping** — search, treesitter, and diagnostic motions show labels across all visible splits. Select a label in another window and jump there instantly.
 - ⚙️ **Operator-pending mode** — use SmartMotion motions with any vim operator (`>w`, `gUw`, `=j`, `gqj`, etc.)
+- 👁️ **Visual range selection** — `gs` picks two targets, enters visual mode spanning the range
+- 🔄 **Argument swap** — `saa` picks two treesitter arguments and swaps them
+- ✏️ **Multi-cursor edit** — `gmd`/`gmy` toggle-select multiple words, then delete or yank them all at once
 - 🔁 **Repeat** — `.` repeats the last SmartMotion
 - 🧩 **Fully modular pipeline** — Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action. Every stage is replaceable. Build entirely custom motions from scratch.
-- 📦 **10 presets, 40 keybindings** — enable what you want, disable what you don't
+- 📦 **10 presets, 50+ keybindings** — enable what you want, disable what you don't
 
 ---
 
@@ -51,14 +56,14 @@ return {
     presets = {
       words = true,        -- w, b, e, ge
       lines = true,        -- j, k
-      search = true,       -- s, f, F
+      search = true,       -- s, f, F, t, T, ;, ,, gs
       delete = true,       -- d, dt, dT, rdw, rdl
       yank = true,         -- y, yt, yT, ryw, ryl
       change = true,       -- c, ct, cT
       paste = true,        -- p, P
-      treesitter = true,   -- ]], [[, ]c, [c, daa, caa, yaa, dfn, cfn, yfn
+      treesitter = true,   -- ]], [[, ]c, [c, ]b, [b, daa, caa, yaa, dfn, cfn, yfn, saa
       diagnostics = true,  -- ]d, [d, ]e, [e
-      misc = true,         -- . (repeat)
+      misc = true,         -- . (repeat), gmd, gmy
     },
   },
 }
@@ -102,13 +107,18 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>🔍 Search</b> — <code>s</code> <code>f</code> <code>F</code> 🪟</summary>
+<summary><b>🔍 Search</b> — <code>s</code> <code>f</code> <code>F</code> <code>t</code> <code>T</code> <code>;</code> <code>,</code> <code>gs</code> 🪟</summary>
 
-| Key | Mode | Description                                          |
-|-----|------|------------------------------------------------------|
-| `s` | n, o | Live search across all visible text with labels      |
-| `f` | n, o | 2-char find forward with labels                      |
-| `F` | n, o | 2-char find backward with labels                     |
+| Key  | Mode | Description                                          |
+|------|------|------------------------------------------------------|
+| `s`  | n, o | Live search across all visible text with labels      |
+| `f`  | n, o | 2-char find forward with labels                      |
+| `F`  | n, o | 2-char find backward with labels                     |
+| `t`  | n, o | Till character forward (jump to just before match)   |
+| `T`  | n, o | Till character backward (jump to just after match)   |
+| `;`  | n, v | Repeat last f/F/t/T motion (same direction)          |
+| `,`  | n, v | Repeat last f/F/t/T motion (reversed direction)      |
+| `gs` | n    | Visual select via labels — pick two targets, enter visual mode |
 
 > Multi-window: labels appear in all visible splits.
 
@@ -162,7 +172,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>🌳 Treesitter</b> — <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>daa</code> <code>caa</code> <code>yaa</code> <code>dfn</code> <code>cfn</code> <code>yfn</code> 🪟</summary>
+<summary><b>🌳 Treesitter</b> — <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>]b</code> <code>[b</code> <code>daa</code> <code>caa</code> <code>yaa</code> <code>dfn</code> <code>cfn</code> <code>yfn</code> <code>saa</code> 🪟</summary>
 
 | Key   | Mode | Description                                   |
 |-------|------|-----------------------------------------------|
@@ -170,16 +180,19 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 | `[[`  | n, o | Jump to previous function                     |
 | `]c`  | n, o | Jump to next class/struct                     |
 | `[c`  | n, o | Jump to previous class/struct                 |
+| `]b`  | n, o | Jump to next block/scope (if, for, while, try, etc.) |
+| `[b`  | n, o | Jump to previous block/scope                  |
 | `daa` | n    | Delete around argument (includes separator)   |
 | `caa` | n    | Change argument                               |
 | `yaa` | n    | Yank argument                                 |
 | `dfn` | n    | Delete function name                          |
 | `cfn` | n    | Change function name (rename)                 |
 | `yfn` | n    | Yank function name                            |
+| `saa` | n    | Swap two arguments — pick two, swap their positions |
 
 Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, and Ruby. Non-matching node types are safely ignored.
 
-> Multi-window: navigation motions (`]]`, `[[`, `]c`, `[c`) show labels across all visible splits. Editing motions stay in the current buffer.
+> Multi-window: navigation motions (`]]`, `[[`, `]c`, `[c`, `]b`, `[b`) show labels across all visible splits. Editing motions stay in the current buffer.
 
 </details>
 
@@ -198,11 +211,13 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 </details>
 
 <details>
-<summary><b>🔁 Misc</b> — <code>.</code></summary>
+<summary><b>🔁 Misc</b> — <code>.</code> <code>gmd</code> <code>gmy</code></summary>
 
-| Key | Mode | Description            |
-|-----|------|------------------------|
-| `.` | n    | Repeat last SmartMotion |
+| Key   | Mode | Description                                          |
+|-------|------|------------------------------------------------------|
+| `.`   | n    | Repeat last SmartMotion                               |
+| `gmd` | n    | Multi-cursor delete — toggle-select words, press Enter to delete all |
+| `gmy` | n    | Multi-cursor yank — toggle-select words, press Enter to yank all    |
 
 </details>
 
@@ -236,7 +251,7 @@ gqj   — format from cursor to labeled line
 >]]   — indent from cursor to labeled function
 ```
 
-All jump-only motions (`w`, `b`, `e`, `ge`, `j`, `k`, `s`, `f`, `F`, `]]`, `[[`, `]c`, `[c`, `]d`, `[d`, `]e`, `[e`) are available in operator-pending mode. SmartMotion's own operators (`d`, `y`, `c`, `p`, `P`) are not — they handle operators internally via inference.
+All jump-only motions (`w`, `b`, `e`, `ge`, `j`, `k`, `s`, `f`, `F`, `t`, `T`, `]]`, `[[`, `]c`, `[c`, `]b`, `[b`, `]d`, `[d`, `]e`, `[e`) are available in operator-pending mode. SmartMotion's own operators (`d`, `y`, `c`, `p`, `P`) and standalone actions (`gs`, `saa`, `gmd`, `gmy`) are not — they handle operations internally.
 
 ---
 
@@ -245,8 +260,8 @@ All jump-only motions (`w`, `b`, `e`, `ge`, `j`, `k`, `s`, `f`, `F`, `]]`, `[[`,
 Search, treesitter navigation, and diagnostic motions collect targets from **all visible splits** — not just the current window. Labels from the current window get priority (closer targets get single-character labels), and selecting a label in another window jumps your cursor there.
 
 Enabled by default for:
-- **Search**: `s`, `f`, `F`
-- **Treesitter navigation**: `]]`, `[[`, `]c`, `[c`
+- **Search**: `s`, `f`, `F`, `t`, `T`, `;`, `,`, `gs`
+- **Treesitter navigation**: `]]`, `[[`, `]c`, `[c`, `]b`, `[b`
 - **Diagnostics**: `]d`, `[d`, `]e`, `[e`
 
 Word and line motions (`w`, `b`, `e`, `ge`, `j`, `k`) stay single-window — directional motions within one window are the natural UX.
@@ -353,6 +368,9 @@ Full default configuration:
 
   -- Automatically select when only one target exists
   auto_select_target = false,
+
+  -- Enable label overlay during native / search (toggle with <C-s>)
+  native_search = true,
 }
 ```
 
@@ -369,6 +387,7 @@ Highlight values accept either a string (existing highlight group name) or a tab
 | `dim` | `SmartMotionDim` | Backdrop for non-target text |
 | `search_prefix` | `SmartMotionSearchPrefix` | Search prefix label |
 | `search_prefix_dim` | `SmartMotionSearchPrefixDim` | Dimmed search prefix |
+| `selected` | `SmartMotionSelected` | Multi-cursor selected target |
 
 ```lua
 highlight = {

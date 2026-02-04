@@ -11,6 +11,7 @@ local default_highlights = {
 	SmartMotionDim = { fg = "#555555", bg = "none" },
 	SmartMotionSearchPrefix = { fg = "#BBBBBB", bg = "none" },
 	SmartMotionSearchPrefixDim = { fg = "#888888", bg = "none" },
+	SmartMotionSelected = { fg = "#FAFAFA", bg = "#2FD070", bold = true },
 }
 
 local background_highlights = {
@@ -21,6 +22,7 @@ local background_highlights = {
 	SmartMotionDim = { fg = "#555555", bg = "none" },
 	SmartMotionSearchPrefix = { fg = "#E0E0E0", bg = "#333333" },
 	SmartMotionSearchPrefixDim = { fg = "#AAAAAA", bg = "#1F1F1F" },
+	SmartMotionSelected = { fg = "#FAFAFA", bg = "#2FD070", bold = true },
 }
 
 local M = {}

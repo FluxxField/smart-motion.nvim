@@ -42,7 +42,7 @@ gq]]  — format from cursor to labeled function
 
 ### Which motions support it?
 
-All jump-only motions: `w`, `b`, `e`, `ge`, `j`, `k`, `s`, `f`, `F`, `]]`, `[[`, `]c`, `[c`, `]d`, `[d`, `]e`, `[e`.
+All jump-only motions: `w`, `b`, `e`, `ge`, `j`, `k`, `s`, `f`, `F`, `t`, `T`, `]]`, `[[`, `]c`, `[c`, `]b`, `[b`, `]d`, `[d`, `]e`, `[e`.
 
 SmartMotion's own operators (`d`, `y`, `c`, `p`, `P`) and composites (`dt`, `yt`, `ct`, `daa`, `cfn`, etc.) are **not** registered in `"o"` mode — they handle operations internally via the inference system.
 
@@ -82,6 +82,96 @@ sm.motions.register("my_search", {
   trigger = "<leader>s",
 })
 ```
+
+---
+
+## 🎯 Till Motions & Char Repeat
+
+### t/T — Till Character
+
+`t` and `T` are single-character "till" motions. They prompt for one character, then label all matches — but the jump lands just **before** (for `t`) or just **after** (for `T`) the matched character rather than on it.
+
+- `t` → forward: cursor lands at `col - 1` of the match
+- `T` → backward: cursor lands at `col + 1` of the match
+
+Both work in normal and operator-pending mode. In operator-pending mode, `dt` deletes from cursor to just before the character — matching native vim behavior.
+
+### ;/, — Repeat Last Char Motion
+
+After any `f`/`F`/`t`/`T` motion, the last search state (text, direction, exclude_target) is saved. Press `;` to repeat in the same direction, `,` to repeat in the reversed direction.
+
+Both `;` and `,` show labels across all visible windows for selection — they don't just jump to the next match like native vim. This gives you full control over which match to jump to.
+
+---
+
+## 🔎 Native Search Labels
+
+When `native_search` is enabled (default), SmartMotion enhances vim's built-in `/` search:
+
+1. Press `/` and start typing — incremental match highlights appear in real-time
+2. Press Enter to close the search prompt
+3. Labels appear on all visible matches — pick one to jump there instantly
+4. Press `<C-s>` during search to toggle the label overlay on/off
+
+This is disabled in operator-pending mode (since operators need native search behavior). Configure via:
+
+```lua
+opts = {
+  native_search = true,  -- default: enabled
+}
+```
+
+---
+
+## 🌳 Scope-Aware Motions
+
+`]b` and `[b` jump to block/scope boundaries — control flow, loops, exception handling, and closures:
+
+- **Control flow**: `if`, `switch`, `match`, `case`, `else`, `elif`
+- **Loops**: `for`, `while`, `do`, `repeat`, `loop`
+- **Exception handling**: `try`, `catch`, `except`, `finally`
+- **Blocks/closures**: `block`, `lambda`, `closure`, `with`, `do_block`
+
+These work across all languages with treesitter support. Labels appear in all visible windows. Available in both normal and operator-pending mode.
+
+---
+
+## 👁️ Visual Range Selection
+
+`gs` lets you pick two word targets and enters visual mode spanning the range:
+
+1. Press `gs` — labels appear on all visible words (across windows)
+2. Pick the first target — it highlights while labels re-render for the second pick
+3. Pick the second target — visual mode activates from the first to the second position
+
+If the two targets are in different order, they're automatically sorted so the selection goes from earlier to later. If the first target is in a different window, the cursor switches to that window.
+
+---
+
+## 🔄 Argument Swap
+
+`saa` picks two treesitter arguments and swaps their text:
+
+1. Press `saa` — labels appear on all function/method arguments in the current buffer
+2. Pick the first argument — it highlights while labels re-render
+3. Pick the second argument — both arguments swap positions
+
+The swap replaces the later position first to avoid offset corruption. Works with any language that has treesitter support for argument/parameter lists.
+
+---
+
+## ✏️ Multi-Cursor Edit
+
+`gmd` (delete) and `gmy` (yank) provide toggle-based multi-selection:
+
+1. Press `gmd` or `gmy` — labels appear on all visible words
+2. Press label keys to **toggle** targets on/off — selected targets turn green (`SmartMotionSelected`)
+3. Press **Enter** to confirm, **ESC** to cancel
+4. Action executes on all selected targets:
+   - `gmd`: deletes each selected word (processed bottom-to-top for position stability)
+   - `gmy`: yanks all selected words into the `"` register (newline-separated, in document order)
+
+Double-character labels work too — press the first character, then the second to toggle that target.
 
 ---
 
@@ -141,6 +231,7 @@ SmartMotion allows full control over highlight groups. You can change foreground
 | `second_char`     | SmartMotionSecondChar    | Brighter second label character      |
 | `second_char_dim` | SmartMotionSecondCharDim | Dimmed second label character        |
 | `dim`             | SmartMotionDim           | Background dim when not in selection |
+| `selected`        | SmartMotionSelected      | Multi-cursor selected target (green) |
 
 ### Setting Custom Highlights
 
