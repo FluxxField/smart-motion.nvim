@@ -144,7 +144,50 @@ function presets.search(exclude)
 				},
 			},
 		},
+		t = {
+			collector = "lines",
+			extractor = "text_search_1_char_until",
+			filter = "filter_words_after_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n", "o" },
+			metadata = {
+				label = "Till Character After Cursor",
+				description = "Jump to just before the searched character after cursor",
+				motion_state = {
+					multi_window = true,
+				},
+			},
+		},
+		T = {
+			collector = "lines",
+			extractor = "text_search_1_char_until",
+			filter = "filter_words_before_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n", "o" },
+			metadata = {
+				label = "Till Character Before Cursor",
+				description = "Jump to just after the searched character before cursor",
+				motion_state = {
+					multi_window = true,
+				},
+			},
+		},
 	}, exclude)
+
+	-- Register ;/, keymaps for repeating last f/F/t/T
+	local char_repeat = require("smart-motion.search.char_repeat")
+
+	vim.keymap.set({ "n", "v" }, ";", function()
+		char_repeat.run(false)
+	end, { desc = "Repeat last char motion", noremap = true, silent = true })
+
+	vim.keymap.set({ "n", "v" }, ",", function()
+		char_repeat.run(true)
+	end, { desc = "Repeat last char motion (reversed)", noremap = true, silent = true })
 end
 
 --- @param exclude? SmartMotionPresetKey.Delete[]

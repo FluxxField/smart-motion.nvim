@@ -34,7 +34,7 @@
 
 ---@alias SmartMotionPresetKey.Words "w" | "b" | "e" | "ge"
 ---@alias SmartMotionPresetKey.Lines "j" | "k"
----@alias SmartMotionPresetKey.Search "s" | "S" | "f" | "F"
+---@alias SmartMotionPresetKey.Search "s" | "S" | "f" | "F" | "t" | "T"
 ---@alias SmartMotionPresetKey.Delete "d" | "dt" | "dT" | "df" | "dF" | "rdw" | "rdl"
 ---@alias SmartMotionPresetKey.Yank "y" | "yt" | "yT" | "yf" | "yF" | "ryw" | "ryl"
 ---@alias SmartMotionPresetKey.Change "c" | "ct" | "cT" | "cf" | "cF"
@@ -88,6 +88,7 @@
 --- @field sort_descending? boolean
 --- @field timeout_after_input? boolean
 --- @field word_pattern? string
+--- @field multi_window? boolean
 --- @field paste_mode? 'before' | 'after'
 --- @field keys? fun(motion_state: SmartMotionMotionState): string[]
 --- @field ts_query? string -- Raw treesitter query string
