@@ -29,11 +29,15 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 - ✂️ **Until motions** — `dt`, `yt`, `ct` operate from cursor to a labeled character on the current line
 - 📡 **Remote operations** — `rdw`, `rdl`, `ryw`, `ryl` delete or yank words and lines without moving the cursor
 - 🌳 **Treesitter-aware motions** — jump to functions (`]]`/`[[`), classes (`]c`/`[c`), scopes/blocks (`]b`/`[b`), delete/change/yank function names (`dfn`, `cfn`, `yfn`), and arguments (`daa`, `caa`, `yaa`)
+- 🌲 **Treesitter incremental select** — `gS` selects node at cursor, `;` expands to parent, `,` shrinks to child
+- 🔎 **Treesitter search** — `R` searches text and selects the surrounding syntax node (works with operators: `dR`, `yR`, `cR`)
 - 🩺 **Diagnostics jumping** — navigate all diagnostics (`]d`/`[d`) or errors only (`]e`/`[e`)
 - 🔎 **2-char find** — `f`/`F` for leap-style two-character search with labels
 - 🔍 **Live search** — `s` for incremental search with labeled results across all visible text
+- 🔎 **Fuzzy search** — `S` for fuzzy matching (type "fn" to match "function", "filename", etc.)
 - 🎯 **Till motions** — `t`/`T` for single-character till (jump to just before/after the match), with `;`/`,` to repeat
-- 🔎 **Native search labels** — `<C-s>` during `/` search toggles label overlay on matches
+- 🔎 **Native search labels** — `/` shows labels incrementally as you type, `<C-s>` toggles labels on/off
+- 🧠 **Label conflict avoidance** — labels can't be valid search continuations (no ambiguity)
 - 🪟 **Multi-window jumping** — search, treesitter, and diagnostic motions show labels across all visible splits. Select a label in another window and jump there instantly.
 - ⚙️ **Operator-pending mode** — use SmartMotion motions with any vim operator (`>w`, `gUw`, `=j`, `gqj`, etc.)
 - 👁️ **Visual range selection** — `gs` picks two targets, enters visual mode spanning the range
@@ -107,11 +111,12 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>🔍 Search</b> — <code>s</code> <code>f</code> <code>F</code> <code>t</code> <code>T</code> <code>;</code> <code>,</code> <code>gs</code> 🪟</summary>
+<summary><b>🔍 Search</b> — <code>s</code> <code>S</code> <code>f</code> <code>F</code> <code>t</code> <code>T</code> <code>;</code> <code>,</code> <code>gs</code> 🪟</summary>
 
 | Key  | Mode | Description                                          |
 |------|------|------------------------------------------------------|
 | `s`  | n, o | Live search across all visible text with labels      |
+| `S`  | n, o | Fuzzy search — type partial patterns to match words  |
 | `f`  | n, o | 2-char find forward with labels                      |
 | `F`  | n, o | 2-char find backward with labels                     |
 | `t`  | n, o | Till character forward (jump to just before match)   |
@@ -120,7 +125,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 | `,`  | n, v | Repeat last f/F/t/T motion (reversed direction)      |
 | `gs` | n    | Visual select via labels — pick two targets, enter visual mode |
 
-> Multi-window: labels appear in all visible splits.
+> Multi-window: labels appear in all visible splits. Label conflict avoidance ensures labels can't be valid search continuations.
 
 </details>
 
@@ -172,23 +177,25 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>🌳 Treesitter</b> — <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>]b</code> <code>[b</code> <code>daa</code> <code>caa</code> <code>yaa</code> <code>dfn</code> <code>cfn</code> <code>yfn</code> <code>saa</code> 🪟</summary>
+<summary><b>🌳 Treesitter</b> — <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>]b</code> <code>[b</code> <code>daa</code> <code>caa</code> <code>yaa</code> <code>dfn</code> <code>cfn</code> <code>yfn</code> <code>saa</code> <code>gS</code> <code>R</code> 🪟</summary>
 
-| Key   | Mode | Description                                   |
-|-------|------|-----------------------------------------------|
-| `]]`  | n, o | Jump to next function                         |
-| `[[`  | n, o | Jump to previous function                     |
-| `]c`  | n, o | Jump to next class/struct                     |
-| `[c`  | n, o | Jump to previous class/struct                 |
-| `]b`  | n, o | Jump to next block/scope (if, for, while, try, etc.) |
-| `[b`  | n, o | Jump to previous block/scope                  |
-| `daa` | n    | Delete around argument (includes separator)   |
-| `caa` | n    | Change argument                               |
-| `yaa` | n    | Yank argument                                 |
-| `dfn` | n    | Delete function name                          |
-| `cfn` | n    | Change function name (rename)                 |
-| `yfn` | n    | Yank function name                            |
-| `saa` | n    | Swap two arguments — pick two, swap their positions |
+| Key   | Mode    | Description                                           |
+|-------|---------|-------------------------------------------------------|
+| `]]`  | n, o    | Jump to next function                                 |
+| `[[`  | n, o    | Jump to previous function                             |
+| `]c`  | n, o    | Jump to next class/struct                             |
+| `[c`  | n, o    | Jump to previous class/struct                         |
+| `]b`  | n, o    | Jump to next block/scope (if, for, while, try, etc.)  |
+| `[b`  | n, o    | Jump to previous block/scope                          |
+| `daa` | n       | Delete around argument (includes separator)           |
+| `caa` | n       | Change argument                                       |
+| `yaa` | n       | Yank argument                                         |
+| `dfn` | n       | Delete function name                                  |
+| `cfn` | n       | Change function name (rename)                         |
+| `yfn` | n       | Yank function name                                    |
+| `saa` | n       | Swap two arguments — pick two, swap their positions   |
+| `gS`  | n, x    | Treesitter incremental select — `;` expand, `,` shrink |
+| `R`   | n, x, o | Treesitter search — search text, select surrounding node |
 
 Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, and Ruby. Non-matching node types are safely ignored.
 

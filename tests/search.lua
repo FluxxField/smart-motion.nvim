@@ -1,8 +1,9 @@
 -- SmartMotion Playground: Search Motions
--- Presets: s, f, F, t, T, ;, ,, gs, native /
+-- Presets: s, S, f, F, t, T, ;, ,, gs, native /
 --
 -- INSTRUCTIONS:
---   s     → live search: type characters, labels narrow as you type
+--   s     → live search: type characters, labels narrow as you type (literal)
+--   S     → fuzzy search: type partial patterns (e.g., "fn" matches "function")
 --   f     → 2-char find AFTER cursor (type 2 chars, then pick label)
 --   F     → 2-char find BEFORE cursor
 --   t     → till char AFTER cursor (jumps one BEFORE the match)
@@ -12,8 +13,12 @@
 --   gs    → visual range select: pick start word, pick end word → visual selection
 --
 -- NATIVE SEARCH:
---   /     → type pattern, press Enter. Labels appear on matches.
+--   /     → type pattern, labels appear incrementally as you type!
 --   <C-s> → toggle SmartMotion labels on/off during search
+--
+-- LABEL CONFLICT AVOIDANCE:
+--   When searching "fo" and matches include "foo", "for", "fox":
+--   Labels "o", "r", "x" are excluded (they could be search continuations)
 --
 -- MULTI-WINDOW:
 --   :vsplit tests/words_lines.lua
@@ -223,3 +228,63 @@ local function receive_message(connection, timeout)
   print(string.format("Waiting %dms for message from %s", timeout, connection.host))
   return "response"
 end
+
+-- ── Section 7: Fuzzy search with S ─────────────────────────────
+
+-- FUZZY SEARCH TEST:
+-- Press S (capital S) to start fuzzy search
+-- Type partial patterns — they match non-consecutively:
+--   "fn"  → matches "function", "firstName", "filename"
+--   "cfg" → matches "config", "configure", "configuration"
+--   "usr" → matches "user", "username", "userService"
+
+local function createUserService(config)
+  return {
+    config = config,
+    users = {},
+    authenticate = function(self, username, password)
+      return self.users[username] and self.users[username].password == password
+    end,
+  }
+end
+
+local function configureApplication(settings)
+  local configuration = {
+    debug = settings.debug or false,
+    logLevel = settings.logLevel or "info",
+    maxConnections = settings.maxConnections or 100,
+  }
+  return configuration
+end
+
+local function fetchUserProfile(userId)
+  local firstName = "John"
+  local lastName = "Doe"
+  local userEmail = "john.doe@example.com"
+  return {
+    id = userId,
+    firstName = firstName,
+    lastName = lastName,
+    email = userEmail,
+  }
+end
+
+local function validateUsername(username)
+  if not username or #username < 3 then
+    return false, "Username too short"
+  end
+  if username:match("[^%w_]") then
+    return false, "Username contains invalid characters"
+  end
+  return true
+end
+
+-- Try: S then "fn" — matches function, firstName
+-- Try: S then "cfg" — matches config, configure, configuration
+-- Try: S then "usr" — matches user, username, userService, userEmail
+-- Try: S then "val" — matches validate, validateUsername, valid
+
+-- SCORING TEST:
+-- Fuzzy matches are sorted by score (best matches first)
+-- Word boundary matches score higher than mid-word matches
+-- Consecutive matches score higher than spread-out matches

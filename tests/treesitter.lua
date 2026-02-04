@@ -1,5 +1,5 @@
 -- SmartMotion Playground: Treesitter Motions
--- Presets: ]], [[, ]c, [c, ]b, [b, daa, caa, yaa, dfn, cfn, yfn, saa
+-- Presets: ]], [[, ]c, [c, ]b, [b, daa, caa, yaa, dfn, cfn, yfn, saa, gS, R
 --
 -- INSTRUCTIONS:
 --   ]]  → jump to next function definition
@@ -15,6 +15,8 @@
 --   cfn → change function name
 --   yfn → yank function name
 --   saa → swap two arguments (pick first, pick second, they swap)
+--   gS  → treesitter incremental select (start at cursor, ; expand, , shrink)
+--   R   → treesitter search (search text → select surrounding node)
 --
 -- MULTI-WINDOW:
 --   :vsplit tests/search.lua
@@ -353,3 +355,84 @@ end
 
 -- Try: dfn — labels appear on validate_email, validate_phone, validate_url, etc.
 -- Try: cfn on validate_email — deletes the name, enters insert mode to type new one
+
+-- ── Section 6: Treesitter Incremental Select (gS) ─────────────
+
+-- INCREMENTAL SELECT TEST:
+-- 1. Place cursor inside a function, on a variable, or in an expression
+-- 2. Press gS — visual selection starts on smallest node at cursor
+-- 3. Press ; — selection expands to parent node
+-- 4. Press ; again — expands further up the tree
+-- 5. Press , — selection shrinks to child node
+-- 6. Press Enter — confirms selection
+-- 7. Press ESC — cancels and exits visual mode
+--
+-- Watch the echo area: shows node type and position [n/total]
+
+local function incremental_select_demo()
+  local deeply = {
+    nested = {
+      data = {
+        value = calculate_something(1, 2, 3),
+      },
+    },
+  }
+  -- Try: place cursor on "calculate_something", press gS
+  -- Then: ; to expand to call expression, ; to expand to table field, etc.
+  return deeply.nested.data.value
+end
+
+local function calculate_something(a, b, c)
+  local result = (a + b) * c
+  -- Try: place cursor on "a", press gS, then ; repeatedly
+  -- Watch: identifier → binary_expression → parenthesized_expression → etc.
+  if result > 100 then
+    return result - 50
+  else
+    return result + 50
+  end
+end
+
+-- ── Section 7: Treesitter Search (R) ──────────────────────────
+
+-- TREESITTER SEARCH TEST:
+-- Press R, type search text, labels appear on TS nodes containing matches
+-- Select a label → the entire TS node is selected (not just the text match)
+--
+-- OPERATOR-PENDING MODE:
+--   dR → delete the node containing search text
+--   yR → yank the node containing search text
+--   cR → change the node containing search text
+--
+-- NORMAL/VISUAL MODE:
+--   R → select the node containing search text
+
+local function treesitter_search_demo()
+  local config = {
+    host = "localhost",
+    port = 8080,
+    debug = true,
+  }
+  -- Try: R then type "host" — labels appear on nodes containing "host"
+  -- Select a label — the entire field (key = value) is selected
+
+  local message = "Hello, " .. config.host .. ":" .. config.port
+  -- Try: dR then type "Hello" — deletes the string assignment
+  -- Try: yR then type "config" — yanks the table containing the match
+
+  return message
+end
+
+local function another_search_target()
+  local users = {
+    { name = "Alice", role = "admin" },
+    { name = "Bob", role = "user" },
+    { name = "Charlie", role = "user" },
+  }
+  -- Try: R then type "Alice" — select the node containing "Alice"
+  -- Try: dR then type "Bob" — delete the entire table entry containing "Bob"
+
+  for _, user in ipairs(users) do
+    print(user.name .. " is " .. user.role)
+  end
+end

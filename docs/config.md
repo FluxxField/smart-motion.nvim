@@ -26,7 +26,7 @@ local default_config = {
   disable_dim_background = false,
   history_max_size = 20,
   auto_select_target = false,
-  native_search = true, -- label overlay during / search (toggle with <C-s>)
+  native_search = true, -- incremental labels during / search (toggle with <C-s>)
 }
 ```
 
