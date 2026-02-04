@@ -21,24 +21,24 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 
 ---
 
-## Features
+## ✨ Features
 
-- **Word, line, and search jumping** with home-row hint labels — forward, backward, start, end
-- **Flow State** — chain motions without re-triggering; press `w` → select → press `w` again instantly
-- **Composable d/y/c/p** — `d` + any motion deletes, `y` + any motion yanks, `c` + any motion changes, with visual feedback at every step
-- **Until motions** — `dt`, `yt`, `ct` operate from cursor to a labeled character on the current line
-- **Remote operations** — `rdw`, `rdl`, `ryw`, `ryl` delete or yank words and lines without moving the cursor
-- **Treesitter-aware motions** — jump to functions (`]]`/`[[`), classes (`]c`/`[c`), delete/change/yank function names (`dfn`, `cfn`, `yfn`), and arguments (`daa`, `caa`, `yaa`)
-- **Diagnostics jumping** — navigate all diagnostics (`]d`/`[d`) or errors only (`]e`/`[e`)
-- **2-char find** — `f`/`F` for leap-style two-character search with labels
-- **Live search** — `s`/`S` for incremental search with labeled results
-- **Repeat** — `.` repeats the last SmartMotion
-- **Fully modular pipeline** — Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action. Every stage is replaceable. Build entirely custom motions from scratch.
-- **10 presets, 40 keybindings** — enable what you want, disable what you don't
+- ⚡ **Word, line, and search jumping** with home-row hint labels — forward, backward, start, end
+- 🌊 **Flow State** — chain motions without re-triggering; press `w` → select → press `w` again instantly
+- 🔀 **Composable d/y/c/p** — `d` + any motion deletes, `y` + any motion yanks, `c` + any motion changes, with visual feedback at every step
+- ✂️ **Until motions** — `dt`, `yt`, `ct` operate from cursor to a labeled character on the current line
+- 📡 **Remote operations** — `rdw`, `rdl`, `ryw`, `ryl` delete or yank words and lines without moving the cursor
+- 🌳 **Treesitter-aware motions** — jump to functions (`]]`/`[[`), classes (`]c`/`[c`), delete/change/yank function names (`dfn`, `cfn`, `yfn`), and arguments (`daa`, `caa`, `yaa`)
+- 🩺 **Diagnostics jumping** — navigate all diagnostics (`]d`/`[d`) or errors only (`]e`/`[e`)
+- 🔎 **2-char find** — `f`/`F` for leap-style two-character search with labels
+- 🔍 **Live search** — `s`/`S` for incremental search with labeled results
+- 🔁 **Repeat** — `.` repeats the last SmartMotion
+- 🧩 **Fully modular pipeline** — Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action. Every stage is replaceable. Build entirely custom motions from scratch.
+- 📦 **10 presets, 40 keybindings** — enable what you want, disable what you don't
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
 Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 
@@ -73,12 +73,12 @@ presets = {
 
 ---
 
-## What You Get
+## 🎯 What You Get
 
 Every preset and its keybindings at a glance. Enable a preset and all its bindings are ready.
 
 <details>
-<summary><b>Words</b> — <code>w</code> <code>b</code> <code>e</code> <code>ge</code></summary>
+<summary><b>⚡ Words</b> — <code>w</code> <code>b</code> <code>e</code> <code>ge</code></summary>
 
 | Key  | Mode | Description                          |
 |------|------|--------------------------------------|
@@ -90,7 +90,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>Lines</b> — <code>j</code> <code>k</code></summary>
+<summary><b>📏 Lines</b> — <code>j</code> <code>k</code></summary>
 
 | Key | Mode | Description                  |
 |-----|------|------------------------------|
@@ -100,7 +100,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>Search</b> — <code>s</code> <code>S</code> <code>f</code> <code>F</code></summary>
+<summary><b>🔍 Search</b> — <code>s</code> <code>S</code> <code>f</code> <code>F</code></summary>
 
 | Key | Mode | Description                             |
 |-----|------|-----------------------------------------|
@@ -112,7 +112,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>Delete</b> — <code>d</code> <code>dt</code> <code>dT</code> <code>rdw</code> <code>rdl</code></summary>
+<summary><b>🗑️ Delete</b> — <code>d</code> <code>dt</code> <code>dT</code> <code>rdw</code> <code>rdl</code></summary>
 
 | Key   | Mode | Description                                    |
 |-------|------|------------------------------------------------|
@@ -125,7 +125,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>Yank</b> — <code>y</code> <code>yt</code> <code>yT</code> <code>ryw</code> <code>ryl</code></summary>
+<summary><b>📋 Yank</b> — <code>y</code> <code>yt</code> <code>yT</code> <code>ryw</code> <code>ryl</code></summary>
 
 | Key   | Mode | Description                                   |
 |-------|------|-----------------------------------------------|
@@ -138,7 +138,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>Change</b> — <code>c</code> <code>ct</code> <code>cT</code></summary>
+<summary><b>✏️ Change</b> — <code>c</code> <code>ct</code> <code>cT</code></summary>
 
 | Key  | Mode | Description                                    |
 |------|------|------------------------------------------------|
@@ -149,7 +149,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>Paste</b> — <code>p</code> <code>P</code></summary>
+<summary><b>📌 Paste</b> — <code>p</code> <code>P</code></summary>
 
 | Key | Mode | Description                                   |
 |-----|------|-----------------------------------------------|
@@ -159,7 +159,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>Treesitter</b> — <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>daa</code> <code>caa</code> <code>yaa</code> <code>dfn</code> <code>cfn</code> <code>yfn</code></summary>
+<summary><b>🌳 Treesitter</b> — <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>daa</code> <code>caa</code> <code>yaa</code> <code>dfn</code> <code>cfn</code> <code>yfn</code></summary>
 
 | Key   | Mode | Description                                   |
 |-------|------|-----------------------------------------------|
@@ -179,7 +179,7 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 </details>
 
 <details>
-<summary><b>Diagnostics</b> — <code>]d</code> <code>[d</code> <code>]e</code> <code>[e</code></summary>
+<summary><b>🩺 Diagnostics</b> — <code>]d</code> <code>[d</code> <code>]e</code> <code>[e</code></summary>
 
 | Key  | Mode | Description                         |
 |------|------|-------------------------------------|
@@ -191,7 +191,7 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 </details>
 
 <details>
-<summary><b>Misc</b> — <code>.</code></summary>
+<summary><b>🔁 Misc</b> — <code>.</code></summary>
 
 | Key | Mode | Description            |
 |-----|------|------------------------|
@@ -201,7 +201,7 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 
 ---
 
-## Flow State
+## 🌊 Flow State
 
 Press a motion key, see labels, select a target. Then press the same key (or a different motion key) again within the timeout window — labels appear instantly with no re-trigger delay. You're in flow.
 
@@ -217,7 +217,7 @@ opts = {
 
 ---
 
-## Why SmartMotion?
+## 🧩 Why SmartMotion?
 
 Every motion plugin does one thing well. SmartMotion does all of them — and exposes the machinery so you can build your own.
 
@@ -278,7 +278,7 @@ For a full guide on building custom motions, see [docs/custom_motion.md](./docs/
 ---
 
 <details>
-<summary><h2>Configuration</h2></summary>
+<summary><h2>⚙️ Configuration</h2></summary>
 
 Full default configuration:
 
@@ -318,7 +318,19 @@ Full default configuration:
 }
 ```
 
+### 🎨 Highlight Customization
+
 Highlight values accept either a string (existing highlight group name) or a table (color definition):
+
+| Group | Default | Description |
+|-------|---------|-------------|
+| `hint` | `SmartMotionHint` | Primary jump label |
+| `hint_dim` | `SmartMotionHintDim` | Dimmed secondary label |
+| `two_char_hint` | `SmartMotionTwoCharHint` | Two-character jump label |
+| `two_char_hint_dim` | `SmartMotionTwoCharHintDim` | Dimmed two-character label |
+| `dim` | `SmartMotionDim` | Backdrop for non-target text |
+| `search_prefix` | `SmartMotionSearchPrefix` | Search prefix label |
+| `search_prefix_dim` | `SmartMotionSearchPrefixDim` | Dimmed search prefix |
 
 ```lua
 highlight = {
@@ -328,15 +340,23 @@ highlight = {
 }
 ```
 
+Toggle background-style hints:
+
+```lua
+opts = {
+  use_background_highlights = true,
+}
+```
+
 For full configuration documentation, see [docs/config.md](./docs/config.md).
 
 </details>
 
 ---
 
-## Acknowledgments
+## 📦 Alternatives
 
-SmartMotion stands on the shoulders of giants. Inspiration and foundational ideas come from:
+SmartMotion is inspired by and aims to unify the best ideas from:
 
 - [hop.nvim](https://github.com/phaazon/hop.nvim)
 - [flash.nvim](https://github.com/folke/flash.nvim)
@@ -346,20 +366,20 @@ SmartMotion stands on the shoulders of giants. Inspiration and foundational idea
 
 ---
 
-## License
+## 📜 License
 
 Licensed under [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html).
 
-## Author
+## 👤 Author
 
 Built by [FluxxField](https://github.com/FluxxField)
 Business inquiries: [keenanjj13@protonmail.com](mailto:keenanjj13@protonmail.com)
 
-> Also builds premium websites: [SLP Custom Built](https://www.slpcustombuilt.com), [Cornerstone Homes](https://www.cornerstonehomesok.com)
+> ✨ Also builds premium websites: [SLP Custom Built](https://www.slpcustombuilt.com), [Cornerstone Homes](https://www.cornerstonehomesok.com)
 
 ---
 
-For full documentation, visit the [docs/](./docs) directory:
+📖 For full documentation, visit the [docs/](./docs) directory:
 
 - [Configuration](./docs/config.md)
 - [Presets](./docs/presets.md)
