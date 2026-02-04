@@ -32,9 +32,9 @@
 ---@alias SmartMotionPresetKey.Words "w" | "b" | "e" | "ge"
 ---@alias SmartMotionPresetKey.Lines "j" | "k"
 ---@alias SmartMotionPresetKey.Search "s" | "S" | "f" | "F"
----@alias SmartMotionPresetKey.Delete "d" | "dt" | "dT" | "rdw" | "rdl"
----@alias SmartMotionPresetKey.Yank "y" | "yt" | "yT" | "ryw" | "ryl"
----@alias SmartMotionPresetKey.Change "c" | "ct" | "cT"
+---@alias SmartMotionPresetKey.Delete "d" | "dt" | "dT" | "df" | "dF" | "rdw" | "rdl"
+---@alias SmartMotionPresetKey.Yank "y" | "yt" | "yT" | "yf" | "yF" | "ryw" | "ryl"
+---@alias SmartMotionPresetKey.Change "c" | "ct" | "cT" | "cf" | "cF"
 
 ---@class SmartMotionPresetsModule
 ---@field words fun(exclude?: SmartMotionPresetKey.Words[])

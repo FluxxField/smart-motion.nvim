@@ -88,7 +88,7 @@ function M.resume_flow()
 
 	M.last_motion_timestamp = M.last_motion_timestamp + paused_duration
 	M.is_paused = false
-	M.is_pause_started_at = nil
+	M.pause_started_at = nil
 
 	log.debug("Resumed flow - adjusted timestamp by " .. paused_duration .. "ms")
 end

@@ -1,4 +1,5 @@
 local log = require("smart-motion.core.log")
+local resolve_range = require("smart-motion.actions.utils").resolve_range
 
 ---@type SmartMotionActionModuleEntry
 local M = {}
@@ -10,36 +11,21 @@ function M.run(ctx, cfg, motion_state)
 	local target = motion_state.selected_jump_target
 	local bufnr = target.metadata.bufnr
 	local winid = target.metadata.winid
-	local row = target.end_pos.row
-	local col = target.end_pos.col
+	local start_row, start_col, end_row, end_col = resolve_range(ctx, motion_state)
 
-	local line = vim.api.nvim_buf_get_lines(bufnr, row, row + 1, false)[1] or ""
-
-	if col >= #line then
-		vim.cmd("normal! C")
-		vim.cmd("startinsert!")
+	if target.type == "lines" and not motion_state.exclude_target then
+		local lines = vim.api.nvim_buf_get_lines(bufnr, start_row, end_row + 1, false)
+		vim.fn.setreg('"', table.concat(lines, "\n"), "l")
+		vim.api.nvim_buf_set_lines(bufnr, start_row, end_row + 1, false, { "" })
+		vim.api.nvim_win_set_cursor(winid, { start_row + 1, 0 })
 	else
-		local ok, pos = pcall(vim.api.nvim_win_get_cursor, winid)
-
-		if ok and pos then
-			local cur_row, cur_col = unpack(pos)
-
-			if motion_state.exclude_target then
-				col = math.max(0, col - 1)
-			end
-
-			vim.api.nvim_buf_set_mark(bufnr, ">", row + 1, col, {})
-			vim.cmd("normal! c`>")
-			vim.api.nvim_win_set_cursor(winid, { cur_row, cur_col })
-			vim.cmd("startinsert")
-		end
+		local text = vim.api.nvim_buf_get_text(bufnr, start_row, start_col, end_row, end_col, {})
+		vim.fn.setreg('"', table.concat(text, "\n"), "c")
+		vim.api.nvim_buf_set_text(bufnr, start_row, start_col, end_row, end_col, { "" })
+		vim.api.nvim_win_set_cursor(winid, { start_row + 1, start_col })
 	end
 
-	-- Clear mark
-	local ok = pcall(vim.api.nvim_buf_del_mark, bufnr, ">")
-	if not ok then
-		log.error("Action Change: del_mark failed")
-	end
+	vim.cmd("startinsert")
 end
 
 return M

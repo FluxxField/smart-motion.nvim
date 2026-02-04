@@ -49,7 +49,7 @@ function M.create_motion_state()
 		hint_position = HINT_POSITION.START,
 
 		-- Motion Intent
-		target_type = target_type,
+		target_type = nil,
 
 		-- Motion-specific data (starts empty)
 		jump_target_count = 0,

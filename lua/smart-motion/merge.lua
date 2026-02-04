@@ -35,7 +35,7 @@ local function merge_registry_modules(registry_type, module_names)
 	local metadatas = {}
 
 	for _, name in ipairs(module_names) do
-		local mod = registry.get(name)
+		local mod = registry.get_by_name(name)
 		if not mod then
 			error(string.format("[smart-motion] No %s module found for name: %s", registry_type, name))
 		end
