@@ -49,6 +49,7 @@ function M.run(ctx, cfg, motion_state, data)
 				start_pos = { row = line_number, col = start_col },
 				end_pos = { row = line_number, col = end_col },
 				type = TARGET_TYPES.SEARCH,
+				metadata = data.metadata,
 			})
 
 			col = end_col + 1

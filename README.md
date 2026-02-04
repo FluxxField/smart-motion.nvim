@@ -31,7 +31,9 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 - 🌳 **Treesitter-aware motions** — jump to functions (`]]`/`[[`), classes (`]c`/`[c`), delete/change/yank function names (`dfn`, `cfn`, `yfn`), and arguments (`daa`, `caa`, `yaa`)
 - 🩺 **Diagnostics jumping** — navigate all diagnostics (`]d`/`[d`) or errors only (`]e`/`[e`)
 - 🔎 **2-char find** — `f`/`F` for leap-style two-character search with labels
-- 🔍 **Live search** — `s`/`S` for incremental search with labeled results
+- 🔍 **Live search** — `s` for incremental search with labeled results across all visible text
+- 🪟 **Multi-window jumping** — search, treesitter, and diagnostic motions show labels across all visible splits. Select a label in another window and jump there instantly.
+- ⚙️ **Operator-pending mode** — use SmartMotion motions with any vim operator (`>w`, `gUw`, `=j`, `gqj`, etc.)
 - 🔁 **Repeat** — `.` repeats the last SmartMotion
 - 🧩 **Fully modular pipeline** — Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action. Every stage is replaceable. Build entirely custom motions from scratch.
 - 📦 **10 presets, 40 keybindings** — enable what you want, disable what you don't
@@ -49,7 +51,7 @@ return {
     presets = {
       words = true,        -- w, b, e, ge
       lines = true,        -- j, k
-      search = true,       -- s, S, f, F
+      search = true,       -- s, f, F
       delete = true,       -- d, dt, dT, rdw, rdl
       yank = true,         -- y, yt, yT, ryw, ryl
       change = true,       -- c, ct, cT
@@ -80,34 +82,35 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 <details>
 <summary><b>⚡ Words</b> — <code>w</code> <code>b</code> <code>e</code> <code>ge</code></summary>
 
-| Key  | Mode | Description                          |
-|------|------|--------------------------------------|
-| `w`  | n, v | Jump to start of word after cursor   |
-| `b`  | n, v | Jump to start of word before cursor  |
-| `e`  | n, v | Jump to end of word after cursor     |
-| `ge` | n, v | Jump to end of word before cursor    |
+| Key  | Mode    | Description                          |
+|------|---------|--------------------------------------|
+| `w`  | n, v, o | Jump to start of word after cursor   |
+| `b`  | n, v, o | Jump to start of word before cursor  |
+| `e`  | n, v, o | Jump to end of word after cursor     |
+| `ge` | n, v, o | Jump to end of word before cursor    |
 
 </details>
 
 <details>
 <summary><b>📏 Lines</b> — <code>j</code> <code>k</code></summary>
 
-| Key | Mode | Description                  |
-|-----|------|------------------------------|
-| `j` | n, v | Jump to line after cursor    |
-| `k` | n, v | Jump to line before cursor   |
+| Key | Mode    | Description                  |
+|-----|---------|------------------------------|
+| `j` | n, v, o | Jump to line after cursor    |
+| `k` | n, v, o | Jump to line before cursor   |
 
 </details>
 
 <details>
-<summary><b>🔍 Search</b> — <code>s</code> <code>S</code> <code>f</code> <code>F</code></summary>
+<summary><b>🔍 Search</b> — <code>s</code> <code>f</code> <code>F</code> 🪟</summary>
 
-| Key | Mode | Description                             |
-|-----|------|-----------------------------------------|
-| `s` | n    | Live search forward with labeled results |
-| `S` | n    | Live search backward with labeled results |
-| `f` | n    | 2-char find forward with labels          |
-| `F` | n    | 2-char find backward with labels         |
+| Key | Mode | Description                                          |
+|-----|------|------------------------------------------------------|
+| `s` | n, o | Live search across all visible text with labels      |
+| `f` | n, o | 2-char find forward with labels                      |
+| `F` | n, o | 2-char find backward with labels                     |
+
+> Multi-window: labels appear in all visible splits.
 
 </details>
 
@@ -159,14 +162,14 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>🌳 Treesitter</b> — <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>daa</code> <code>caa</code> <code>yaa</code> <code>dfn</code> <code>cfn</code> <code>yfn</code></summary>
+<summary><b>🌳 Treesitter</b> — <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>daa</code> <code>caa</code> <code>yaa</code> <code>dfn</code> <code>cfn</code> <code>yfn</code> 🪟</summary>
 
 | Key   | Mode | Description                                   |
 |-------|------|-----------------------------------------------|
-| `]]`  | n    | Jump to next function                         |
-| `[[`  | n    | Jump to previous function                     |
-| `]c`  | n    | Jump to next class/struct                     |
-| `[c`  | n    | Jump to previous class/struct                 |
+| `]]`  | n, o | Jump to next function                         |
+| `[[`  | n, o | Jump to previous function                     |
+| `]c`  | n, o | Jump to next class/struct                     |
+| `[c`  | n, o | Jump to previous class/struct                 |
 | `daa` | n    | Delete around argument (includes separator)   |
 | `caa` | n    | Change argument                               |
 | `yaa` | n    | Yank argument                                 |
@@ -176,17 +179,21 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 
 Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, and Ruby. Non-matching node types are safely ignored.
 
+> Multi-window: navigation motions (`]]`, `[[`, `]c`, `[c`) show labels across all visible splits. Editing motions stay in the current buffer.
+
 </details>
 
 <details>
-<summary><b>🩺 Diagnostics</b> — <code>]d</code> <code>[d</code> <code>]e</code> <code>[e</code></summary>
+<summary><b>🩺 Diagnostics</b> — <code>]d</code> <code>[d</code> <code>]e</code> <code>[e</code> 🪟</summary>
 
 | Key  | Mode | Description                         |
 |------|------|-------------------------------------|
-| `]d` | n    | Jump to next diagnostic             |
-| `[d` | n    | Jump to previous diagnostic         |
-| `]e` | n    | Jump to next error                  |
-| `[e` | n    | Jump to previous error              |
+| `]d` | n, o | Jump to next diagnostic             |
+| `[d` | n, o | Jump to previous diagnostic         |
+| `]e` | n, o | Jump to next error                  |
+| `[e` | n, o | Jump to previous error              |
+
+> Multi-window: labels appear in all visible splits.
 
 </details>
 
@@ -214,6 +221,37 @@ opts = {
   flow_state_timeout_ms = 300,
 }
 ```
+
+---
+
+## ⚙️ Operator-Pending Mode
+
+SmartMotion motions work with **any vim operator**. Type an operator, then a SmartMotion motion key — labels appear, and the operator applies from your cursor to the selected target.
+
+```
+>w    — indent from cursor to labeled word
+gUw   — uppercase from cursor to labeled word
+=j    — auto-indent from cursor to labeled line
+gqj   — format from cursor to labeled line
+>]]   — indent from cursor to labeled function
+```
+
+All jump-only motions (`w`, `b`, `e`, `ge`, `j`, `k`, `s`, `f`, `F`, `]]`, `[[`, `]c`, `[c`, `]d`, `[d`, `]e`, `[e`) are available in operator-pending mode. SmartMotion's own operators (`d`, `y`, `c`, `p`, `P`) are not — they handle operators internally via inference.
+
+---
+
+## 🪟 Multi-Window Jumping
+
+Search, treesitter navigation, and diagnostic motions collect targets from **all visible splits** — not just the current window. Labels from the current window get priority (closer targets get single-character labels), and selecting a label in another window jumps your cursor there.
+
+Enabled by default for:
+- **Search**: `s`, `f`, `F`
+- **Treesitter navigation**: `]]`, `[[`, `]c`, `[c`
+- **Diagnostics**: `]d`, `[d`, `]e`, `[e`
+
+Word and line motions (`w`, `b`, `e`, `ge`, `j`, `k`) stay single-window — directional motions within one window are the natural UX.
+
+Multi-window is automatically disabled in operator-pending mode, since vim operators expect cursor movement within the same buffer.
 
 ---
 

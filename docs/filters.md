@@ -73,6 +73,13 @@ These filters combine visibility filtering with directional logic. Each is a mer
 > [!NOTE]
 > Most built-in filters are merged composites — for example, `filter_words_after_cursor` combines `filter_visible_lines` + `filter_words_after_cursor` internally using the `merge()` utility from `filters/utils.lua`.
 
+### Multi-Window Behavior
+
+When multi-window jumping is active, directional and visibility filters have special handling:
+
+- **Directional filters** (`filter_words_after_cursor`, `filter_words_before_cursor`, `filter_lines_after_cursor`, `filter_lines_before_cursor`) pass through all targets from other windows. Directional filtering only applies to targets in the current window.
+- **`filter_visible_lines`** uses each target's own `winid` to check visibility, so targets are correctly filtered against their own window's viewport.
+
 ---
 
 ## ? Building Your Own Filter

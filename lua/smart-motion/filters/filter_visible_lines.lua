@@ -4,8 +4,9 @@ local log = require("smart-motion.core.log")
 local M = {}
 
 function M.run(ctx, cfg, motion_state, target)
-	local top_line = vim.fn.line("w0", ctx.winid) - 1
-	local bottom_line = vim.fn.line("w$", ctx.winid) - 1
+	local winid = (target.metadata and target.metadata.winid) or ctx.winid
+	local top_line = vim.fn.line("w0", winid) - 1
+	local bottom_line = vim.fn.line("w$", winid) - 1
 	local row = target.start_pos.row
 
 	if row >= top_line and row <= bottom_line then

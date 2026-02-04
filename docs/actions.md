@@ -97,12 +97,15 @@ function M.run(ctx, cfg, motion_state)
     return
   end
 
-  if jump_target.bufnr ~= vim.api.nvim_get_current_buf() then
-    vim.api.nvim_set_current_buf(jump_target.bufnr)
+  -- Switch to the target's window (handles multi-window jumping)
+  local winid = jump_target.metadata.winid
+  local current_winid = vim.api.nvim_get_current_win()
+  if winid and winid ~= current_winid then
+    vim.api.nvim_set_current_win(winid)
   end
 
   local pos = { jump_target.row + 1, jump_target.col }
-  local success, err = pcall(vim.api.nvim_win_set_cursor, jump_target.winid or 0, pos)
+  local success, err = pcall(vim.api.nvim_win_set_cursor, winid or 0, pos)
 
   if not success then
     -- Log an error

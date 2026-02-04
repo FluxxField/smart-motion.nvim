@@ -13,7 +13,7 @@ function presets.words(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n", "v" },
+			modes = { "n", "v", "o" },
 			metadata = {
 				label = "Jump to Start of Word after cursor",
 				description = "Jumps to the start of a visible word target using labels after the cursor",
@@ -26,7 +26,7 @@ function presets.words(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n", "v" },
+			modes = { "n", "v", "o" },
 			metadata = {
 				label = "Jump to Start of Word before cursor",
 				description = "Jumps to the start of a visible word target using labels before the cursor",
@@ -39,7 +39,7 @@ function presets.words(exclude)
 			visualizer = "hint_end",
 			action = "jump_centered",
 			map = true,
-			modes = { "n", "v" },
+			modes = { "n", "v", "o" },
 			metadata = {
 				label = "Jump to End of Word after cursor",
 				description = "Jumps to the end of a visible word target using labels after the cursor",
@@ -52,7 +52,7 @@ function presets.words(exclude)
 			visualizer = "hint_end",
 			action = "jump_centered",
 			map = true,
-			modes = { "n", "v" },
+			modes = { "n", "v", "o" },
 			metadata = {
 				label = "Jump to End of Word before cursor",
 				description = "Jumps to the end of a visible word target using labels before the cursor",
@@ -71,7 +71,7 @@ function presets.lines(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n", "v" },
+			modes = { "n", "v", "o" },
 			metadata = {
 				label = "Jump to Line after cursor",
 				description = "Jumps to the start of the line after the cursor",
@@ -84,7 +84,7 @@ function presets.lines(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n", "v" },
+			modes = { "n", "v", "o" },
 			metadata = {
 				label = "Jump to Line before cursor",
 				description = "Jumps to the start of the line before the cursor",
@@ -99,27 +99,17 @@ function presets.search(exclude)
 		s = {
 			collector = "lines",
 			extractor = "live_search",
-			filter = "filter_words_after_cursor",
+			filter = "filter_visible",
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n" },
+			modes = { "n", "o" },
 			metadata = {
-				label = "Jump to Searched Text After Cursor",
-				description = "Jumps to the start of the searched for text",
-			},
-		},
-		S = {
-			collector = "lines",
-			extractor = "live_search",
-			filter = "filter_words_before_cursor",
-			visualizer = "hint_start",
-			action = "jump_centered",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Jump to Searched Text After Cursor",
-				description = "Jumps to the start of the searched for text",
+				label = "Live Search",
+				description = "Live search across all visible text with labeled results",
+				motion_state = {
+					multi_window = true,
+				},
 			},
 		},
 		f = {
@@ -129,10 +119,13 @@ function presets.search(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n" },
+			modes = { "n", "o" },
 			metadata = {
 				label = "2 Character Find After Cursor",
 				description = "Labels 2 Character Searches and jump to target",
+				motion_state = {
+					multi_window = true,
+				},
 			},
 		},
 		F = {
@@ -142,10 +135,13 @@ function presets.search(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n" },
+			modes = { "n", "o" },
 			metadata = {
 				label = "2 Character Find Before Cursor",
 				description = "Labels 2 Character Searches and jump to target",
+				motion_state = {
+					multi_window = true,
+				},
 			},
 		},
 	}, exclude)
@@ -453,12 +449,13 @@ function presets.treesitter(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n" },
+			modes = { "n", "o" },
 			metadata = {
 				label = "Jump to Next Function",
 				description = "Jump to a function definition after the cursor",
 				motion_state = {
 					ts_node_types = function_node_types,
+					multi_window = true,
 				},
 			},
 		},
@@ -470,12 +467,13 @@ function presets.treesitter(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n" },
+			modes = { "n", "o" },
 			metadata = {
 				label = "Jump to Previous Function",
 				description = "Jump to a function definition before the cursor",
 				motion_state = {
 					ts_node_types = function_node_types,
+					multi_window = true,
 				},
 			},
 		},
@@ -487,12 +485,13 @@ function presets.treesitter(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n" },
+			modes = { "n", "o" },
 			metadata = {
 				label = "Jump to Next Class",
 				description = "Jump to a class/struct definition after the cursor",
 				motion_state = {
 					ts_node_types = class_node_types,
+					multi_window = true,
 				},
 			},
 		},
@@ -504,12 +503,13 @@ function presets.treesitter(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n" },
+			modes = { "n", "o" },
 			metadata = {
 				label = "Jump to Previous Class",
 				description = "Jump to a class/struct definition before the cursor",
 				motion_state = {
 					ts_node_types = class_node_types,
+					multi_window = true,
 				},
 			},
 		},
@@ -653,10 +653,13 @@ function presets.diagnostics(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n" },
+			modes = { "n", "o" },
 			metadata = {
 				label = "Jump to Next Diagnostic",
 				description = "Jump to a diagnostic after the cursor",
+				motion_state = {
+					multi_window = true,
+				},
 			},
 		},
 		["[d"] = {
@@ -667,10 +670,13 @@ function presets.diagnostics(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n" },
+			modes = { "n", "o" },
 			metadata = {
 				label = "Jump to Previous Diagnostic",
 				description = "Jump to a diagnostic before the cursor",
+				motion_state = {
+					multi_window = true,
+				},
 			},
 		},
 		["]e"] = {
@@ -681,12 +687,13 @@ function presets.diagnostics(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n" },
+			modes = { "n", "o" },
 			metadata = {
 				label = "Jump to Next Error",
 				description = "Jump to an error diagnostic after the cursor",
 				motion_state = {
 					diagnostic_severity = vim.diagnostic.severity.ERROR,
+					multi_window = true,
 				},
 			},
 		},
@@ -698,12 +705,13 @@ function presets.diagnostics(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n" },
+			modes = { "n", "o" },
 			metadata = {
 				label = "Jump to Previous Error",
 				description = "Jump to an error diagnostic before the cursor",
 				motion_state = {
 					diagnostic_severity = vim.diagnostic.severity.ERROR,
+					multi_window = true,
 				},
 			},
 		},

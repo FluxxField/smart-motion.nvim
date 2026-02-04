@@ -125,9 +125,11 @@ Covers:
 
 ## 🚀 advanced.md
 
-Explore deeper features like flow state and motion chaining.
+Explore deeper features like flow state, operator-pending mode, and multi-window jumping.
 
 Covers:
+- Operator-pending mode — use SmartMotion motions with any vim operator
+- Multi-window jumping — targets across all visible splits
 - Flow state and how SmartMotion mimics native feel
 - Multi-target actions
 - History and chaining logic
