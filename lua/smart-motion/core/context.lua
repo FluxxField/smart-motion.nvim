@@ -29,16 +29,41 @@ function M.get()
 		cursor_line = cursor[1] - 1,
 		cursor_col = cursor[2],
 		last_line = vim.api.nvim_buf_line_count(bufnr),
+		mode = vim.fn.mode(true),
 	}
+
+	-- Collect all visible non-floating windows in current tabpage
+	ctx.windows = {}
+	for _, wid in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+		local win_config = vim.api.nvim_win_get_config(wid)
+		if win_config.relative == "" then
+			local buf = vim.api.nvim_win_get_buf(wid)
+			local cur = vim.api.nvim_win_get_cursor(wid)
+			local entry = {
+				winid = wid,
+				bufnr = buf,
+				cursor_line = cur[1] - 1,
+				cursor_col = cur[2],
+				last_line = vim.api.nvim_buf_line_count(buf),
+			}
+			if wid == winid then
+				table.insert(ctx.windows, 1, entry)
+			else
+				table.insert(ctx.windows, entry)
+			end
+		end
+	end
 
 	log.debug(
 		string.format(
-			"Context collected: buf=%d, win=%d, cursor_line=%d, cursor_col=%d, last_line=%d",
+			"Context collected: buf=%d, win=%d, cursor_line=%d, cursor_col=%d, last_line=%d, mode=%s, windows=%d",
 			ctx.bufnr,
 			ctx.winid,
 			ctx.cursor_line,
 			ctx.cursor_col,
-			ctx.last_line
+			ctx.last_line,
+			ctx.mode,
+			#ctx.windows
 		)
 	)
 

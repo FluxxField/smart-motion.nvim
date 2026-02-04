@@ -26,8 +26,9 @@ function M.run(ctx, cfg, motion_state)
 		return
 	end
 
-	if bufnr ~= vim.api.nvim_get_current_buf() then
-		vim.api.nvim_set_current_buf(bufnr)
+	local current_winid = vim.api.nvim_get_current_win()
+	if winid and winid ~= current_winid then
+		vim.api.nvim_set_current_win(winid)
 	end
 
 	local pos = { row + 1, math.max(col, 0) }

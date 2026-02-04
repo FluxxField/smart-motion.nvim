@@ -106,6 +106,15 @@ These fields are used by the `treesitter` collector to control which nodes are c
 
 ---
 
+## 🪟 Multi-Window Fields
+
+| Field               | Type                 | Description                                                                                         |
+| ------------------- | -------------------- | --------------------------------------------------------------------------------------------------- |
+| `multi_window?`     | `boolean`            | When true, the pipeline collects targets from all visible windows (disabled in operator-pending mode). |
+| `affected_buffers?` | `table<integer,true>`| Set of buffer numbers that have been touched by highlights. Used for cleanup on motion reset.        |
+
+---
+
 ## 🩺 Diagnostic Fields
 
 | Field                   | Type                      | Description                                                                 |

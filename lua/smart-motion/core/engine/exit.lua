@@ -21,7 +21,11 @@ function M.run(ctx, cfg, motion_state, exit_type)
 	end
 
 	if motion_state.selected_jump_target then
-		modules.action.run(ctx, cfg, motion_state)
+		if ctx.mode and ctx.mode:find("o") then
+			require("smart-motion.actions.jump").run(ctx, cfg, motion_state)
+		else
+			modules.action.run(ctx, cfg, motion_state)
+		end
 	end
 end
 

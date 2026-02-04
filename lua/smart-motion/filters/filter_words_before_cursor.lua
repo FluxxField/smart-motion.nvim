@@ -5,6 +5,10 @@ local HINT_POSITION = require("smart-motion.consts").HINT_POSITION
 local M = {}
 
 function M.run(ctx, cfg, motion_state, target)
+	if target.metadata and target.metadata.winid and target.metadata.winid ~= ctx.winid then
+		return target
+	end
+
 	local hint_position = motion_state.hint_position
 	local cursor_row, cursor_col = ctx.cursor_line, ctx.cursor_col
 

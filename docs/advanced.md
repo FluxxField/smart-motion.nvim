@@ -23,6 +23,68 @@ Flow state allows users to **chain motions rapidly** without showing hints every
 
 ---
 
+## ⚙️ Operator-Pending Mode
+
+SmartMotion jump motions register in operator-pending mode (`"o"`), making them work with any native vim operator:
+
+```
+>w    — indent from cursor to labeled word
+gUw   — uppercase from cursor to labeled word
+=j    — auto-indent from cursor to labeled line
+gq]]  — format from cursor to labeled function
+```
+
+### How It Works
+
+1. `ctx.mode` is captured via `vim.fn.mode(true)` when the motion starts. In operator-pending mode this returns `"no"`.
+2. When `ctx.mode` contains `"o"`, the pipeline forces a plain jump action (no centering via `zz`), since centering would disrupt the operator.
+3. Multi-window collection is disabled in operator-pending mode — vim operators expect cursor movement within the same buffer.
+
+### Which motions support it?
+
+All jump-only motions: `w`, `b`, `e`, `ge`, `j`, `k`, `s`, `f`, `F`, `]]`, `[[`, `]c`, `[c`, `]d`, `[d`, `]e`, `[e`.
+
+SmartMotion's own operators (`d`, `y`, `c`, `p`, `P`) and composites (`dt`, `yt`, `ct`, `daa`, `cfn`, etc.) are **not** registered in `"o"` mode — they handle operations internally via the inference system.
+
+---
+
+## 🪟 Multi-Window Jumping
+
+Search, treesitter navigation, and diagnostic motions collect targets from all visible (non-floating) windows in the current tabpage.
+
+### How It Works
+
+1. When `motion_state.multi_window` is true and multiple windows are visible, the pipeline wraps the collector to iterate all windows.
+2. For each window, a fresh collector coroutine runs with a per-window sub-context. Each yielded item gets `metadata.bufnr` and `metadata.winid` injected.
+3. The current window is listed first in `ctx.windows`, so its targets get label priority — nearby targets get single-character labels.
+4. Directional filters pass through all cross-window targets. Visibility filters use each target's own `winid`.
+5. Highlight extmarks are placed in each target's buffer. `motion_state.affected_buffers` tracks all touched buffers for cleanup.
+6. The jump action calls `nvim_set_current_win()` to switch windows instead of `nvim_set_current_buf()`.
+
+### Custom motions with multi-window
+
+Add `multi_window = true` to your motion's `metadata.motion_state`:
+
+```lua
+sm.motions.register("my_search", {
+  collector = "lines",
+  extractor = "live_search",
+  filter = "filter_words_after_cursor",
+  visualizer = "hint_start",
+  action = "jump_centered",
+  map = true,
+  modes = { "n" },
+  metadata = {
+    motion_state = {
+      multi_window = true,
+    },
+  },
+  trigger = "<leader>s",
+})
+```
+
+---
+
 ## 🔂 Action Composition
 
 Instead of writing new actions for every combination (like `dw`, `ct)`), SmartMotion supports **action merging**:

@@ -34,6 +34,7 @@ function M.run(ctx, cfg, motion_state, data)
 				start_pos = { row = line_number, col = start_pos },
 				end_pos = { row = line_number, col = end_pos },
 				type = TARGET_TYPES.WORDS,
+				metadata = data.metadata,
 			})
 
 			search_start = end_pos + 1

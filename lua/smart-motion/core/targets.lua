@@ -25,11 +25,12 @@ local M = {}
 ---@param raw_data table
 ---@return Target
 function M.format_target(ctx, cfg, motion_state, raw_data)
-	local metadata = vim.tbl_deep_extend("force", raw_data.metadata or {}, {
+	local target_bufnr = (raw_data.metadata and raw_data.metadata.bufnr) or ctx.bufnr
+	local metadata = vim.tbl_deep_extend("force", {
 		bufnr = ctx.bufnr,
 		winid = ctx.winid,
-		filetype = vim.bo[ctx.bufnr].filetype,
-	})
+		filetype = vim.bo[target_bufnr].filetype,
+	}, raw_data.metadata or {})
 
 	return vim.tbl_extend("force", {}, raw_data, {
 		type = raw_data.type or "unknown",
