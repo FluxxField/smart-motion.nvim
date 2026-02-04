@@ -514,6 +514,200 @@ function presets.treesitter(exclude)
 			},
 		},
 	}, exclude)
+
+	-- Argument/parameter container node types across languages.
+	-- ts_yield_children yields each individual argument as a target.
+	local arg_container_types = {
+		"arguments",
+		"argument_list",
+		"parameters",
+		"parameter_list",
+		"formal_parameters",
+	}
+
+	-- Treesitter editing motions: operate on function names and arguments
+	presets._register({
+		-- Delete/Change/Yank around argument (includes separator)
+		daa = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "delete",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Delete Around Argument",
+				description = "Delete an argument including its separator",
+				motion_state = {
+					ts_node_types = arg_container_types,
+					ts_yield_children = true,
+					ts_around_separator = true,
+				},
+			},
+		},
+		caa = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "change",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Change Around Argument",
+				description = "Change an argument (replaces its content)",
+				motion_state = {
+					ts_node_types = arg_container_types,
+					ts_yield_children = true,
+				},
+			},
+		},
+		yaa = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "yank",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Yank Around Argument",
+				description = "Yank an argument",
+				motion_state = {
+					ts_node_types = arg_container_types,
+					ts_yield_children = true,
+				},
+			},
+		},
+
+		-- Delete/Change/Yank function name
+		dfn = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "delete",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Delete Function Name",
+				description = "Delete a function's name",
+				motion_state = {
+					ts_node_types = function_node_types,
+					ts_child_field = "name",
+				},
+			},
+		},
+		cfn = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "change",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Change Function Name",
+				description = "Change a function's name (rename)",
+				motion_state = {
+					ts_node_types = function_node_types,
+					ts_child_field = "name",
+				},
+			},
+		},
+		yfn = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "yank",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Yank Function Name",
+				description = "Yank a function's name",
+				motion_state = {
+					ts_node_types = function_node_types,
+					ts_child_field = "name",
+				},
+			},
+		},
+	}, exclude)
+end
+
+--- @param exclude? string[]
+function presets.diagnostics(exclude)
+	presets._register({
+		["]d"] = {
+			collector = "diagnostics",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_after_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Jump to Next Diagnostic",
+				description = "Jump to a diagnostic after the cursor",
+			},
+		},
+		["[d"] = {
+			collector = "diagnostics",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_before_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Jump to Previous Diagnostic",
+				description = "Jump to a diagnostic before the cursor",
+			},
+		},
+		["]e"] = {
+			collector = "diagnostics",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_after_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Jump to Next Error",
+				description = "Jump to an error diagnostic after the cursor",
+				motion_state = {
+					diagnostic_severity = vim.diagnostic.severity.ERROR,
+				},
+			},
+		},
+		["[e"] = {
+			collector = "diagnostics",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_before_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Jump to Previous Error",
+				description = "Jump to an error diagnostic before the cursor",
+				motion_state = {
+					diagnostic_severity = vim.diagnostic.severity.ERROR,
+				},
+			},
+		},
+	}, exclude)
 end
 
 --- Internal registration logic with optional filtering.
