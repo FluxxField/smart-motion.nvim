@@ -29,6 +29,7 @@ This reference documents all the motions included in the default SmartMotion pre
 | Key  | Mode | Multi-window | Description                                          |
 | ---- | ---- | ------------ | ---------------------------------------------------- |
 | `s`  | n, o | yes          | Live search across all visible text with labels      |
+| `S`  | n, o | yes          | Fuzzy search — type partial patterns to match words  |
 | `f`  | n, o | yes          | 2 Character Find After Cursor                        |
 | `F`  | n, o | yes          | 2 Character Find Before Cursor                       |
 | `t`  | n, o | yes          | Till Character After Cursor (jump to just before)    |
@@ -36,6 +37,9 @@ This reference documents all the motions included in the default SmartMotion pre
 | `;`  | n, v | yes          | Repeat last f/F/t/T motion (same direction)          |
 | `,`  | n, v | yes          | Repeat last f/F/t/T motion (reversed direction)      |
 | `gs` | n    | yes          | Visual select via labels — pick two words, enter visual mode |
+
+> [!NOTE]
+> `s` uses literal matching, `S` uses fuzzy matching (FZY algorithm with scoring for word boundaries, camelCase, consecutive matches). Both support label conflict avoidance — labels can't be valid search continuations.
 
 > [!NOTE]
 > `;` and `,` use literal matching and show labels across all visible windows. `gs` uses dual selection (pick start, then end) and works across windows.
@@ -109,6 +113,19 @@ This reference documents all the motions included in the default SmartMotion pre
 | `cfn` | n    | Change function name (rename)                   |
 | `yfn` | n    | Yank function name                              |
 | `saa` | n    | Swap two arguments — pick two with labels, swap positions |
+
+### Selection
+
+| Key  | Mode    | Description                                                   |
+| ---- | ------- | ------------------------------------------------------------- |
+| `gS` | n, x    | Treesitter incremental select — `;` to expand, `,` to shrink  |
+| `R`  | n, x, o | Treesitter search — search text, select surrounding TS node   |
+
+> [!NOTE]
+> `gS` starts with the smallest named node at cursor, then use `;` to expand to parent nodes and `,` to shrink to child nodes. Shows node type in echo area. Press Enter to confirm, ESC to cancel.
+
+> [!NOTE]
+> `R` works in operator-pending mode: `dR` deletes the node containing search text, `yR` yanks it, `cR` changes it. In normal/visual mode, it enters visual selection on the node.
 
 > [!NOTE]
 > Treesitter presets use broad node type lists that work across many languages (Lua, Python, JavaScript, TypeScript, Rust, Go, C/C++, Java, Ruby). Non-matching types are safely ignored.

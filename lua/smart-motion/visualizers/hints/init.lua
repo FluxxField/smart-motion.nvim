@@ -1,5 +1,6 @@
 --- Module for hint generation and assignment.
 local highlight = require("smart-motion.core.highlight")
+local label_conflict = require("smart-motion.core.label_conflict")
 local log = require("smart-motion.core.log")
 
 ---@type SmartMotionVisualizerModuleEntry
@@ -61,6 +62,31 @@ function M.generate_hint_labels(ctx, cfg, motion_state)
 	return final_labels
 end
 
+--- Recalculates label counts based on a filtered key set.
+---@param motion_state SmartMotionMotionState
+---@param total_keys integer Number of available keys after filtering
+local function recalculate_label_counts(motion_state, total_keys)
+	local jump_target_count = motion_state.jump_target_count
+
+	if jump_target_count <= total_keys then
+		motion_state.single_label_count = jump_target_count
+		motion_state.double_label_count = 0
+		motion_state.sacrificed_keys_count = 0
+	else
+		local labels_needed = jump_target_count - total_keys
+		local initial_sacrifice = math.ceil(math.sqrt(labels_needed))
+
+		motion_state.double_label_count = labels_needed + initial_sacrifice
+
+		local adjusted_sacrifice = math.ceil(math.sqrt(motion_state.double_label_count))
+
+		motion_state.sacrificed_keys_count = math.max(initial_sacrifice, adjusted_sacrifice)
+		motion_state.single_label_count = total_keys - motion_state.sacrificed_keys_count
+	end
+
+	motion_state.total_keys = total_keys
+end
+
 --- Generates, assigns and applies labels in a single pass.
 ---@param ctx SmartMotionContext
 ---@param cfg SmartMotionConfig
@@ -89,7 +115,20 @@ function M.run(ctx, cfg, motion_state)
 		end)
 	end
 
-	local label_pool = M.generate_hint_labels(ctx, cfg, motion_state)
+	-- Filter out conflicting labels when in search mode
+	local effective_cfg = cfg
+	if motion_state.is_searching_mode and motion_state.search_text and #motion_state.search_text > 0 then
+		local filtered_keys = label_conflict.filter_conflicting_labels(cfg.keys, targets, ctx.bufnr)
+		if #filtered_keys < #cfg.keys then
+			-- Create a shallow copy of cfg with filtered keys
+			effective_cfg = vim.tbl_extend("force", {}, cfg)
+			effective_cfg.keys = filtered_keys
+			-- Recalculate label counts based on new key pool
+			recalculate_label_counts(motion_state, #filtered_keys)
+		end
+	end
+
+	local label_pool = M.generate_hint_labels(ctx, effective_cfg, motion_state)
 
 	if #targets > #label_pool then
 		log.debug(string.format("Only %d labels available, but %d targets found", #label_pool, #targets))

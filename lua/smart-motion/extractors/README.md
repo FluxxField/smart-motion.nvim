@@ -53,5 +53,6 @@ The `pass_through` extractor returns collector data unchanged. This is used when
 | 1-character search (f/F) | `text_search_1_char` |
 | 1-character until search (t/T) | `text_search_1_char_until` |
 | 2-character search | `text_search_2_char` |
-| Live incremental search | `live_search` |
+| Live incremental search (literal) | `live_search` |
+| Fuzzy incremental search | `fuzzy_search` |
 | Passing pre-formed targets through | `pass_through` |

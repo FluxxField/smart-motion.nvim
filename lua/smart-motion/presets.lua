@@ -112,6 +112,22 @@ function presets.search(exclude)
 				},
 			},
 		},
+		S = {
+			collector = "lines",
+			extractor = "fuzzy_search",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n", "o" },
+			metadata = {
+				label = "Fuzzy Search",
+				description = "Fuzzy search across all visible text with labeled results",
+				motion_state = {
+					multi_window = true,
+				},
+			},
+		},
 		f = {
 			collector = "lines",
 			extractor = "text_search_2_char",
@@ -761,6 +777,20 @@ function presets.treesitter(exclude)
 		vim.keymap.set("n", "saa", function()
 			require("smart-motion.actions.swap").run()
 		end, { desc = "Swap two arguments", noremap = true, silent = true })
+	end
+
+	-- Register gS keymap for treesitter incremental selection
+	if not (type(exclude) == "table" and exclude["gS"] == false) then
+		vim.keymap.set({ "n", "x" }, "gS", function()
+			require("smart-motion.actions.treesitter_select").run()
+		end, { desc = "Treesitter incremental select (; expand, , shrink)", noremap = true, silent = true })
+	end
+
+	-- Register R keymap for treesitter search (search text → select surrounding node)
+	if not (type(exclude) == "table" and exclude["R"] == false) then
+		vim.keymap.set({ "n", "x", "o" }, "R", function()
+			require("smart-motion.actions.treesitter_search").run()
+		end, { desc = "Treesitter search (select node containing match)", noremap = true, silent = true })
 	end
 end
 
