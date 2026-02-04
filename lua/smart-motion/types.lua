@@ -27,14 +27,18 @@
 ---@field delete? true | SmartMotionPresetKey.Delete[]
 ---@field yank? true | SmartMotionPresetKey.Yank[]
 ---@field change? true | SmartMotionPresetKey.Change[]
+---@field treesitter? true | SmartMotionPresetKey.Treesitter[]
+---@field diagnostics? true | SmartMotionPresetKey.Diagnostics[]
 ---@field [string] boolean | string[]
 
 ---@alias SmartMotionPresetKey.Words "w" | "b" | "e" | "ge"
 ---@alias SmartMotionPresetKey.Lines "j" | "k"
 ---@alias SmartMotionPresetKey.Search "s" | "S" | "f" | "F"
----@alias SmartMotionPresetKey.Delete "d" | "dt" | "dT" | "rdw" | "rdl"
----@alias SmartMotionPresetKey.Yank "y" | "yt" | "yT" | "ryw" | "ryl"
----@alias SmartMotionPresetKey.Change "c" | "ct" | "cT"
+---@alias SmartMotionPresetKey.Delete "d" | "dt" | "dT" | "df" | "dF" | "rdw" | "rdl"
+---@alias SmartMotionPresetKey.Yank "y" | "yt" | "yT" | "yf" | "yF" | "ryw" | "ryl"
+---@alias SmartMotionPresetKey.Change "c" | "ct" | "cT" | "cf" | "cF"
+---@alias SmartMotionPresetKey.Treesitter "]]" | "[[" | "]c" | "[c" | "daa" | "caa" | "yaa" | "dfn" | "cfn" | "yfn"
+---@alias SmartMotionPresetKey.Diagnostics "]d" | "[d" | "]e" | "[e"
 
 ---@class SmartMotionPresetsModule
 ---@field words fun(exclude?: SmartMotionPresetKey.Words[])
@@ -85,6 +89,12 @@
 --- @field word_pattern? string
 --- @field paste_mode? 'before' | 'after'
 --- @field keys? fun(motion_state: SmartMotionMotionState): string[]
+--- @field ts_query? string -- Raw treesitter query string
+--- @field ts_node_types? string[] -- Treesitter node types to match
+--- @field ts_child_field? string -- Yield a specific named field from matched nodes (e.g. "name")
+--- @field ts_yield_children? boolean -- Yield named children of matched container nodes
+--- @field ts_around_separator? boolean -- Expand child ranges to include surrounding separators
+--- @field diagnostic_severity? integer|integer[] -- Filter diagnostics by severity
 --- @field motion SmartMotionMotionEntry
 
 ---@class SmartMotionTarget

@@ -1,6 +1,6 @@
 --- @alias Direction "after_cursor" | "before_cursor" | "both"
 --- @alias HintPosition "start" | "end"
---- @alias TargetType "words" | "lines" | "search"
+--- @alias TargetType "words" | "lines" | "search" | "treesitter"
 --- @alias SelectionMode "first" | "second"
 --- @alias SearchExitType "early_exit" | "direct_hint" | "auto_select" | "continue_to_selection"
 
@@ -33,6 +33,7 @@ M.TARGET_TYPES = {
 	WORDS = "words",
 	LINES = "lines",
 	SEARCH = "search",
+	TREESITTER = "treesitter",
 }
 
 ---@type table<string, TargetType>
