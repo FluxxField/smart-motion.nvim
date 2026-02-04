@@ -10,6 +10,8 @@ M._enabled = true -- global toggle, flipped by <C-s>
 M._augroup = nil
 M._cfg = nil
 M._pattern = nil -- current cmdline pattern for incremental preview
+M._motion_state = nil -- stored motion state for incremental labels
+M._ctx = nil -- stored context for incremental labels
 
 --- Sets up autocmds and keymaps for native search label overlay.
 ---@param cfg SmartMotionConfig
@@ -60,27 +62,34 @@ function M.setup(cfg)
 				return
 			end
 
-			-- Always clean up preview extmarks
-			M._clear_preview()
-
 			M._active = false
 
-			-- Only proceed to label selection if search was confirmed
+			-- If search was aborted (ESC), clean up and return
 			if vim.v.event.abort then
+				M._clear_preview()
+				M._motion_state = nil
+				M._ctx = nil
 				return
 			end
 
 			local cmd_type = vim.fn.getcmdtype()
 			if cmd_type ~= "/" and cmd_type ~= "?" then
+				M._clear_preview()
+				M._motion_state = nil
+				M._ctx = nil
 				return
 			end
 
 			local pattern = vim.fn.getcmdline()
 			if not pattern or pattern == "" then
+				M._clear_preview()
+				M._motion_state = nil
+				M._ctx = nil
 				return
 			end
 
 			-- Schedule to run after cmdline fully closes
+			-- Labels are still visible from incremental preview
 			vim.schedule(function()
 				M._show_labels(pattern)
 			end)
@@ -115,74 +124,61 @@ end
 
 --- Clears all preview extmarks from all visible buffers.
 function M._clear_preview()
-	for _, wid in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-		local win_config = vim.api.nvim_win_get_config(wid)
-		if win_config.relative == "" then
-			local bufnr = vim.api.nvim_win_get_buf(wid)
-			if vim.api.nvim_buf_is_valid(bufnr) then
-				vim.api.nvim_buf_clear_namespace(bufnr, consts.ns_id, 0, -1)
+	local highlight_mod = require("smart-motion.core.highlight")
+
+	if M._motion_state and M._ctx then
+		highlight_mod.clear(M._ctx, M._cfg, M._motion_state)
+	else
+		-- Fallback: clear namespace directly
+		for _, wid in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+			local win_config = vim.api.nvim_win_get_config(wid)
+			if win_config.relative == "" then
+				local bufnr = vim.api.nvim_win_get_buf(wid)
+				if vim.api.nvim_buf_is_valid(bufnr) then
+					vim.api.nvim_buf_clear_namespace(bufnr, consts.ns_id, 0, -1)
+				end
 			end
 		end
 	end
 	vim.cmd("redraw")
 end
 
---- Renders preview match highlights (no labels) while user is still typing in cmdline.
+--- Renders incremental labels while user is typing in cmdline.
 ---@param pattern string|nil
 function M._render_preview(pattern)
 	M._clear_preview()
+	M._motion_state = nil
+	M._ctx = nil
 
 	if not pattern or pattern == "" then
 		return
 	end
 
-	local ctx = M._get_windows_ctx()
+	local context = require("smart-motion.core.context")
+	local state = require("smart-motion.core.state")
+	local hints = require("smart-motion.visualizers.hints")
+
+	local ctx = context.get()
 	local targets = M._find_matches(pattern, ctx)
 
 	if #targets == 0 then
 		return
 	end
 
-	local highlight_group = M._cfg.highlight.hint or "SmartMotionHint"
+	local motion_state = state.create_motion_state()
+	motion_state.multi_window = true
+	motion_state.jump_targets = targets
+	motion_state.jump_target_count = #targets
+	motion_state.is_searching_mode = true
+	motion_state.search_text = pattern
+	state.finalize_motion_state(ctx, M._cfg, motion_state)
 
-	for _, target in ipairs(targets) do
-		local bufnr = target.metadata.bufnr
-		local row = target.start_pos.row
-		local start_col = target.start_pos.col
-		local end_col = target.end_pos.col
+	-- Store for cleanup and reuse in _show_labels
+	M._motion_state = motion_state
+	M._ctx = ctx
 
-		-- Clamp columns to line length
-		local line_text = vim.api.nvim_buf_get_lines(bufnr, row, row + 1, false)[1]
-		if line_text then
-			start_col = math.min(start_col, #line_text)
-			end_col = math.min(end_col, #line_text)
-		end
-
-		if start_col < end_col then
-			vim.api.nvim_buf_set_extmark(bufnr, consts.ns_id, row, start_col, {
-				end_col = end_col,
-				hl_group = highlight_group,
-			})
-		end
-	end
-
-	vim.cmd("redraw")
-end
-
---- Lightweight context for window enumeration (no full context.get() needed during cmdline).
----@return table ctx with windows list
-function M._get_windows_ctx()
-	local windows = {}
-	for _, wid in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-		local win_config = vim.api.nvim_win_get_config(wid)
-		if win_config.relative == "" then
-			table.insert(windows, {
-				winid = wid,
-				bufnr = vim.api.nvim_win_get_buf(wid),
-			})
-		end
-	end
-	return { windows = windows }
+	-- Render labels
+	hints.run(ctx, M._cfg, motion_state)
 end
 
 --- Finds all matches of the search pattern in visible lines across all windows.
@@ -249,22 +245,38 @@ function M._show_labels(pattern)
 	local jump = require("smart-motion.actions.jump")
 	local cfg = M._cfg
 
-	local ctx = context.get()
-	local motion_state = state.create_motion_state()
-	motion_state.multi_window = true
+	-- Reuse stored state from incremental preview if available and pattern matches
+	local ctx = M._ctx
+	local motion_state = M._motion_state
 
-	-- Find all matches across visible windows
-	local targets = M._find_matches(pattern, ctx)
-	if #targets == 0 then
-		return
+	if not ctx or not motion_state or M._pattern ~= pattern then
+		-- Recreate if state is stale or pattern changed
+		ctx = context.get()
+		motion_state = state.create_motion_state()
+		motion_state.multi_window = true
+
+		local targets = M._find_matches(pattern, ctx)
+		if #targets == 0 then
+			M._ctx = nil
+			M._motion_state = nil
+			return
+		end
+
+		motion_state.jump_targets = targets
+		motion_state.jump_target_count = #targets
+		state.finalize_motion_state(ctx, cfg, motion_state)
+
+		-- Render labels (only if we recreated state)
+		hints.run(ctx, cfg, motion_state)
 	end
 
-	motion_state.jump_targets = targets
-	motion_state.jump_target_count = #targets
-	state.finalize_motion_state(ctx, cfg, motion_state)
+	-- Clear stored state
+	M._ctx = nil
+	M._motion_state = nil
 
-	-- Render labels
-	hints.run(ctx, cfg, motion_state)
+	if not motion_state.jump_targets or #motion_state.jump_targets == 0 then
+		return
+	end
 
 	-- Wait for label selection
 	selection.wait_for_hint_selection(ctx, cfg, motion_state)

@@ -38,7 +38,7 @@
 ---@alias SmartMotionPresetKey.Delete "d" | "dt" | "dT" | "df" | "dF" | "rdw" | "rdl"
 ---@alias SmartMotionPresetKey.Yank "y" | "yt" | "yT" | "yf" | "yF" | "ryw" | "ryl"
 ---@alias SmartMotionPresetKey.Change "c" | "ct" | "cT" | "cf" | "cF"
----@alias SmartMotionPresetKey.Treesitter "]]" | "[[" | "]c" | "[c" | "]b" | "[b" | "daa" | "caa" | "yaa" | "dfn" | "cfn" | "yfn" | "saa"
+---@alias SmartMotionPresetKey.Treesitter "]]" | "[[" | "]c" | "[c" | "]b" | "[b" | "daa" | "caa" | "yaa" | "dfn" | "cfn" | "yfn" | "saa" | "gS" | "R"
 ---@alias SmartMotionPresetKey.Misc "." | "gmd" | "gmy"
 ---@alias SmartMotionPresetKey.Diagnostics "]d" | "[d" | "]e" | "[e"
 
