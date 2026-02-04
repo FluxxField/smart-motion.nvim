@@ -34,11 +34,12 @@
 
 ---@alias SmartMotionPresetKey.Words "w" | "b" | "e" | "ge"
 ---@alias SmartMotionPresetKey.Lines "j" | "k"
----@alias SmartMotionPresetKey.Search "s" | "S" | "f" | "F" | "t" | "T"
+---@alias SmartMotionPresetKey.Search "s" | "S" | "f" | "F" | "t" | "T" | "gs"
 ---@alias SmartMotionPresetKey.Delete "d" | "dt" | "dT" | "df" | "dF" | "rdw" | "rdl"
 ---@alias SmartMotionPresetKey.Yank "y" | "yt" | "yT" | "yf" | "yF" | "ryw" | "ryl"
 ---@alias SmartMotionPresetKey.Change "c" | "ct" | "cT" | "cf" | "cF"
----@alias SmartMotionPresetKey.Treesitter "]]" | "[[" | "]c" | "[c" | "daa" | "caa" | "yaa" | "dfn" | "cfn" | "yfn"
+---@alias SmartMotionPresetKey.Treesitter "]]" | "[[" | "]c" | "[c" | "]b" | "[b" | "daa" | "caa" | "yaa" | "dfn" | "cfn" | "yfn" | "saa"
+---@alias SmartMotionPresetKey.Misc "." | "gmd" | "gmy"
 ---@alias SmartMotionPresetKey.Diagnostics "]d" | "[d" | "]e" | "[e"
 
 ---@class SmartMotionPresetsModule

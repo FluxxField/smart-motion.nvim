@@ -188,6 +188,13 @@ function presets.search(exclude)
 	vim.keymap.set({ "n", "v" }, ",", function()
 		char_repeat.run(true)
 	end, { desc = "Repeat last char motion (reversed)", noremap = true, silent = true })
+
+	-- Register gs keymap for visual range selection
+	if not (type(exclude) == "table" and exclude["gs"] == false) then
+		vim.keymap.set("n", "gs", function()
+			require("smart-motion.actions.visual_select").run()
+		end, { desc = "Visual select via labels", noremap = true, silent = true })
+	end
 end
 
 --- @param exclude? SmartMotionPresetKey.Delete[]
@@ -444,6 +451,19 @@ function presets.misc(exclude)
 			},
 		},
 	}, exclude)
+
+	-- Register gmd/gmy keymaps for multi-cursor edit
+	if not (type(exclude) == "table" and exclude["gmd"] == false) then
+		vim.keymap.set("n", "gmd", function()
+			require("smart-motion.actions.multi_edit").run("delete")
+		end, { desc = "Multi-cursor delete", noremap = true, silent = true })
+	end
+
+	if not (type(exclude) == "table" and exclude["gmy"] == false) then
+		vim.keymap.set("n", "gmy", function()
+			require("smart-motion.actions.multi_edit").run("yank")
+		end, { desc = "Multi-cursor yank", noremap = true, silent = true })
+	end
 end
 
 --- @param exclude? string[]
@@ -481,6 +501,22 @@ function presets.treesitter(exclude)
 		"impl_item",
 		"type_alias_declaration",
 		"module",
+	}
+
+	local scope_node_types = {
+		-- Control flow
+		"if_statement", "if_expression", "else_clause", "elif_clause",
+		"switch_statement", "switch_expression", "match_expression",
+		"case_statement", "case_clause",
+		-- Loops
+		"while_statement", "while_expression",
+		"for_statement", "for_expression", "for_in_statement", "for_of_statement",
+		"do_statement", "loop_expression", "repeat_statement",
+		-- Exception handling
+		"try_statement", "catch_clause", "except_clause", "finally_clause",
+		-- Blocks/closures
+		"block", "closure_expression", "lambda", "lambda_expression",
+		"with_statement", "do_block",
 	}
 
 	presets._register({
@@ -552,6 +588,42 @@ function presets.treesitter(exclude)
 				description = "Jump to a class/struct definition before the cursor",
 				motion_state = {
 					ts_node_types = class_node_types,
+					multi_window = true,
+				},
+			},
+		},
+		["]b"] = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_after_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n", "o" },
+			metadata = {
+				label = "Jump to Next Block/Scope",
+				description = "Jump to a block/scope boundary after the cursor",
+				motion_state = {
+					ts_node_types = scope_node_types,
+					multi_window = true,
+				},
+			},
+		},
+		["[b"] = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_before_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n", "o" },
+			metadata = {
+				label = "Jump to Previous Block/Scope",
+				description = "Jump to a block/scope boundary before the cursor",
+				motion_state = {
+					ts_node_types = scope_node_types,
 					multi_window = true,
 				},
 			},
@@ -683,6 +755,13 @@ function presets.treesitter(exclude)
 			},
 		},
 	}, exclude)
+
+	-- Register saa keymap for argument swap
+	if not (type(exclude) == "table" and exclude["saa"] == false) then
+		vim.keymap.set("n", "saa", function()
+			require("smart-motion.actions.swap").run()
+		end, { desc = "Swap two arguments", noremap = true, silent = true })
+	end
 end
 
 --- @param exclude? string[]

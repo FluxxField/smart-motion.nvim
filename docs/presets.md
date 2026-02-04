@@ -26,11 +26,19 @@ This reference documents all the motions included in the default SmartMotion pre
 
 ## Preset: `search`
 
-| Key | Mode | Multi-window | Description                                     |
-| --- | ---- | ------------ | ----------------------------------------------- |
-| `s` | n, o | yes          | Live search across all visible text with labels |
-| `f` | n, o | yes          | 2 Character Find After Cursor                   |
-| `F` | n, o | yes          | 2 Character Find Before Cursor                  |
+| Key  | Mode | Multi-window | Description                                          |
+| ---- | ---- | ------------ | ---------------------------------------------------- |
+| `s`  | n, o | yes          | Live search across all visible text with labels      |
+| `f`  | n, o | yes          | 2 Character Find After Cursor                        |
+| `F`  | n, o | yes          | 2 Character Find Before Cursor                       |
+| `t`  | n, o | yes          | Till Character After Cursor (jump to just before)    |
+| `T`  | n, o | yes          | Till Character Before Cursor (jump to just after)    |
+| `;`  | n, v | yes          | Repeat last f/F/t/T motion (same direction)          |
+| `,`  | n, v | yes          | Repeat last f/F/t/T motion (reversed direction)      |
+| `gs` | n    | yes          | Visual select via labels — pick two words, enter visual mode |
+
+> [!NOTE]
+> `;` and `,` use literal matching and show labels across all visible windows. `gs` uses dual selection (pick start, then end) and works across windows.
 
 ---
 
@@ -87,6 +95,8 @@ This reference documents all the motions included in the default SmartMotion pre
 | `[[` | n, o | yes          | Jump to previous function definition before cursor   |
 | `]c` | n, o | yes          | Jump to next class/struct definition after cursor    |
 | `[c` | n, o | yes          | Jump to previous class/struct definition before cursor |
+| `]b` | n, o | yes          | Jump to next block/scope (if, for, while, try, etc.) |
+| `[b` | n, o | yes          | Jump to previous block/scope                         |
 
 ### Editing
 
@@ -98,9 +108,13 @@ This reference documents all the motions included in the default SmartMotion pre
 | `dfn` | n    | Delete function name                            |
 | `cfn` | n    | Change function name (rename)                   |
 | `yfn` | n    | Yank function name                              |
+| `saa` | n    | Swap two arguments — pick two with labels, swap positions |
 
 > [!NOTE]
 > Treesitter presets use broad node type lists that work across many languages (Lua, Python, JavaScript, TypeScript, Rust, Go, C/C++, Java, Ruby). Non-matching types are safely ignored.
+
+> [!NOTE]
+> `saa` (swap) uses dual selection: press to see labels on all arguments, pick the first argument, labels re-render for the second pick, then both arguments swap positions. The later position is replaced first for buffer stability.
 
 ---
 
@@ -117,9 +131,14 @@ This reference documents all the motions included in the default SmartMotion pre
 
 ## Preset: `misc`
 
-| Key | Description                |
-| --- | -------------------------- |
-| `.` | Repeat the previous motion |
+| Key   | Description                                                        |
+| ----- | ------------------------------------------------------------------ |
+| `.`   | Repeat the previous motion                                         |
+| `gmd` | Multi-cursor delete — toggle-select multiple words, Enter to delete |
+| `gmy` | Multi-cursor yank — toggle-select multiple words, Enter to yank     |
+
+> [!NOTE]
+> `gmd` and `gmy` use multi-selection mode: labels appear on all visible words. Press a label key to toggle it on/off (selected targets highlight green). Press Enter to confirm, ESC to cancel. Targets are processed in reverse position order for safe sequential editing.
 
 ---
 
@@ -131,7 +150,7 @@ This reference documents all the motions included in the default SmartMotion pre
 | ---- | ----------- |
 | `n`  | Normal mode |
 | `v`  | Visual mode |
-| `o`  | Operator-pending mode — works with any vim operator (`>`, `<`, `gU`, `gu`, `=`, `gq`, `!`, `zf`, etc.) |
+| `o`  | Operator-pending mode — works with any vim operator (`>`, `<`, `gU`, `gu`, `=`, `gq`, `!`, `zf`, etc.). Available for all jump motions including `t`/`T` and `]b`/`[b`. |
 
 > [!NOTE]
 > In operator-pending mode, SmartMotion performs a plain jump (no centering) so the operator receives the cursor movement correctly. Multi-window is disabled in operator-pending mode since vim operators expect movement within the same buffer.

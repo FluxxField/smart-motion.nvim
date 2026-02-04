@@ -25,6 +25,8 @@ local default_config = {
   flow_state_timeout_ms = 300,
   disable_dim_background = false,
   history_max_size = 20,
+  auto_select_target = false,
+  native_search = true, -- label overlay during / search (toggle with <C-s>)
 }
 ```
 

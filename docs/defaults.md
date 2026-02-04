@@ -111,14 +111,14 @@ The following presets are available:
 | ------------- | -------------------------------------------------------- |
 | `words`       | Motions for `w`, `b`, `e`, `ge`                          |
 | `lines`       | Motions for `j`, `k`                                     |
-| `search`      | Motions for `f`, `F`, `s`, `S`                           |
+| `search`      | Motions for `s`, `f`, `F`, `t`, `T`, `;`, `,`, `gs`     |
 | `delete`      | Delete motions: `d`, `dt`, `dT`, `rdw`, `rdl`           |
 | `yank`        | Yank motions: `y`, `yt`, `yT`, `ryw`, `ryl`             |
 | `change`      | Change motions: `c`, `ct`, `cT`                          |
 | `paste`       | Paste motions: `p`, `P`                                  |
-| `treesitter`  | Navigation (`]]`, `[[`, `]c`, `[c`) and editing (`daa`, `caa`, `yaa`, `dfn`, `cfn`, `yfn`) |
+| `treesitter`  | Navigation (`]]`, `[[`, `]c`, `[c`, `]b`, `[b`) and editing (`daa`, `caa`, `yaa`, `dfn`, `cfn`, `yfn`, `saa`) |
 | `diagnostics` | Diagnostic jumping: `]d`, `[d`, `]e`, `[e`              |
-| `misc`        | Repeat previous motion with `.`                          |
+| `misc`        | Repeat (`.`), multi-cursor delete (`gmd`), multi-cursor yank (`gmy`) |
 
 See [`presets.md`](./presets.md) for the full breakdown of mappings and behavior.
 
