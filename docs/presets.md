@@ -69,6 +69,53 @@ This reference documents all the motions included in the default SmartMotion pre
 
 ---
 
+## Preset: `paste`
+
+| Key | Description                                    |
+| --- | ---------------------------------------------- |
+| `p` | Paste after target (select word/line to paste) |
+| `P` | Paste before target                            |
+
+---
+
+## Preset: `treesitter`
+
+### Navigation
+
+| Key  | Description                                          |
+| ---- | ---------------------------------------------------- |
+| `]]` | Jump to next function definition after cursor        |
+| `[[` | Jump to previous function definition before cursor   |
+| `]c` | Jump to next class/struct definition after cursor    |
+| `[c` | Jump to previous class/struct definition before cursor |
+
+### Editing
+
+| Key   | Description                                     |
+| ----- | ----------------------------------------------- |
+| `daa` | Delete around argument (includes separator)     |
+| `caa` | Change around argument                          |
+| `yaa` | Yank around argument                            |
+| `dfn` | Delete function name                            |
+| `cfn` | Change function name (rename)                   |
+| `yfn` | Yank function name                              |
+
+> [!NOTE]
+> Treesitter presets use broad node type lists that work across many languages (Lua, Python, JavaScript, TypeScript, Rust, Go, C/C++, Java, Ruby). Non-matching types are safely ignored.
+
+---
+
+## Preset: `diagnostics`
+
+| Key  | Description                                     |
+| ---- | ----------------------------------------------- |
+| `]d` | Jump to next diagnostic after cursor            |
+| `[d` | Jump to previous diagnostic before cursor       |
+| `]e` | Jump to next error diagnostic after cursor      |
+| `[e` | Jump to previous error diagnostic before cursor |
+
+---
+
 ## Preset: `misc`
 
 | Key | Description                |
@@ -176,6 +223,10 @@ require("smart-motion").setup({
     delete = false,
     yank = true,
     change = false,
+    paste = true,
+    treesitter = true,
+    diagnostics = true,
+    misc = true,
   },
 })
 ```

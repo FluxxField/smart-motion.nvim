@@ -45,12 +45,25 @@ This means the **entire pipeline only needs 2 loops total**:
 
 ## 📦 Built-in Collectors
 
-| Name    | Description                             |
-| ------- | --------------------------------------- |
-| `lines` | Yields every line in the current buffer |
+| Name          | Description                                              |
+| ------------- | -------------------------------------------------------- |
+| `lines`       | Yields every line in the current buffer                  |
+| `treesitter`  | Yields targets from treesitter nodes (supports 4 modes)  |
+| `diagnostics` | Yields LSP diagnostics as targets                        |
+| `history`     | Yields entries from the SmartMotion jump history         |
 
-> [!NOTE]
-> Additional built-in collectors like `visible_lines`, `multi_buffer_lines`, or `telescope_results` are planned or may be available in user modules.
+### `treesitter` Collector Modes
+
+The treesitter collector is controlled by fields on `motion_state`:
+
+1. **`ts_query`** — Raw treesitter query string (language-specific). Captures are yielded as targets.
+2. **`ts_node_types` + `ts_child_field`** — Walks the tree for matching node types, then yields a specific named field (e.g., the `"name"` field of a function declaration).
+3. **`ts_node_types` + `ts_yield_children`** — Walks the tree for container nodes (e.g., `arguments`), then yields each named child as a separate target. When `ts_around_separator = true`, ranges expand to include trailing/leading separators (commas).
+4. **`ts_node_types`** alone — Plain node type matching. Yields entire nodes that match.
+
+### `diagnostics` Collector
+
+Collects all `vim.diagnostic.get()` results for the buffer. Supports optional severity filtering via `motion_state.diagnostic_severity` (a single `vim.diagnostic.severity` value or a table of values).
 
 ---
 
@@ -127,7 +140,7 @@ Collectors could be written to fetch from:
 
 - Git changes (e.g., jump to modified lines)
 - Telescope search results
-- LSP diagnostics or references
+- LSP references or symbols
 - Multiple buffers or project-wide files
 
 SmartMotion is designed to accommodate all of these.
