@@ -407,6 +407,115 @@ function presets.misc(exclude)
 	}, exclude)
 end
 
+--- @param exclude? string[]
+function presets.treesitter(exclude)
+	-- Broad list of function-like node types across languages.
+	-- Non-matching types are safely ignored per language.
+	local function_node_types = {
+		-- Lua
+		"function_declaration",
+		"function_definition",
+		-- Python
+		-- (function_definition covers Python)
+		-- JavaScript / TypeScript
+		"arrow_function",
+		"method_definition",
+		-- Rust
+		"function_item",
+		-- Go
+		-- (function_declaration, method_declaration cover Go)
+		"method_declaration",
+		-- C / C++
+		-- (function_definition covers C/C++)
+		-- Java / C#
+		-- (method_declaration covers Java/C#)
+		-- Ruby
+		"method",
+	}
+
+	local class_node_types = {
+		"class_declaration",
+		"class_definition",
+		"struct_item",
+		"struct_definition",
+		"interface_declaration",
+		"impl_item",
+		"type_alias_declaration",
+		"module",
+	}
+
+	presets._register({
+		["]]"] = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_after_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Jump to Next Function",
+				description = "Jump to a function definition after the cursor",
+				motion_state = {
+					ts_node_types = function_node_types,
+				},
+			},
+		},
+		["[["] = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_before_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Jump to Previous Function",
+				description = "Jump to a function definition before the cursor",
+				motion_state = {
+					ts_node_types = function_node_types,
+				},
+			},
+		},
+		["]c"] = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_after_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Jump to Next Class",
+				description = "Jump to a class/struct definition after the cursor",
+				motion_state = {
+					ts_node_types = class_node_types,
+				},
+			},
+		},
+		["[c"] = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_before_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Jump to Previous Class",
+				description = "Jump to a class/struct definition before the cursor",
+				motion_state = {
+					ts_node_types = class_node_types,
+				},
+			},
+		},
+	}, exclude)
+end
+
 --- Internal registration logic with optional filtering.
 --- @param motions_list table<string, SmartMotionModule>
 --- @param exclude? string[]

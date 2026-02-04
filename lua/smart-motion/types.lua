@@ -27,6 +27,7 @@
 ---@field delete? true | SmartMotionPresetKey.Delete[]
 ---@field yank? true | SmartMotionPresetKey.Yank[]
 ---@field change? true | SmartMotionPresetKey.Change[]
+---@field treesitter? true | SmartMotionPresetKey.Treesitter[]
 ---@field [string] boolean | string[]
 
 ---@alias SmartMotionPresetKey.Words "w" | "b" | "e" | "ge"
@@ -35,6 +36,7 @@
 ---@alias SmartMotionPresetKey.Delete "d" | "dt" | "dT" | "df" | "dF" | "rdw" | "rdl"
 ---@alias SmartMotionPresetKey.Yank "y" | "yt" | "yT" | "yf" | "yF" | "ryw" | "ryl"
 ---@alias SmartMotionPresetKey.Change "c" | "ct" | "cT" | "cf" | "cF"
+---@alias SmartMotionPresetKey.Treesitter "]]" | "[[" | "]c" | "[c"
 
 ---@class SmartMotionPresetsModule
 ---@field words fun(exclude?: SmartMotionPresetKey.Words[])
