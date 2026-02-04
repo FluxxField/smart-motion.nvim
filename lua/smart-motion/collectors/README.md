@@ -5,7 +5,7 @@ A collector is responsible for gathering raw data that might contain potential j
 ## How It Works
 
 1. A collector fetches raw data from the buffer (or other sources).
-2. It yields this data as a generator.
+2. It yields this data as a generator (coroutine).
 3. The extractor will process it later.
 
 ---
@@ -23,34 +23,50 @@ function collect_lines(ctx, cfg, motion_state)
 end
 ```
 
-✅ Gathers lines from the buffer but does NOT extract words or targets.
+Gathers lines from the buffer but does NOT extract words or targets.
 
 ---
 
-## Example: `treesitter_functions.lua` (Collecting Function Definitions)
+## Example: `treesitter.lua` (Collecting Treesitter Nodes)
+
+The treesitter collector supports 4 modes controlled by `motion_state` fields:
+
+**Mode 1: Raw query** (`ts_query`) — Language-specific treesitter query string.
+
+**Mode 2: Child field** (`ts_node_types` + `ts_child_field`) — Yields a specific named field from matched nodes (e.g., function `"name"`).
+
+**Mode 3: Yield children** (`ts_node_types` + `ts_yield_children`) — Yields each named child of container nodes (e.g., individual arguments). Use `ts_around_separator = true` to include commas.
+
+**Mode 4: Node types** (`ts_node_types` alone) — Plain node type matching.
 
 ```lua
-function collect_treesitter_functions(ctx, cfg, motion_state)
-    return coroutine.wrap(function()
-        local ts = vim.treesitter
-        local parser = ts.get_parser(ctx.bufnr, "lua")
-        local tree = parser:parse()[1]
-        local root = tree:root()
-
-        for node in root:iter_children() do
-            if ts.query.node_is_function(node) then
-                coroutine.yield({
-                    bufnr = ctx.bufnr,
-                    lnum = ts.get_node_start(node),
-                    text = vim.treesitter.get_node_text(node, ctx.bufnr),
-                })
-            end
-        end
-    end)
-end
+-- Example: collect function definitions (Mode 4)
+metadata = {
+    motion_state = {
+        ts_node_types = {
+            "function_declaration",
+            "function_definition",
+            "arrow_function",
+            "method_definition",
+        },
+    },
+}
 ```
 
-✅ Finds function definitions using Treesitter but does NOT turn them into jump targets.
+---
+
+## Example: `diagnostics.lua` (Collecting LSP Diagnostics)
+
+```lua
+-- Collects all diagnostics; severity filtering via motion_state.diagnostic_severity
+metadata = {
+    motion_state = {
+        diagnostic_severity = vim.diagnostic.severity.ERROR, -- optional
+    },
+}
+```
+
+Collects `vim.diagnostic.get()` results as targets with position, message, severity, and source metadata.
 
 ---
 
@@ -58,7 +74,7 @@ end
 
 | Use Case | Example Collector |
 | --- | --- |
-| Getting buffer lines | `collect_lines` |
-| Getting function definitions | `collect_treesitter_functions` |
-| Getting LSP diagnostics | `collect_lsp_diagnostics` |
-| Getting TODO comments | `collect_todo_comments` |
+| Getting buffer lines | `lines` |
+| Getting treesitter nodes (functions, classes, arguments) | `treesitter` |
+| Getting LSP diagnostics | `diagnostics` |
+| Getting jump history entries | `history` |

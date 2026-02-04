@@ -85,6 +85,35 @@ This page lists _all known properties_ of `motion_state`, including _required fi
 
 ---
 
+## 🌳 Treesitter Fields
+
+These fields are used by the `treesitter` collector to control which nodes are collected.
+
+| Field                  | Type       | Description                                                                                              |
+| ---------------------- | ---------- | -------------------------------------------------------------------------------------------------------- |
+| `ts_query?`            | `string`   | Raw treesitter query string. Language-specific. Captures are yielded as targets.                         |
+| `ts_node_types?`       | `string[]` | List of treesitter node type strings to match (e.g., `"function_declaration"`, `"class_definition"`).    |
+| `ts_child_field?`      | `string`   | When set with `ts_node_types`, yields a specific named field from matched nodes (e.g., `"name"`).       |
+| `ts_yield_children?`   | `boolean`  | When set with `ts_node_types`, yields named children of matched container nodes (e.g., arguments).      |
+| `ts_around_separator?` | `boolean`  | When used with `ts_yield_children`, expands ranges to include trailing/leading separators (e.g., commas).|
+
+> [!NOTE]
+> The treesitter collector supports 4 modes depending on which fields are set:
+> 1. `ts_query` — Raw query string (language-specific)
+> 2. `ts_node_types` + `ts_child_field` — Yield a specific named field from matched nodes
+> 3. `ts_node_types` + `ts_yield_children` — Yield named children of container nodes
+> 4. `ts_node_types` alone — Plain node type matching
+
+---
+
+## 🩺 Diagnostic Fields
+
+| Field                   | Type                      | Description                                                                 |
+| ----------------------- | ------------------------- | --------------------------------------------------------------------------- |
+| `diagnostic_severity?`  | `number \| number[]`      | Filter diagnostics by severity. Accepts a single `vim.diagnostic.severity` value or a list of them. |
+
+---
+
 ## 🏷️ Metadata
 
 | Field          | Type     | Description                                                              |

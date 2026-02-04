@@ -55,8 +55,13 @@
 
 ## Phase 6: Advanced Motions (v1.2.0+)
 
-### Ideas
+### Completed
+- ✅ Treesitter-aware motions (function/class navigation, argument editing, function name editing)
+- ✅ Jump to LSP Diagnostics (with severity filtering)
+- ✅ Paste motions
+- ✅ Range-based actions (`resolve_range` for delete/yank/change/until variants)
+
+### Ideas (Remaining)
 - Jump to Git Conflicts.
 - Search & Replace with Hints.
-- Jump to LSP Diagnostics.
 - History review with labels.

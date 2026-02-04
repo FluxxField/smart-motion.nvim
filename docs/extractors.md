@@ -38,14 +38,20 @@ This system minimizes overhead and makes SmartMotion fast, even on large files.
 
 ## 📦 Built-in Extractors
 
-| Name          | Description                                      |
-| ------------- | ------------------------------------------------ |
-| `lines`       | Extracts whole-line targets                      |
-| `words`       | Extracts words using regex-based word boundaries |
-| `text_search` | Extracts fixed-length search targets (1-2 chars) |
+| Name                       | Description                                                                      |
+| -------------------------- | -------------------------------------------------------------------------------- |
+| `lines`                    | Extracts whole-line targets                                                      |
+| `words`                    | Extracts words using regex-based word boundaries                                 |
+| `text_search_1_char`       | Extracts 1-character search matches (used for `f`/`F`-style motions)             |
+| `text_search_1_char_until` | Same as `text_search_1_char` but sets `exclude_target = true` (for `t`/`T`)     |
+| `text_search_2_char`       | Extracts 2-character search matches with prefix display                          |
+| `live_search`              | Continuously updates search results as the user types, with backspace support    |
+| `pass_through`             | Passes collector data through without any transformation                         |
 
 > [!NOTE]
 > All built-in extractors are registered using `register_many()` in the `extractors` registry. You can override or extend them.
+>
+> The `text_search_*` and `live_search` extractors use a `before_input_loop` hook (via `module_wrapper`) to read user input before each pipeline iteration. The `pass_through` extractor is used with collectors like `treesitter` and `diagnostics` that already yield fully-formed targets.
 
 ---
 
