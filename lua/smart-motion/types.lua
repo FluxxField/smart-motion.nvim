@@ -30,6 +30,7 @@
 ---@field change? true | SmartMotionPresetKey.Change[]
 ---@field treesitter? true | SmartMotionPresetKey.Treesitter[]
 ---@field diagnostics? true | SmartMotionPresetKey.Diagnostics[]
+---@field git? true | SmartMotionPresetKey.Git[]
 ---@field [string] boolean | string[]
 
 ---@alias SmartMotionPresetKey.Words "w" | "b" | "e" | "ge"
@@ -41,6 +42,7 @@
 ---@alias SmartMotionPresetKey.Treesitter "]]" | "[[" | "]c" | "[c" | "]b" | "[b" | "daa" | "caa" | "yaa" | "dfn" | "cfn" | "yfn" | "saa" | "gS" | "R"
 ---@alias SmartMotionPresetKey.Misc "." | "gmd" | "gmy"
 ---@alias SmartMotionPresetKey.Diagnostics "]d" | "[d" | "]e" | "[e"
+---@alias SmartMotionPresetKey.Git "]g" | "[g"
 
 ---@class SmartMotionPresetsModule
 ---@field words fun(exclude?: SmartMotionPresetKey.Words[])
@@ -49,6 +51,10 @@
 ---@field delete fun(exclude?: SmartMotionPresetKey.Delete[])
 ---@field yank fun(exclude?: SmartMotionPresetKey.Yank[])
 ---@field change fun(exclude?: SmartMotionPresetKey.Change[])
+---@field treesitter fun(exclude?: SmartMotionPresetKey.Treesitter[])
+---@field diagnostics fun(exclude?: SmartMotionPresetKey.Diagnostics[])
+---@field git fun(exclude?: SmartMotionPresetKey.Git[])
+---@field misc fun(exclude?: SmartMotionPresetKey.Misc[])
 ---@field _register fun(motions_list: table<string, SmartMotionModule>, exclude?: string[])
 
 ---@class SmartMotionContext

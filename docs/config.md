@@ -64,6 +64,7 @@ return {
       paste = true,
       treesitter = true,
       diagnostics = true,
+      git = true,
       misc = true,
     },
   },

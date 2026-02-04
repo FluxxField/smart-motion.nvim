@@ -870,6 +870,46 @@ function presets.diagnostics(exclude)
 	}, exclude)
 end
 
+--- @param exclude? SmartMotionPresetKey.Git[]
+function presets.git(exclude)
+	presets._register({
+		["]g"] = {
+			collector = "git_hunks",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_after_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n", "o" },
+			metadata = {
+				label = "Jump to Next Git Hunk",
+				description = "Jump to a git changed region after the cursor",
+				motion_state = {
+					multi_window = true,
+				},
+			},
+		},
+		["[g"] = {
+			collector = "git_hunks",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_before_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n", "o" },
+			metadata = {
+				label = "Jump to Previous Git Hunk",
+				description = "Jump to a git changed region before the cursor",
+				motion_state = {
+					multi_window = true,
+				},
+			},
+		},
+	}, exclude)
+end
+
 --- Internal registration logic with optional filtering.
 --- @param motions_list table<string, SmartMotionModule>
 --- @param exclude? string[]

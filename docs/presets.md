@@ -146,6 +146,21 @@ This reference documents all the motions included in the default SmartMotion pre
 
 ---
 
+## Preset: `git`
+
+| Key  | Mode | Multi-window | Description                                     |
+| ---- | ---- | ------------ | ----------------------------------------------- |
+| `]g` | n, o | yes          | Jump to next git hunk (changed region) after cursor  |
+| `[g` | n, o | yes          | Jump to previous git hunk before cursor              |
+
+> [!NOTE]
+> Git hunk motions work best with [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) installed. SmartMotion uses gitsigns' API for accurate hunk detection. Without gitsigns, it falls back to parsing `git diff` output directly.
+
+> [!NOTE]
+> A "hunk" is a contiguous region of changed lines in git. This includes added lines, deleted lines, and modified lines. The metadata includes `hunk_type` ("add", "delete", or "change") for potential custom actions.
+
+---
+
 ## Preset: `misc`
 
 | Key   | Description                                                        |

@@ -32,6 +32,7 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 - 🌲 **Treesitter incremental select** — `gS` selects node at cursor, `;` expands to parent, `,` shrinks to child
 - 🔎 **Treesitter search** — `R` searches text and selects the surrounding syntax node (works with operators: `dR`, `yR`, `cR`)
 - 🩺 **Diagnostics jumping** — navigate all diagnostics (`]d`/`[d`) or errors only (`]e`/`[e`)
+- 🔀 **Git hunk jumping** — navigate git changed regions (`]g`/`[g`) with gitsigns.nvim integration
 - 🔎 **2-char find** — `f`/`F` for leap-style two-character search with labels
 - 🔍 **Live search** — `s` for incremental search with labeled results across all visible text
 - 🔎 **Fuzzy search** — `S` for fuzzy matching (type "fn" to match "function", "filename", etc.)
@@ -45,7 +46,7 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 - ✏️ **Multi-cursor edit** — `gmd`/`gmy` toggle-select multiple words, then delete or yank them all at once
 - 🔁 **Repeat** — `.` repeats the last SmartMotion
 - 🧩 **Fully modular pipeline** — Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action. Every stage is replaceable. Build entirely custom motions from scratch.
-- 📦 **10 presets, 50+ keybindings** — enable what you want, disable what you don't
+- 📦 **11 presets, 50+ keybindings** — enable what you want, disable what you don't
 
 ---
 
@@ -67,6 +68,7 @@ return {
       paste = true,        -- p, P
       treesitter = true,   -- ]], [[, ]c, [c, ]b, [b, daa, caa, yaa, dfn, cfn, yfn, saa
       diagnostics = true,  -- ]d, [d, ]e, [e
+      git = true,          -- ]g, [g
       misc = true,         -- . (repeat), gmd, gmy
     },
   },
@@ -218,6 +220,20 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 </details>
 
 <details>
+<summary><b>🔀 Git</b> — <code>]g</code> <code>[g</code> 🪟</summary>
+
+| Key  | Mode | Description                              |
+|------|------|------------------------------------------|
+| `]g` | n, o | Jump to next git hunk (changed region)   |
+| `[g` | n, o | Jump to previous git hunk                |
+
+> Works best with [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) installed. Falls back to `git diff` parsing without gitsigns.
+
+> Multi-window: labels appear in all visible splits.
+
+</details>
+
+<details>
 <summary><b>🔁 Misc</b> — <code>.</code> <code>gmd</code> <code>gmy</code></summary>
 
 | Key   | Mode | Description                                          |
@@ -258,7 +274,7 @@ gqj   — format from cursor to labeled line
 >]]   — indent from cursor to labeled function
 ```
 
-All jump-only motions (`w`, `b`, `e`, `ge`, `j`, `k`, `s`, `f`, `F`, `t`, `T`, `]]`, `[[`, `]c`, `[c`, `]b`, `[b`, `]d`, `[d`, `]e`, `[e`) are available in operator-pending mode. SmartMotion's own operators (`d`, `y`, `c`, `p`, `P`) and standalone actions (`gs`, `saa`, `gmd`, `gmy`) are not — they handle operations internally.
+All jump-only motions (`w`, `b`, `e`, `ge`, `j`, `k`, `s`, `f`, `F`, `t`, `T`, `]]`, `[[`, `]c`, `[c`, `]b`, `[b`, `]d`, `[d`, `]e`, `[e`, `]g`, `[g`) are available in operator-pending mode. SmartMotion's own operators (`d`, `y`, `c`, `p`, `P`) and standalone actions (`gs`, `saa`, `gmd`, `gmy`) are not — they handle operations internally.
 
 ---
 
@@ -270,6 +286,7 @@ Enabled by default for:
 - **Search**: `s`, `f`, `F`, `t`, `T`, `;`, `,`, `gs`
 - **Treesitter navigation**: `]]`, `[[`, `]c`, `[c`, `]b`, `[b`
 - **Diagnostics**: `]d`, `[d`, `]e`, `[e`
+- **Git**: `]g`, `[g`
 
 Word and line motions (`w`, `b`, `e`, `ge`, `j`, `k`) stay single-window — directional motions within one window are the natural UX.
 
