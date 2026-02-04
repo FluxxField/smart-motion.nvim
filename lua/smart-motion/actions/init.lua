@@ -40,6 +40,13 @@ local action_entries = {
 			description = "Changes text at the target and enters insert mode",
 		},
 	},
+	change_until = {
+		run = merge({ require("smart-motion.actions.change") }),
+		metadata = {
+			label = "Change Until",
+			description = "Changes from cursor up to (but not including) the target and enters insert mode",
+		},
+	},
 	change_jump = {
 		run = merge({
 			require("smart-motion.actions.jump"),
@@ -96,6 +103,13 @@ local action_entries = {
 		metadata = {
 			label = "Yank",
 			description = "Yanks (copies) the selected text",
+		},
+	},
+	yank_until = {
+		run = merge({ require("smart-motion.actions.yank") }),
+		metadata = {
+			label = "Yank Until",
+			description = "Yanks from cursor up to (but not including) the target",
 		},
 	},
 	yank_jump = {

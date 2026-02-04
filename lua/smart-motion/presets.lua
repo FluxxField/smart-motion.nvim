@@ -170,6 +170,19 @@ function presets.delete(exclude)
 				},
 			},
 		},
+		dt = {
+			collector = "lines",
+			extractor = "text_search_1_char_until",
+			filter = "filter_words_on_cursor_line_after_cursor",
+			visualizer = "hint_start",
+			action = "delete",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Delete Until Searched Text After Cursor",
+				description = "Deletes until the searched for text after the cursor",
+			},
+		},
 		dT = {
 			collector = "lines",
 			extractor = "text_search_1_char_until",
@@ -179,8 +192,8 @@ function presets.delete(exclude)
 			map = true,
 			modes = { "n" },
 			metadata = {
-				label = "Delete Until Searched Text",
-				description = "Deletes until the searched for text",
+				label = "Delete Until Searched Text Before Cursor",
+				description = "Deletes until the searched for text before the cursor",
 			},
 		},
 		rdw = {
@@ -233,6 +246,19 @@ function presets.yank(exclude)
 				},
 			},
 		},
+		yt = {
+			collector = "lines",
+			extractor = "text_search_1_char_until",
+			filter = "filter_words_on_cursor_line_after_cursor",
+			visualizer = "hint_start",
+			action = "yank_until",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Yank Until Searched Text After Cursor",
+				description = "Yank until the searched for text after the cursor",
+			},
+		},
 		yT = {
 			collector = "lines",
 			extractor = "text_search_1_char_until",
@@ -243,7 +269,7 @@ function presets.yank(exclude)
 			modes = { "n" },
 			metadata = {
 				label = "Yank Until Searched Text Before Cursor",
-				description = "Yank until the searched for text",
+				description = "Yank until the searched for text before the cursor",
 			},
 		},
 		ryw = {
@@ -294,6 +320,19 @@ function presets.change(exclude)
 				motion_state = {
 					allow_quick_action = true,
 				},
+			},
+		},
+		ct = {
+			collector = "lines",
+			extractor = "text_search_1_char_until",
+			filter = "filter_words_on_cursor_line_after_cursor",
+			visualizer = "hint_start",
+			action = "change_until",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Change Until Searched Text After Cursor",
+				description = "Change until the searched for text after the cursor",
 			},
 		},
 		cT = {

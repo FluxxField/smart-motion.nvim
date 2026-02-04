@@ -140,7 +140,7 @@ function motions.map_motion(name, motion_opts, opts)
 	if opts.which_key ~= false and package.loaded["which-key"] then
 		local wk = require("which-key")
 		for _, mode in ipairs(modes) do
-			wk.register({ trigger_key, desc = desc, mode = mode })
+			wk.add({ { trigger_key, desc = desc, mode = mode } })
 		end
 	end
 

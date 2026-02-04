@@ -39,41 +39,6 @@ function M.close_floating_windows()
 	log.debug("Floating window cleanup complete")
 end
 
---- Waits for the user to press a hint key and returns the associated jump target.
----@param ctx SmartMotionContext
----@param cfg SmartMotionConfig
----@param motion_state SmartMotionMotionState
----@return any|nil
-function M.wait_for_hint_selection(ctx, cfg, motion_state)
-	log.debug("Waiting for user hint selection")
-
-	if type(motion_state.assigned_hint_labels) ~= "table" or vim.tbl_isempty(motion_state.assigned_hint_labels) then
-		log.error("wait_for_hint_selection called with invalid or empty motion_state.assigned_hint_labels table")
-
-		return nil
-	end
-
-	local char = vim.fn.getcharstr()
-
-	if char == "" then
-		log.debug("User pressed nothing - selection cancelled")
-
-		return nil
-	end
-
-	local entry = motion_state.assigned_hint_labels[char]
-
-	if entry and entry.target then
-		log.debug("User selected hint: " .. vim.inspect(entry.target))
-
-		return entry.target
-	else
-		log.debug("No matching hint found for input: " .. char)
-
-		return nil
-	end
-end
-
 --- Prepares the motion by gathering context, config, and initializing state.
 ---@return SmartMotionContext?, SmartMotionConfig?, SmartMotionMotionState?
 function M.prepare_motion()
