@@ -27,7 +27,6 @@ M.defaults = {
 	disable_dim_background = false,
 	history_max_size = HISTORY_MAX_SIZE,
 	auto_select_target = false,
-	native_search = true,
 }
 
 ---@type SmartMotionConfig

@@ -59,11 +59,6 @@ function M.setup(user_config)
 		end
 	end
 
-	-- Native search label overlay
-	if validated_config.native_search ~= false then
-		require("smart-motion.search").setup(validated_config)
-	end
-
 	M.merge_filters = merge.merge_filters
 	M.merge_actions = merge.merge_actions
 
