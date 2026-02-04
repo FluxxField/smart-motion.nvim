@@ -17,6 +17,36 @@ local function walk_tree(node, node_types, results)
 	end
 end
 
+--- Yields a single treesitter node as a target.
+--- @param node TSNode
+--- @param bufnr integer
+--- @param extra_metadata? table
+local function yield_node(node, bufnr, extra_metadata)
+	local start_row, start_col, end_row, end_col = node:range()
+	local text = vim.treesitter.get_node_text(node, bufnr)
+
+	coroutine.yield({
+		text = text,
+		start_pos = { row = start_row, col = start_col },
+		end_pos = { row = end_row, col = end_col },
+		type = "treesitter",
+		metadata = vim.tbl_extend("force", { node_type = node:type() }, extra_metadata or {}),
+	})
+end
+
+--- Gets all named children of a node.
+--- @param node TSNode
+--- @return TSNode[]
+local function get_named_children(node)
+	local children = {}
+	for child in node:iter_children() do
+		if child:named() then
+			table.insert(children, child)
+		end
+	end
+	return children
+end
+
 --- Collects treesitter nodes as targets.
 --- Supports two modes via motion_state:
 ---   ts_query: raw treesitter query string (language-specific)
@@ -45,47 +75,94 @@ function M.run()
 		if motion_state.ts_query then
 			local query_ok, query = pcall(vim.treesitter.query.parse, lang, motion_state.ts_query)
 			if not query_ok or not query then
-				log.debug("Failed to parse treesitter query for lang '" .. lang .. "': " .. tostring(motion_state.ts_query))
+				log.debug(
+					"Failed to parse treesitter query for lang '" .. lang .. "': " .. tostring(motion_state.ts_query)
+				)
 				return
 			end
 
 			for id, node in query:iter_captures(root, bufnr) do
-				local start_row, start_col, end_row, end_col = node:range()
-				local text = vim.treesitter.get_node_text(node, bufnr)
-
-				coroutine.yield({
-					text = text,
-					start_pos = { row = start_row, col = start_col },
-					end_pos = { row = end_row, col = end_col },
-					type = "treesitter",
-					metadata = {
-						node_type = node:type(),
-						capture_name = query.captures[id],
-					},
-				})
+				yield_node(node, bufnr, { capture_name = query.captures[id] })
 			end
 
 			return
 		end
 
-		-- Mode 2: Node type matching (language-agnostic)
+		-- Mode 2: Yield a specific named field from matched nodes (e.g. function "name")
+		if motion_state.ts_node_types and motion_state.ts_child_field then
+			local nodes = {}
+			walk_tree(root, motion_state.ts_node_types, nodes)
+
+			for _, node in ipairs(nodes) do
+				local field_nodes = node:field(motion_state.ts_child_field)
+				for _, field_node in ipairs(field_nodes) do
+					yield_node(field_node, bufnr, {
+						parent_type = node:type(),
+						field_name = motion_state.ts_child_field,
+					})
+				end
+			end
+
+			return
+		end
+
+		-- Mode 3: Yield named children of matched container nodes (e.g. arguments)
+		-- When ts_around_separator is true, expands ranges to include trailing/leading separators.
+		if motion_state.ts_node_types and motion_state.ts_yield_children then
+			local containers = {}
+			walk_tree(root, motion_state.ts_node_types, containers)
+
+			for _, container in ipairs(containers) do
+				local named_children = get_named_children(container)
+
+				for i, child in ipairs(named_children) do
+					local sr, sc, er, ec = child:range()
+
+					-- Expand range to include separators (commas, whitespace) for "around" semantics
+					if motion_state.ts_around_separator and #named_children > 1 then
+						local is_last = (i == #named_children)
+						if not is_last then
+							-- Include trailing separator: extend end to start of next named child
+							local next_child = named_children[i + 1]
+							local nsr, nsc = next_child:range()
+							er = nsr
+							ec = nsc
+						else
+							-- Last child: include leading separator from end of previous named child
+							local prev_child = named_children[i - 1]
+							local _, _, per, pec = prev_child:range()
+							sr = per
+							sc = pec
+						end
+					end
+
+					local text = vim.api.nvim_buf_get_text(bufnr, sr, sc, er, ec, {})
+
+					coroutine.yield({
+						text = table.concat(text, "\n"),
+						start_pos = { row = sr, col = sc },
+						end_pos = { row = er, col = ec },
+						type = "treesitter",
+						metadata = {
+							node_type = child:type(),
+							parent_type = container:type(),
+							child_index = i,
+							child_count = #named_children,
+						},
+					})
+				end
+			end
+
+			return
+		end
+
+		-- Mode 4: Plain node type matching (language-agnostic)
 		if motion_state.ts_node_types then
 			local nodes = {}
 			walk_tree(root, motion_state.ts_node_types, nodes)
 
 			for _, node in ipairs(nodes) do
-				local start_row, start_col, end_row, end_col = node:range()
-				local text = vim.treesitter.get_node_text(node, bufnr)
-
-				coroutine.yield({
-					text = text,
-					start_pos = { row = start_row, col = start_col },
-					end_pos = { row = end_row, col = end_col },
-					type = "treesitter",
-					metadata = {
-						node_type = node:type(),
-					},
-				})
+				yield_node(node, bufnr)
 			end
 
 			return
