@@ -83,6 +83,16 @@ function M.reset_motion(ctx, cfg, motion_state)
 		})
 	end
 
+	-- Save char state for ;/, repeat if this was an f/F/t/T motion
+	local trigger_key = motion_state.motion and motion_state.motion.trigger_key
+	if trigger_key and vim.tbl_contains({ "f", "F", "t", "T" }, trigger_key) then
+		local search_text = motion_state.search_text
+		if search_text and search_text ~= "" then
+			local char_state = require("smart-motion.search.char_state")
+			char_state.save(search_text, motion_state.direction, motion_state.exclude_target or false)
+		end
+	end
+
 	-- Clear any virtual text and extmarks.
 	highlight.clear(ctx, cfg, motion_state)
 

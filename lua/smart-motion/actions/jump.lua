@@ -20,6 +20,15 @@ function M.run(ctx, cfg, motion_state)
 		row = target.end_pos.row
 	end
 
+	-- Till offset: exclude_target stops one position before the match
+	if motion_state.exclude_target then
+		if motion_state.direction == "after_cursor" then
+			col = col - 1
+		elseif motion_state.direction == "before_cursor" then
+			col = col + 1
+		end
+	end
+
 	if type(target) ~= "table" or not row or not col then
 		log.error("jump_to_target called with invalid target table: " .. vim.inspect(motion_state.selected_jump_target))
 
