@@ -26,6 +26,9 @@ function M.run(ctx, cfg, motion_state)
 		return
 	end
 
+	-- Save current position to jumplist before moving
+	vim.cmd("normal! m'")
+
 	local current_winid = vim.api.nvim_get_current_win()
 	if winid and winid ~= current_winid then
 		vim.api.nvim_set_current_win(winid)
@@ -38,6 +41,9 @@ function M.run(ctx, cfg, motion_state)
 		log.error("Failed to move cursor: " .. tostring(err))
 		return
 	end
+
+	-- Open any folds at the target position
+	vim.cmd("normal! zv")
 
 	log.debug(string.format("Cursor moved to line %d, col %d", row, col))
 end
