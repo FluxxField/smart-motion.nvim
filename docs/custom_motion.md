@@ -196,7 +196,71 @@ SmartMotionMotionEntry {
 
 ---
 
-## ?? Related Topics
+## Example: Treesitter Function Jump
+
+This motion jumps to function definitions after the cursor using the treesitter collector:
+
+```lua
+require("smart-motion").register_motion("]]", {
+  collector = "treesitter",
+  extractor = "pass_through",
+  modifier = "weight_distance",
+  filter = "filter_words_after_cursor",
+  visualizer = "hint_start",
+  action = "jump_centered",
+  map = true,
+  modes = { "n" },
+  metadata = {
+    label = "Jump to Next Function",
+    description = "Jump to a function definition after the cursor",
+    motion_state = {
+      ts_node_types = {
+        "function_declaration",
+        "function_definition",
+        "arrow_function",
+        "method_definition",
+        "function_item",
+        "method_declaration",
+        "method",
+      },
+    },
+  },
+})
+```
+
+The `treesitter` collector walks the syntax tree for matching node types and yields them as targets. Since targets are already fully formed, the `pass_through` extractor is used.
+
+---
+
+## Example: Diagnostics Jump
+
+This motion jumps to LSP error diagnostics after the cursor:
+
+```lua
+require("smart-motion").register_motion("]e", {
+  collector = "diagnostics",
+  extractor = "pass_through",
+  modifier = "weight_distance",
+  filter = "filter_words_after_cursor",
+  visualizer = "hint_start",
+  action = "jump_centered",
+  map = true,
+  modes = { "n" },
+  metadata = {
+    label = "Jump to Next Error",
+    description = "Jump to an error diagnostic after the cursor",
+    motion_state = {
+      diagnostic_severity = vim.diagnostic.severity.ERROR,
+    },
+  },
+})
+```
+
+The `diagnostics` collector fetches `vim.diagnostic.get()` results and the `diagnostic_severity` field in `motion_state` filters to only errors.
+
+---
+
+## Related Topics
 
 - [`registering.md`](./registering.md)
 - [`actions.md`](./actions.md)

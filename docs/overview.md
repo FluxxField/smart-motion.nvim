@@ -25,7 +25,7 @@ Covers:
 A guide to the built-in presets and how to use or customize them.
 
 Covers:
-- Available preset categories (words, lines, search, delete, yank, change)
+- All 10 preset categories (words, lines, search, delete, yank, change, paste, treesitter, diagnostics, misc)
 - Enabling or excluding mappings
 - Linking to the Presets Reference
 
@@ -145,6 +145,39 @@ Covers:
 - How to override highlight groups or provide custom colors
 
 ➡️ View [config.md](config.md)
+
+---
+
+## 📋 defaults.md
+
+Complete reference of all built-in modules.
+
+Covers:
+- All collectors, extractors, filters, visualizers, actions, wrappers, and presets
+- Quick-reference tables for every module
+
+➡️ View [defaults.md](defaults.md)
+
+---
+
+## 🔧 modifiers.md
+
+Modifiers transform targets between extraction and filtering.
+
+➡️ View [modifiers.md](modifiers.md)
+
+---
+
+## 📊 motion_state.md
+
+Full reference for the `motion_state` table passed through the pipeline.
+
+Covers:
+- Core settings, hint labeling, selection state
+- Search fields, treesitter fields, diagnostic fields
+- Action and paste settings
+
+➡️ View [motion_state.md](motion_state.md)
 
 ---
 

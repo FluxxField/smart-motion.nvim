@@ -39,15 +39,39 @@ This would:
 
 ---
 
-## ?? Built-in Filters
+## Built-in Filters
+
+### Base Filters
 
 | Name                   | Description                                  |
 | ---------------------- | -------------------------------------------- |
-| `default`              | No filtering - returns all targets unchanged |
-| `filter_visible_lines` | Keeps only targets in visible screen range   |
+| `default`              | No filtering — returns all targets unchanged |
+| `filter_visible`       | Keeps only targets visible in the current window |
+| `filter_cursor_line_only` | Keeps only targets on the cursor line     |
+| `first_target`         | Keeps only the first target                  |
+
+### Directional Filters (Merged Composites)
+
+These filters combine visibility filtering with directional logic. Each is a merged pipeline of simpler filters.
+
+| Name                                        | Description                                          |
+| ------------------------------------------- | ---------------------------------------------------- |
+| `filter_lines_after_cursor`                 | Visible lines after the cursor                       |
+| `filter_lines_before_cursor`                | Visible lines before the cursor                      |
+| `filter_lines_around_cursor`                | Visible lines before and after the cursor            |
+| `filter_words_after_cursor`                 | Visible words after the cursor                       |
+| `filter_words_before_cursor`                | Visible words before the cursor                      |
+| `filter_words_around_cursor`                | Visible words before and after the cursor            |
+
+### Cursor-Line Filters (Merged Composites)
+
+| Name                                        | Description                                          |
+| ------------------------------------------- | ---------------------------------------------------- |
+| `filter_words_on_cursor_line_after_cursor`   | Words on the cursor line after the cursor           |
+| `filter_words_on_cursor_line_before_cursor`  | Words on the cursor line before the cursor          |
 
 > [!NOTE]
-> Directional filtering (before/after cursor) is expected to move to filters in future versions.
+> Most built-in filters are merged composites — for example, `filter_words_after_cursor` combines `filter_visible_lines` + `filter_words_after_cursor` internally using the `merge()` utility from `filters/utils.lua`.
 
 ---
 

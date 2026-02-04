@@ -22,20 +22,41 @@ Actions are **completely open-ended**. You control the behavior.
 
 ## 📦 Built-in Actions
 
-| Name            | Description                                                               |
-| --------------- | ------------------------------------------------------------------------- |
-| `jump`          | Moves cursor to the target's position                                     |
-| `delete`        | Deletes text from current cursor to target                                |
-| `delete_jump`   | Jumps to the target and deletes from there                                |
-| `delete_until`  | Deletes up to (but not including) the target column                       |
-| `yank`          | Yanks from current position to the target                                 |
-| `yank_jump`     | Jumps to the target and yanks from there                                  |
-| `yank_until`    | Yanks up to (but not including) the target column                         |
-| `remote_delete` | Deletes the target without moving the cursor                              |
-| `remote_yank`   | Yanks the target without moving the cursor                                |
-| `change`        | Deletes text from the current cursor to the target and enters insert mode |
-| `change_jump`   | Jumps to the target and deletes, and enters insert mode from there        |
-| `change_until`  | Change up to (but not including) the target                               |
+| Name                 | Description                                                               |
+| -------------------- | ------------------------------------------------------------------------- |
+| `jump`               | Moves cursor to the target's position                                     |
+| `jump_centered`      | Jumps to the target and centers the screen (`zz`)                         |
+| `center`             | Centers the screen on the cursor                                          |
+| `delete`             | Deletes the target text (uses `resolve_range`)                            |
+| `delete_jump`        | Jumps to the target and deletes from there                                |
+| `delete_until`       | Deletes up to (but not including) the target                              |
+| `delete_line`        | Deletes the entire line at the target                                     |
+| `yank`               | Yanks the target text (uses `resolve_range`)                              |
+| `yank_jump`          | Jumps to the target and yanks from there                                  |
+| `yank_until`         | Yanks up to (but not including) the target                                |
+| `yank_line`          | Yanks the entire line at the target                                       |
+| `change`             | Changes the target text and enters insert mode                            |
+| `change_jump`        | Jumps to the target and starts a change                                   |
+| `change_until`       | Changes up to (but not including) the target                              |
+| `change_line`        | Changes the entire line at the target                                     |
+| `paste`              | Pastes text at the target position                                        |
+| `paste_jump`         | Jumps to the target and pastes                                            |
+| `paste_line`         | Pastes the entire line at the target                                      |
+| `remote_delete`      | Deletes the target without moving the cursor                              |
+| `remote_delete_line` | Deletes the line at the target without moving the cursor                  |
+| `remote_yank`        | Yanks the target without moving the cursor                                |
+| `remote_yank_line`   | Yanks the line at the target without moving the cursor                    |
+| `restore`            | Restores the cursor to its original location (used in remote actions)     |
+| `run_motion`         | Re-runs a motion from history (used by `.` repeat)                        |
+
+### Range-Based Actions
+
+The `delete`, `yank`, and `change` actions use a shared `resolve_range()` helper from `actions/utils.lua` to determine their operation range:
+
+- **When `exclude_target` is false** (default): operates on the target itself (`start_pos` to `end_pos`)
+- **When `exclude_target` is true** ("until" mode): operates from the cursor to the target position
+
+This means `delete` and `delete_until` share the same underlying action module — the behavior is controlled by whether `motion_state.exclude_target` is set (which is done by the `text_search_1_char_until` extractor).
 
 ---
 

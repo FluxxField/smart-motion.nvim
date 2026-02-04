@@ -5,7 +5,7 @@ An extractor takes raw data from a collector and extracts jumpable targets from 
 ## How It Works
 
 1. It receives raw data from a collector (e.g., lines of text).
-2. It finds words, function names, symbols, etc..
+2. It finds words, function names, symbols, etc.
 3. It yields structured jump targets.
 
 ---
@@ -28,36 +28,30 @@ function extract_words(ctx, line_data)
 end
 ```
 
-✅ Finds words inside lines and turns them into jump targets.
+Finds words inside lines and turns them into jump targets.
 
 ---
 
-## Example: `diagnostics.lua` (Extracting Errors from LSP Diagnostics)
+## Example: `pass_through.lua` (Passing Collector Data Through)
 
 ```lua
-function extract_diagnostics(ctx, diagnostics)
-    return coroutine.wrap(function()
-        for _, diag in ipairs(diagnostics) do
-            coroutine.yield({
-                bufnr = ctx.bufnr,
-                lnum = diag.lnum,
-                col = diag.col,
-                text = diag.message,
-                type = "error",
-            })
-        end
-    end)
+function M.run(ctx, cfg, motion_state, data)
+    return data
 end
 ```
 
-✅ Finds error locations from LSP and turns them into jump targets.
+The `pass_through` extractor returns collector data unchanged. This is used when a collector already yields fully-formed targets (e.g., `treesitter` and `diagnostics` collectors).
 
 ---
 
 ## When to Use an Extractor?
 
-| Use Case |	Example Extractor |
+| Use Case | Example Extractor |
 | --- | --- |
-| Extracting words from lines |	`extract_words` |
-| Extracting function names from Treesitter |	`extract_function_names` |
-| Extracting LSP diagnostics |	`extract_diagnostics` |
+| Extracting words from lines | `words` |
+| Extracting whole lines | `lines` |
+| 1-character search (f/F) | `text_search_1_char` |
+| 1-character until search (t/T) | `text_search_1_char_until` |
+| 2-character search | `text_search_2_char` |
+| Live incremental search | `live_search` |
+| Passing pre-formed targets through | `pass_through` |
