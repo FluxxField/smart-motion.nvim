@@ -46,37 +46,37 @@ local quince = "yellow"
 -- Try deleting several color values below:
 
 local colors = {
-  primary = "blue",
-  secondary = "green",
-  accent = "orange",
-  warning = "red",
-  info = "cyan",
-  success = "green",
-  danger = "red",
-  muted = "gray",
-  highlight = "yellow",
-  background = "white",
-  foreground = "black",
-  border = "silver",
+	primary = "blue",
+	secondary = "green",
+	accent = "orange",
+	warning = "red",
+	info = "cyan",
+	success = "green",
+	danger = "red",
+	muted = "gray",
+	highlight = "yellow",
+	background = "white",
+	foreground = "black",
+	border = "silver",
 }
 
 local function get_color_by_category(category)
-  return colors[category] or "unknown"
+	return colors[category] or "unknown"
 end
 
 -- Another good target for gmd — delete some of these status strings:
 
 local statuses = {
-  "pending",
-  "active",
-  "suspended",
-  "cancelled",
-  "completed",
-  "archived",
-  "draft",
-  "review",
-  "approved",
-  "rejected",
+	"pending",
+	"active",
+	"suspended",
+	"cancelled",
+	"completed",
+	"archived",
+	"draft",
+	"review",
+	"approved",
+	"rejected",
 }
 
 -- ── Section 3: Multi-cursor yank (gmy) ───────────────────────
@@ -91,26 +91,26 @@ local statuses = {
 -- Try yanking several names below:
 
 local team = {
-  { name = "Alice", role = "lead", skills = { "lua", "python", "rust" } },
-  { name = "Bob", role = "senior", skills = { "go", "typescript", "lua" } },
-  { name = "Charlie", role = "mid", skills = { "python", "java", "sql" } },
-  { name = "Diana", role = "senior", skills = { "rust", "c", "zig" } },
-  { name = "Eve", role = "junior", skills = { "javascript", "html", "css" } },
-  { name = "Frank", role = "mid", skills = { "kotlin", "swift", "dart" } },
-  { name = "Grace", role = "lead", skills = { "haskell", "ocaml", "elixir" } },
+	{ name = "Alice", role = "lead", skills = { "lua", "python", "rust" } },
+	{ name = "Bob", role = "senior", skills = { "go", "typescript", "lua" } },
+	{ name = "Charlie", role = "mid", skills = { "python", "java", "sql" } },
+	{ name = "Diana", role = "senior", skills = { "rust", "c", "zig" } },
+	{ name = "Eve", role = "junior", skills = { "javascript", "html", "css" } },
+	{ name = "Frank", role = "mid", skills = { "kotlin", "swift", "dart" } },
+	{ name = "Grace", role = "lead", skills = { "haskell", "ocaml", "elixir" } },
 }
 
 local function list_team_skills(members)
-  local all_skills = {}
-  for _, member in ipairs(members) do
-    for _, skill in ipairs(member.skills) do
-      if not all_skills[skill] then
-        all_skills[skill] = {}
-      end
-      all_skills[skill][#all_skills[skill] + 1] = member.name
-    end
-  end
-  return all_skills
+	local all_skills = {}
+	for _, member in ipairs(members) do
+		for _, skill in ipairs(member.skills) do
+			if not all_skills[skill] then
+				all_skills[skill] = {}
+			end
+			all_skills[skill][#all_skills[skill] + 1] = member.name
+		end
+	end
+	return all_skills
 end
 
 -- Try: gmy, toggle "Alice", "Charlie", "Eve" → Enter
@@ -134,46 +134,50 @@ end
 -- - s (search), select, then w (word jump chain)
 
 local function generate_sequence(start, count, step)
-  step = step or 1
-  local seq = {}
-  for i = 0, count - 1 do
-    seq[#seq + 1] = start + (i * step)
-  end
-  return seq
+	step = step or 1
+	local seq = {}
+	for i = 0, count - 1 do
+		seq[#seq + 1] = start + (i * step)
+	end
+	return seq
 end
 
 local function interleave(a, b)
-  local result = {}
-  local max = math.max(#a, #b)
-  for i = 1, max do
-    if a[i] then result[#result + 1] = a[i] end
-    if b[i] then result[#result + 1] = b[i] end
-  end
-  return result
+	local result = {}
+	local max = math.max(#a, #b)
+	for i = 1, max do
+		if a[i] then
+			result[#result + 1] = a[i]
+		end
+		if b[i] then
+			result[#result + 1] = b[i]
+		end
+	end
+	return result
 end
 
 local function chunk(tbl, size)
-  local chunks = {}
-  for i = 1, #tbl, size do
-    local c = {}
-    for j = i, math.min(i + size - 1, #tbl) do
-      c[#c + 1] = tbl[j]
-    end
-    chunks[#chunks + 1] = c
-  end
-  return chunks
+	local chunks = {}
+	for i = 1, #tbl, size do
+		local c = {}
+		for j = i, math.min(i + size - 1, #tbl) do
+			c[#c + 1] = tbl[j]
+		end
+		chunks[#chunks + 1] = c
+	end
+	return chunks
 end
 
 local function rotate(tbl, n)
-  n = n % #tbl
-  local result = {}
-  for i = n + 1, #tbl do
-    result[#result + 1] = tbl[i]
-  end
-  for i = 1, n do
-    result[#result + 1] = tbl[i]
-  end
-  return result
+	n = n % #tbl
+	local result = {}
+	for i = n + 1, #tbl do
+		result[#result + 1] = tbl[i]
+	end
+	for i = 1, n do
+		result[#result + 1] = tbl[i]
+	end
+	return result
 end
 
 -- ── Section 5: Combined workflow ──────────────────────────────
@@ -198,5 +202,5 @@ print("Merged: " .. table.concat(merged, ", "))
 print("Rotated: " .. table.concat(rotated, ", "))
 print("Groups:")
 for i, group in ipairs(groups) do
-  print("  " .. i .. ": " .. table.concat(group, ", "))
+	print("  " .. i .. ": " .. table.concat(group, ", "))
 end

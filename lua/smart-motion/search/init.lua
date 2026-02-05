@@ -288,6 +288,13 @@ function M._show_labels(pattern)
 	-- Jump if target selected
 	if motion_state.selected_jump_target then
 		jump.run(ctx, cfg, motion_state)
+
+		local history = require("smart-motion.core.history")
+		history.add({
+			motion = { trigger_key = "/" },
+			target = motion_state.selected_jump_target,
+			metadata = { time_stamp = os.time() },
+		})
 	end
 end
 

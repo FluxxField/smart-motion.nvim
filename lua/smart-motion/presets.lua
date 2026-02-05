@@ -598,6 +598,13 @@ function presets.misc(exclude)
 			require("smart-motion.actions.multi_edit").run("yank")
 		end, { desc = "Multi-cursor yank", noremap = true, silent = true })
 	end
+
+	-- Register g. keymap for history browsing
+	if not (type(exclude) == "table" and exclude["g."] == false) then
+		vim.keymap.set("n", "g.", function()
+			require("smart-motion.actions.history_browse").run()
+		end, { desc = "Browse motion history", noremap = true, silent = true })
+	end
 end
 
 --- @param exclude? string[]
