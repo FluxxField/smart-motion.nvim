@@ -2,12 +2,14 @@ local consts = require("smart-motion.consts")
 local log = require("smart-motion.core.log")
 
 local HISTORY_MAX_SIZE = consts.HISTORY_MAX_SIZE
-local HISTORY_VERSION = 1
+local HISTORY_VERSION = 2
 local HISTORY_MAX_AGE_SECS = 30 * 24 * 3600 -- 30 days
 
 local M = {
 	entries = {},
+	pins = {},
 	max_size = HISTORY_MAX_SIZE,
+	max_pins = consts.PINS_MAX_SIZE,
 }
 
 --- Returns a dedup key for an entry based on filepath and position.
@@ -29,14 +31,18 @@ function M.add(entry)
 		end
 	end
 
-	-- Deduplicate: remove existing entry at same location
+	-- Deduplicate: remove existing entry at same location, carry forward visit_count
 	local key = M._entry_key(entry)
+	local carried_visit_count = 0
 	for i = #M.entries, 1, -1 do
 		if M._entry_key(M.entries[i]) == key then
+			carried_visit_count = M.entries[i].visit_count or 1
 			table.remove(M.entries, i)
 			break
 		end
 	end
+
+	entry.visit_count = carried_visit_count + 1
 
 	table.insert(M.entries, 1, entry)
 
@@ -51,6 +57,75 @@ end
 
 function M.clear()
 	M.entries = {}
+end
+
+--- Computes a frecency score for an entry (higher = more relevant).
+---@param entry table
+---@return number
+function M._frecency_score(entry)
+	local visit_count = entry.visit_count or 1
+	local elapsed = os.time() - (entry.metadata and entry.metadata.time_stamp or 0)
+	local decay
+	if elapsed < 3600 then
+		decay = 1.0 -- < 1 hour
+	elseif elapsed < 86400 then
+		decay = 0.8 -- < 1 day
+	elseif elapsed < 604800 then
+		decay = 0.5 -- < 1 week
+	else
+		decay = 0.3 -- older
+	end
+	return visit_count * decay
+end
+
+--- Toggles a pin at the current cursor position.
+function M.toggle_pin()
+	local filepath = vim.api.nvim_buf_get_name(0)
+	if filepath == "" then
+		vim.notify("Cannot pin: buffer has no file", vim.log.levels.WARN)
+		return
+	end
+
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local row = cursor[1] - 1 -- 0-indexed
+	local col = cursor[2]
+	local cword = vim.fn.expand("<cword>")
+
+	-- Build a pin entry
+	local pin_entry = {
+		filepath = filepath,
+		target = {
+			text = cword,
+			type = "pin",
+			start_pos = { row = row, col = col },
+			end_pos = { row = row, col = col + #cword },
+			metadata = {
+				pinned = true,
+				filetype = vim.bo.filetype,
+			},
+		},
+		metadata = { time_stamp = os.time() },
+	}
+
+	local key = M._entry_key(pin_entry)
+
+	-- Check if already pinned at this location
+	for i, pin in ipairs(M.pins) do
+		if M._entry_key(pin) == key then
+			table.remove(M.pins, i)
+			vim.notify("Unpinned", vim.log.levels.INFO)
+			return
+		end
+	end
+
+	-- Check max pins
+	if #M.pins >= M.max_pins then
+		vim.notify("Max pins reached (" .. M.max_pins .. "). Unpin one first.", vim.log.levels.WARN)
+		return
+	end
+
+	table.insert(M.pins, pin_entry)
+	vim.notify("Pinned (" .. #M.pins .. "/" .. M.max_pins .. ")", vim.log.levels.INFO)
 end
 
 --- Gets the project root via git, falling back to cwd.
@@ -95,6 +170,7 @@ function M._serialize_entry(entry)
 				},
 			},
 			filepath = entry.filepath,
+			visit_count = entry.visit_count or 1,
 			metadata = { time_stamp = entry.metadata and entry.metadata.time_stamp or os.time() },
 		}
 	end)
@@ -121,6 +197,7 @@ function M._deserialize_entry(data)
 				},
 			},
 			filepath = data.filepath,
+			visit_count = data.visit_count or 1,
 			metadata = data.metadata or { time_stamp = os.time() },
 		}
 	end)
@@ -130,16 +207,42 @@ function M._deserialize_entry(data)
 	return nil
 end
 
+--- Serializes a pin entry for persistence.
+---@param pin table
+---@return table|nil
+function M._serialize_pin(pin)
+	local ok, result = pcall(function()
+		local target = pin.target or {}
+		return {
+			target = {
+				text = target.text,
+				start_pos = target.start_pos,
+				end_pos = target.end_pos,
+				type = target.type,
+				metadata = {
+					pinned = true,
+					filetype = target.metadata and target.metadata.filetype or nil,
+				},
+			},
+			filepath = pin.filepath,
+			metadata = { time_stamp = pin.metadata and pin.metadata.time_stamp or os.time() },
+		}
+	end)
+	if ok then
+		return result
+	end
+	return nil
+end
+
 --- Merges in-memory entries with existing disk entries for concurrent session support.
---- In-memory entries take priority; disk-only entries are appended.
---- Result is sorted by timestamp (most recent first) and trimmed to max_size.
----@return table[] merged entries
+--- Returns { entries = ..., pins = ... }
+---@return table
 function M._merge_with_disk()
 	local filepath = M._get_history_filepath()
 
 	local f = io.open(filepath, "r")
 	if not f then
-		return M.entries
+		return { entries = M.entries, pins = M.pins }
 	end
 
 	local read_ok, content = pcall(function()
@@ -150,15 +253,20 @@ function M._merge_with_disk()
 
 	if not read_ok or not content or content == "" then
 		pcall(function() f:close() end)
-		return M.entries
+		return { entries = M.entries, pins = M.pins }
 	end
 
 	local decode_ok, data = pcall(vim.fn.json_decode, content)
-	if not decode_ok or type(data) ~= "table" or data.version ~= HISTORY_VERSION then
-		return M.entries
+	if not decode_ok or type(data) ~= "table" then
+		return { entries = M.entries, pins = M.pins }
 	end
 
-	-- Start with in-memory entries (current session takes priority)
+	-- Accept version 1 or 2
+	if data.version ~= 1 and data.version ~= 2 then
+		return { entries = M.entries, pins = M.pins }
+	end
+
+	-- Merge entries
 	local seen = {}
 	local merged = {}
 
@@ -170,36 +278,74 @@ function M._merge_with_disk()
 		end
 	end
 
-	-- Add disk entries not already present from current session
 	local now = os.time()
 	for _, raw in ipairs(data.entries or {}) do
 		local entry = M._deserialize_entry(raw)
 		if entry then
 			local key = M._entry_key(entry)
 			if not seen[key] then
-				-- Skip expired
 				local ts = entry.metadata and entry.metadata.time_stamp or 0
 				if (now - ts) <= HISTORY_MAX_AGE_SECS then
 					seen[key] = true
 					table.insert(merged, entry)
 				end
+			else
+				-- Disk duplicate: take max visit_count
+				for _, mem_entry in ipairs(merged) do
+					if M._entry_key(mem_entry) == key then
+						local disk_vc = entry.visit_count or 1
+						local mem_vc = mem_entry.visit_count or 1
+						mem_entry.visit_count = math.max(disk_vc, mem_vc)
+						break
+					end
+				end
 			end
 		end
 	end
 
-	-- Sort by timestamp descending (most recent first)
 	table.sort(merged, function(a, b)
 		local ta = a.metadata and a.metadata.time_stamp or 0
 		local tb = b.metadata and b.metadata.time_stamp or 0
 		return ta > tb
 	end)
 
-	-- Trim to max_size
 	while #merged > M.max_size do
 		table.remove(merged)
 	end
 
-	return merged
+	-- Merge pins
+	local pin_seen = {}
+	local merged_pins = {}
+
+	-- In-memory pins take priority
+	for _, pin in ipairs(M.pins) do
+		local key = M._entry_key(pin)
+		if not pin_seen[key] then
+			pin_seen[key] = true
+			table.insert(merged_pins, pin)
+		end
+	end
+
+	-- Append disk-only pins
+	if data.version == 2 and type(data.pins) == "table" then
+		for _, raw in ipairs(data.pins) do
+			local pin = M._deserialize_entry(raw)
+			if pin then
+				local key = M._entry_key(pin)
+				if not pin_seen[key] then
+					pin_seen[key] = true
+					table.insert(merged_pins, pin)
+				end
+			end
+		end
+	end
+
+	-- Trim pins to max
+	while #merged_pins > M.max_pins do
+		table.remove(merged_pins)
+	end
+
+	return { entries = merged, pins = merged_pins }
 end
 
 --- Saves all history entries to disk as JSON.
@@ -212,20 +358,29 @@ function M._save()
 	vim.fn.mkdir(dir, "p")
 
 	-- Merge with disk for concurrent session support
-	local entries_to_save = M._merge_with_disk()
+	local merged = M._merge_with_disk()
 
-	local serialized = {}
-	for _, entry in ipairs(entries_to_save) do
+	local serialized_entries = {}
+	for _, entry in ipairs(merged.entries) do
 		local s = M._serialize_entry(entry)
 		if s then
-			table.insert(serialized, s)
+			table.insert(serialized_entries, s)
+		end
+	end
+
+	local serialized_pins = {}
+	for _, pin in ipairs(merged.pins) do
+		local s = M._serialize_pin(pin)
+		if s then
+			table.insert(serialized_pins, s)
 		end
 	end
 
 	local data = {
 		version = HISTORY_VERSION,
 		project_root = M._get_project_root(),
-		entries = serialized,
+		entries = serialized_entries,
+		pins = serialized_pins,
 	}
 
 	local ok, json = pcall(vim.fn.json_encode, data)
@@ -274,7 +429,8 @@ function M._load()
 		return
 	end
 
-	if data.version ~= HISTORY_VERSION then
+	-- Accept version 1 or 2 (backward compat)
+	if data.version ~= 1 and data.version ~= 2 then
 		log.warn("History file version mismatch (expected " .. HISTORY_VERSION .. "), starting fresh")
 		return
 	end
@@ -284,6 +440,8 @@ function M._load()
 	end
 
 	local now = os.time()
+
+	-- Load entries
 	local loaded = {}
 	for _, raw in ipairs(data.entries) do
 		local entry = M._deserialize_entry(raw)
@@ -291,25 +449,47 @@ function M._load()
 			-- Expiry: skip entries older than 30 days
 			local ts = entry.metadata and entry.metadata.time_stamp or 0
 			if (now - ts) > HISTORY_MAX_AGE_SECS then
-				goto continue
+				goto continue_entry
 			end
 
 			-- Stale pruning: skip entries for files that no longer exist
 			if entry.filepath and entry.filepath ~= "" and vim.fn.filereadable(entry.filepath) == 0 then
-				goto continue
+				goto continue_entry
 			end
 
 			table.insert(loaded, entry)
 		end
-		::continue::
+		::continue_entry::
 	end
 
-	-- Trim to current max_size
 	while #loaded > M.max_size do
 		table.remove(loaded)
 	end
 
 	M.entries = loaded
+
+	-- Load pins (version 2 only)
+	if data.version == 2 and type(data.pins) == "table" then
+		local loaded_pins = {}
+		for _, raw in ipairs(data.pins) do
+			local pin = M._deserialize_entry(raw)
+			if pin then
+				-- Stale pruning: skip pins for files that no longer exist
+				if pin.filepath and pin.filepath ~= "" and vim.fn.filereadable(pin.filepath) == 0 then
+					goto continue_pin
+				end
+
+				table.insert(loaded_pins, pin)
+			end
+			::continue_pin::
+		end
+
+		while #loaded_pins > M.max_pins do
+			table.remove(loaded_pins)
+		end
+
+		M.pins = loaded_pins
+	end
 end
 
 --- Sets up VimLeavePre autocmd to save history on exit.

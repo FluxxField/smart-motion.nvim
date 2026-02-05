@@ -20,7 +20,7 @@ SmartMotion ships with **13 presets** containing **57+ keybindings**. Each prese
 | `git` | `]g` `[g` | Git hunk navigation |
 | `quickfix` | `]q` `[q` `]l` `[l` | Quickfix/location list |
 | `marks` | `g'` `gm` | Mark navigation and setting |
-| `misc` | `.` `g.` `gmd` `gmy` | Repeat, history, and multi-cursor |
+| `misc` | `.` `g.` `gp` `gmd` `gmy` | Repeat, history, pins, and multi-cursor |
 
 ---
 
@@ -370,22 +370,37 @@ Press gm → labels appear on words → select target → type 'a' → mark 'a' 
 
 ## misc
 
-Repeat, history, and multi-cursor operations.
+Repeat, history, pins, and multi-cursor operations.
 
 | Key | Modes | What it does |
 |-----|-------|--------------|
 | `.` | n | **Repeat** last SmartMotion |
-| `g.` | n | **History browser** — browse and jump to past motion targets |
+| `g.` | n | **History browser** — browse pins and past targets with frecency ranking and action mode |
+| `gp` | n | **Toggle pin** — bookmark/unbookmark the current cursor position |
 | `gmd` | n | **Multi-cursor delete** — toggle-select multiple words, delete all |
 | `gmy` | n | **Multi-cursor yank** — toggle-select multiple words, yank all |
 
 ### History Browser (`g.`)
 
 ```
-Press g. → floating window shows recent motion targets → press label → jump to that location
+Press g. → floating window with pins at top, frecency-ranked entries below
+→ press number (1-9) to jump to a pin
+→ press letter label to jump to an entry
+→ press d/y/c to enter action mode, then press label to act on that target remotely
 ```
 
-Entries show the motion key, target text, file, line number, and time elapsed. History persists across Neovim sessions — see **[Advanced Features: Motion History](Advanced-Features.md#motion-history)** for details.
+The browser shows two sections: **pins** (numbered `1`-`9` with `*` marker) and **entries** (letter labels, sorted by frecency with `█` bar indicators). Press `d`, `y`, or `c` to enter action mode — the title changes to `[D]`/`[Y]`/`[C]`, then press a label to delete, yank, or change that target without navigating there.
+
+History persists across Neovim sessions. Visit counts accumulate over time, pushing frequently-visited locations to the top. See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)** for full details.
+
+### Pins (`gp`)
+
+```
+Press gp → "Pinned (1/9)" — current location bookmarked
+Press gp again at same spot → "Unpinned"
+```
+
+Up to 9 pins. Pins persist across sessions and appear at the top of the history browser with number labels for instant access.
 
 ### Multi-Cursor (`gmd`/`gmy`)
 

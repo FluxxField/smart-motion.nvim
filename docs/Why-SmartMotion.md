@@ -18,7 +18,7 @@ SmartMotion takes a different approach.
 
 ## SmartMotion is a Framework
 
-The 57+ built-in keybindings aren't special. They're built using the exact same system available to you:
+The 59+ built-in keybindings aren't special. They're built using the exact same system available to you:
 
 ```lua
 -- This is literally how the built-in 'w' motion is defined
@@ -249,6 +249,6 @@ SmartMotion shines when you want **power and extensibility**. If you don't need 
 
 → **[Quick Start](Quick-Start.md)** — Get running in 60 seconds
 
-→ **[Presets Guide](Presets.md)** — See all 57+ built-in keybindings
+→ **[Presets Guide](Presets.md)** — See all 59+ built-in keybindings
 
 → **[Build Your Own](Building-Custom-Motions.md)** — Create your first custom motion
