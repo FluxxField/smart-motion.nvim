@@ -12,7 +12,7 @@ Other motion plugins give you a fixed set of features. SmartMotion gives you a *
 Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action
 ```
 
-This isn't just a plugin. It's a **framework**. The 57+ built-in keybindings? They're all built on the same system you can use to create your own.
+This isn't just a plugin. It's a **framework**. The 59+ built-in keybindings? They're all built on the same system you can use to create your own.
 
 ---
 
@@ -95,7 +95,7 @@ Search, treesitter, and diagnostic motions show labels across **all visible spli
 }
 ```
 
-That's it. You now have 57+ motions that work together seamlessly.
+That's it. You now have 59+ motions that work together seamlessly.
 
 ---
 
@@ -157,7 +157,7 @@ The possibilities are endless because **you control every stage**.
 - **[Why SmartMotion?](Why-SmartMotion.md)** — Philosophy and comparison with alternatives
 
 ### Using SmartMotion
-- **[Presets Guide](Presets.md)** — All 13 presets and 57+ keybindings explained
+- **[Presets Guide](Presets.md)** — All 13 presets and 59+ keybindings explained
 - **[Advanced Features](Advanced-Features.md)** — Flow state, multi-window, operator-pending mode
 
 ### Building Your Own

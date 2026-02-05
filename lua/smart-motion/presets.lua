@@ -605,6 +605,13 @@ function presets.misc(exclude)
 			require("smart-motion.actions.history_browse").run()
 		end, { desc = "Browse motion history", noremap = true, silent = true })
 	end
+
+	-- Register gp keymap for toggling pins
+	if not (type(exclude) == "table" and exclude["gp"] == false) then
+		vim.keymap.set("n", "gp", function()
+			require("smart-motion.core.history").toggle_pin()
+		end, { desc = "Toggle pin at cursor", noremap = true, silent = true })
+	end
 end
 
 --- @param exclude? string[]

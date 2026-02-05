@@ -436,39 +436,109 @@ Actions execute in order. This is how SmartMotion builds compound operations wit
 
 ## Motion History
 
-`g.` opens a floating window showing your recent motion targets. Select an entry to jump back.
+`g.` opens a floating window showing your motion history. But this isn't just a list of recent jumps — it's a full-featured history system with **pins**, **frecency ranking**, and **remote actions**.
 
-### What's Shown
+### The Browser
 
-Each entry displays:
-- **Label** — press to jump
-- **Motion key** — which motion triggered it (`w`, `dw`, `s`, `/`, `R`, etc.)
+```
+ 1  *  "authenticate"          auth.lua:42
+ 2  *  "render"                app.tsx:15
+────────────────────────────────────────────────
+ f  s   "config"        ████   config.lua:8     just now
+ j  dw  "handle_error"  ███    server.lua:30    5m ago
+ k  w   "validate"      ██     utils.lua:12     2h ago
+```
+
+Two sections:
+- **Pins** (top) — your bookmarked locations, numbered `1`-`9`, marked with `*`
+- **Entries** (bottom) — all history, sorted by frecency, with letter labels
+
+### Pins (`gp`)
+
+Pin any cursor position as a persistent bookmark:
+
+```
+gp   — toggle pin at cursor location
+```
+
+- Press `gp` on a location → "Pinned (1/9)"
+- Press `gp` on the same location → "Unpinned"
+- Up to 9 pins, persisted across sessions
+- Pins show at the top of the history browser with number labels
+
+Pins are your anchors — the places you keep coming back to. Pin your main function, your test file entry point, your config section.
+
+### Frecency Ranking
+
+History entries are ranked by **frecency** — a combination of visit frequency and recency:
+
+```
+score = visit_count * decay
+```
+
+| Time since last visit | Decay |
+|----------------------|-------|
+| < 1 hour             | 1.0   |
+| < 1 day              | 0.8   |
+| < 1 week             | 0.5   |
+| Older                | 0.3   |
+
+The more you visit a location, the higher it climbs. The frecency bar (`█` to `████`) shows relative ranking at a glance. Locations you visit repeatedly rise to the top; rarely-visited entries sink.
+
+### Action Mode (`d`/`y`/`c`)
+
+Inside the history browser, press `d`, `y`, or `c` to enter action mode:
+
+1. Press `d` — title changes to `[D]`
+2. Press a label — that entry's text is deleted remotely (without navigating there)
+3. The deleted text goes into the `"` register
+
+All three actions:
+
+| Key | Action | What happens |
+|-----|--------|--------------|
+| `d` | Delete | Text deleted at target, saved to register |
+| `y` | Yank   | Text yanked from target into register |
+| `c` | Change | Navigates to target, deletes text, enters insert mode |
+
+Actions work **remotely** — `d` and `y` operate on the target's buffer without leaving your current position. The buffer is loaded silently if needed. If the text at the target has changed since it was recorded, you'll see a warning but the action proceeds.
+
+### What Each Entry Shows
+
+- **Label** — number for pins, letter for entries
+- **Pin marker** — `*` for pinned locations
+- **Motion key** — which motion triggered it (`w`, `dw`, `s`, etc.)
 - **Target text** — the text at the target location
+- **Frecency bar** — relative ranking indicator (`█` to `████`)
 - **File:line** — where the target is
 - **Time elapsed** — how long ago (just now, 5m ago, 2h ago, 3d ago)
 
 ### Persistent History
 
-History is saved to disk automatically and restored when you reopen Neovim. Your `g.` history survives across sessions.
+History and pins are saved to disk automatically and restored when you reopen Neovim.
 
 - **Storage location:** `~/.local/share/nvim/smart-motion/history/`
 - **Per-project:** Each git repo (or working directory) gets its own history file
 - **Saved on exit:** `VimLeavePre` autocmd writes history to disk
 - **Loaded on startup:** `setup()` loads previous session's history
+- **Visit counts persist** — frecency scoring works across sessions
 
 ### Deduplication
 
-Jumping to the same location multiple times doesn't fill history with duplicates. When a new entry matches an existing one (same file and position), the old entry is replaced and the new one goes to the top.
+Jumping to the same location multiple times doesn't fill history with duplicates. When a new entry matches an existing one (same file and position), the old entry is replaced, its `visit_count` is carried forward (and incremented), and the new entry goes to the top.
 
 ### Session Merging
 
-Multiple Neovim sessions in the same project merge their history on save. If session A saved entries and session B exits later, B's save merges both — no entries are lost.
+Multiple Neovim sessions in the same project merge their history and pins on save. If session A saved entries and session B exits later, B's save merges both — no entries are lost.
 
-Current session entries take priority over disk entries at the same location. The merged result is sorted by timestamp (most recent first) and trimmed to `history_max_size`.
+- **Entries:** current session takes priority at the same location; `visit_count` takes the max from both
+- **Pins:** in-memory pins take priority; disk-only pins are appended; deduped by location
+
+The merged result is trimmed to `history_max_size` for entries and 9 for pins.
 
 ### Stale Entry Pruning
 
-Entries pointing to files that no longer exist on disk are automatically removed when history is loaded at startup.
+Entries and pins pointing to files that no longer exist on disk are automatically removed when history is loaded at startup.
 
 ### Entry Expiry
 
@@ -490,6 +560,10 @@ The history browser handles three cases:
 3. **Buffer closed** — reopens the file from disk
 
 Jumplist integration: `m'` is saved before navigating, so `<C-o>` takes you back.
+
+### Version Migration
+
+History files are versioned. Version 1 files (before pins and frecency) are loaded seamlessly — `visit_count` defaults to 1 and pins start empty. No manual migration needed.
 
 ---
 

@@ -47,9 +47,9 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 - 🔄 **Argument swap** — `saa` picks two treesitter arguments and swaps them
 - ✏️ **Multi-cursor edit** — `gmd`/`gmy` toggle-select multiple words, then delete or yank them all at once
 - 🔁 **Repeat** — `.` repeats the last SmartMotion
-- 🕰️ **Motion History** — `g.` opens a labeled history of every motion you've taken — jump back to any previous target, even in closed buffers. Your motions become breadcrumbs.
+- 🕰️ **Motion History** — `g.` opens a labeled history with **pins** at top (`gp` to bookmark, `1`-`9` to jump), **frecency-ranked** entries below, and **action mode** (`d`/`y`/`c` to delete, yank, or change targets remotely without leaving your position). History persists across sessions with visit counts that push frequently-visited locations to the top.
 - 🧩 **Fully modular pipeline** — Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action. Every stage is replaceable. Build entirely custom motions from scratch.
-- 📦 **13 presets, 58+ keybindings** — enable what you want, disable what you don't
+- 📦 **13 presets, 59+ keybindings** — enable what you want, disable what you don't
 
 ---
 
@@ -74,7 +74,7 @@ return {
       git = true,          -- ]g, [g
       quickfix = true,     -- ]q, [q, ]l, [l
       marks = true,        -- g', gm
-      misc = true,         -- . (repeat), g. (history), gmd, gmy
+      misc = true,         -- . (repeat), g. (history), gp (pin), gmd, gmy
     },
   },
 }
@@ -269,12 +269,13 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 </details>
 
 <details>
-<summary><b>🔁 Misc</b> — <code>.</code> <code>g.</code> <code>gmd</code> <code>gmy</code></summary>
+<summary><b>🔁 Misc</b> — <code>.</code> <code>g.</code> <code>gp</code> <code>gmd</code> <code>gmy</code></summary>
 
 | Key   | Mode | Description                                          |
 |-------|------|------------------------------------------------------|
 | `.`   | n    | Repeat last SmartMotion                               |
-| `g.`  | n    | Browse motion history — pick any previous target to jump back to |
+| `g.`  | n    | History browser — pins at top, frecency-ranked entries, action mode (`d`/`y`/`c`) |
+| `gp`  | n    | Toggle pin at cursor — bookmark locations for instant access (up to 9) |
 | `gmd` | n    | Multi-cursor delete — toggle-select words, press Enter to delete all |
 | `gmy` | n    | Multi-cursor yank — toggle-select words, press Enter to yank all    |
 
@@ -334,16 +335,20 @@ Multi-window is automatically disabled in operator-pending mode, since vim opera
 
 ## 🕰️ Motion History
 
-Every motion you take through SmartMotion is recorded. Press `g.` to open a labeled history of everywhere you've been — what motion you used, what text you targeted, which file, and how long ago:
+Every motion you take through SmartMotion is recorded. Press `g.` to open a full-featured history browser with **pins**, **frecency ranking**, and **remote actions**:
 
 ```
- f  s   "authenticate"       auth.lua:42     2m ago
- j  cw  "handle_error"       server.lua:15   5m ago
- d  dR  "validate(input)"    utils.lua:88    12m ago
- k  w   "config"             init.lua:3      1h ago
+ 1  *  "authenticate"            auth.lua:42
+ 2  *  "render"                  app.tsx:15
+────────────────────────────────────────────────
+ f  s   "config"          ████   config.lua:8     just now
+ j  dw  "handle_error"    ███    server.lua:30    5m ago
+ k  w   "validate"        ██     utils.lua:12     2h ago
 ```
 
-Press a label to jump back instantly. If the buffer was closed, SmartMotion reopens it from the file path. Your motions become breadcrumbs — **return to the scene of the crime** anytime.
+**Pins** (`gp`) bookmark up to 9 locations — they stick to the top with number labels for instant access. **Frecency** ranks entries by how often and how recently you visit them — your most-used locations rise to the top automatically. **Action mode** lets you press `d`, `y`, or `c` inside the browser to delete, yank, or change a target's text remotely without ever navigating there.
+
+Press a label to jump back instantly. If the buffer was closed, SmartMotion reopens it from the file path. History and pins persist across sessions — your frecency scores, visit counts, and bookmarks survive restarts.
 
 This is a benefit unique to centralizing your motions through one plugin. Vim's jumplist tracks cursor positions, but SmartMotion's history tracks *intent* — what you did, where you did it, and when. Every `w`, `dw`, `cR`, `f`, `/`, `;` feeds the same history, building a complete picture of your editing session that you can navigate at any time.
 
@@ -357,10 +362,10 @@ Every motion plugin does one thing well. SmartMotion does all of them — and ex
 
 When all your motions flow through the same system, you get things no combination of separate plugins can offer:
 
-- **Motion History** — every jump, search, delete, and change is recorded. Browse and revisit any target with `g.`.
+- **Motion History** — every jump, search, delete, and change is recorded. Pin locations with `gp`, browse frecency-ranked history with `g.`, and act on targets remotely with `d`/`y`/`c` from the browser.
 - **Composable operators** — `d`, `y`, `c` work with *every* motion: words, lines, search, treesitter nodes, diagnostics, marks.
 - **Flow State** — chain any motion into any other motion without re-triggering.
-- **Consistent labels** — the same home-row label system across 57+ keybindings. Learn it once.
+- **Consistent labels** — the same home-row label system across 59+ keybindings. Learn it once.
 - **One config** — enable, disable, or remap everything from a single `opts` table.
 
 The more you use SmartMotion, the more valuable it becomes. Each motion feeds the history, each keystroke builds on the same muscle memory, and every new preset you enable works with everything else automatically.
@@ -534,7 +539,7 @@ Visit the **[Wiki](https://github.com/FluxxField/smart-motion.nvim/wiki)** for f
 - **[Home](https://github.com/FluxxField/smart-motion.nvim/wiki)** — Overview and introduction
 - **[Why SmartMotion?](https://github.com/FluxxField/smart-motion.nvim/wiki/Why-SmartMotion)** — Philosophy and comparison with alternatives
 - **[Quick Start](https://github.com/FluxxField/smart-motion.nvim/wiki/Quick-Start)** — Install and configure in 60 seconds
-- **[Presets Guide](https://github.com/FluxxField/smart-motion.nvim/wiki/Presets)** — All 13 presets and 57+ keybindings
+- **[Presets Guide](https://github.com/FluxxField/smart-motion.nvim/wiki/Presets)** — All 13 presets and 59+ keybindings
 - **[Build Your Own](https://github.com/FluxxField/smart-motion.nvim/wiki/Building-Custom-Motions)** — Create custom motions in minutes
 - **[Configuration](https://github.com/FluxxField/smart-motion.nvim/wiki/Configuration)** — All options explained
 - **[API Reference](https://github.com/FluxxField/smart-motion.nvim/wiki/API-Reference)** — Complete module reference

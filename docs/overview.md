@@ -12,7 +12,7 @@
 - **[Quick Start](Quick-Start.md)** — Install and configure in 60 seconds
 
 ### Using SmartMotion
-- **[Presets](Presets.md)** — All 13 presets and 57+ keybindings explained
+- **[Presets](Presets.md)** — All 13 presets and 59+ keybindings explained
 - **[Advanced Features](Advanced-Features.md)** — Flow state, multi-window, operator-pending mode
 
 ### Building Your Own
