@@ -70,6 +70,14 @@ function M.run(reverse)
 	-- Jump if selected
 	if motion_state.selected_jump_target then
 		jump.run(ctx, cfg, motion_state)
+
+		local history = require("smart-motion.core.history")
+		local trigger = reverse and "," or ";"
+		history.add({
+			motion = { trigger_key = trigger },
+			target = motion_state.selected_jump_target,
+			metadata = { time_stamp = os.time() },
+		})
 	end
 end
 

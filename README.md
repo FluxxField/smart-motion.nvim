@@ -47,8 +47,9 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 - 🔄 **Argument swap** — `saa` picks two treesitter arguments and swaps them
 - ✏️ **Multi-cursor edit** — `gmd`/`gmy` toggle-select multiple words, then delete or yank them all at once
 - 🔁 **Repeat** — `.` repeats the last SmartMotion
+- 🕰️ **Motion History** — `g.` opens a labeled history of every motion you've taken — jump back to any previous target, even in closed buffers. Your motions become breadcrumbs.
 - 🧩 **Fully modular pipeline** — Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action. Every stage is replaceable. Build entirely custom motions from scratch.
-- 📦 **13 presets, 57+ keybindings** — enable what you want, disable what you don't
+- 📦 **13 presets, 58+ keybindings** — enable what you want, disable what you don't
 
 ---
 
@@ -73,7 +74,7 @@ return {
       git = true,          -- ]g, [g
       quickfix = true,     -- ]q, [q, ]l, [l
       marks = true,        -- g', gm
-      misc = true,         -- . (repeat), gmd, gmy
+      misc = true,         -- . (repeat), g. (history), gmd, gmy
     },
   },
 }
@@ -268,11 +269,12 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 </details>
 
 <details>
-<summary><b>🔁 Misc</b> — <code>.</code> <code>gmd</code> <code>gmy</code></summary>
+<summary><b>🔁 Misc</b> — <code>.</code> <code>g.</code> <code>gmd</code> <code>gmy</code></summary>
 
 | Key   | Mode | Description                                          |
 |-------|------|------------------------------------------------------|
 | `.`   | n    | Repeat last SmartMotion                               |
+| `g.`  | n    | Browse motion history — pick any previous target to jump back to |
 | `gmd` | n    | Multi-cursor delete — toggle-select words, press Enter to delete all |
 | `gmy` | n    | Multi-cursor yank — toggle-select words, press Enter to yank all    |
 
@@ -330,9 +332,38 @@ Multi-window is automatically disabled in operator-pending mode, since vim opera
 
 ---
 
+## 🕰️ Motion History
+
+Every motion you take through SmartMotion is recorded. Press `g.` to open a labeled history of everywhere you've been — what motion you used, what text you targeted, which file, and how long ago:
+
+```
+ f  s   "authenticate"       auth.lua:42     2m ago
+ j  cw  "handle_error"       server.lua:15   5m ago
+ d  dR  "validate(input)"    utils.lua:88    12m ago
+ k  w   "config"             init.lua:3      1h ago
+```
+
+Press a label to jump back instantly. If the buffer was closed, SmartMotion reopens it from the file path. Your motions become breadcrumbs — **return to the scene of the crime** anytime.
+
+This is a benefit unique to centralizing your motions through one plugin. Vim's jumplist tracks cursor positions, but SmartMotion's history tracks *intent* — what you did, where you did it, and when. Every `w`, `dw`, `cR`, `f`, `/`, `;` feeds the same history, building a complete picture of your editing session that you can navigate at any time.
+
+---
+
 ## 🧩 Why SmartMotion?
 
 Every motion plugin does one thing well. SmartMotion does all of them — and exposes the machinery so you can build your own.
+
+### One Plugin, Compound Benefits
+
+When all your motions flow through the same system, you get things no combination of separate plugins can offer:
+
+- **Motion History** — every jump, search, delete, and change is recorded. Browse and revisit any target with `g.`.
+- **Composable operators** — `d`, `y`, `c` work with *every* motion: words, lines, search, treesitter nodes, diagnostics, marks.
+- **Flow State** — chain any motion into any other motion without re-triggering.
+- **Consistent labels** — the same home-row label system across 57+ keybindings. Learn it once.
+- **One config** — enable, disable, or remap everything from a single `opts` table.
+
+The more you use SmartMotion, the more valuable it becomes. Each motion feeds the history, each keystroke builds on the same muscle memory, and every new preset you enable works with everything else automatically.
 
 ### The Pipeline
 

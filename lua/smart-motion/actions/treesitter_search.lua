@@ -259,6 +259,15 @@ function M.run(mode, operator)
 		return
 	end
 
+	-- Record to history so g. can navigate back here
+	local history = require("smart-motion.core.history")
+	local trigger = pending_operator and (pending_operator .. "R") or "R"
+	history.add({
+		motion = { trigger_key = trigger },
+		target = target,
+		metadata = { time_stamp = os.time() },
+	})
+
 	-- Apply the selection based on mode
 	local sr = target.start_pos.row
 	local sc = target.start_pos.col
