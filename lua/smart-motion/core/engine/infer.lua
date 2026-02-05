@@ -2,6 +2,7 @@ local exit = require("smart-motion.core.events.exit")
 local consts = require("smart-motion.consts")
 local module_loader = require("smart-motion.utils.module_loader")
 local targets = require("smart-motion.core.targets")
+local state = require("smart-motion.core.state")
 local utils = require("smart-motion.utils")
 local log = require("smart-motion.core.log")
 
@@ -24,6 +25,16 @@ function M.run(ctx, cfg, motion_state)
 	motion_state.target_type = consts.TARGET_TYPES_BY_KEY[motion_key]
 
 	local modules = module_loader.get_modules(ctx, cfg, motion_state, { "extractor", "action" })
+
+	-- Merge inferred module metadata into motion_state (setup.run couldn't do this
+	-- because the extractor wasn't known yet before infer resolved the motion key)
+	for _, module in pairs(modules) do
+		if state.module_has_motion_state(module) then
+			for k, v in pairs(module.metadata.motion_state) do
+				motion_state[k] = v
+			end
+		end
+	end
 
 	if not modules.extractor or not modules.extractor.run then
 		if motion_key == motion_state.motion.trigger_key then
