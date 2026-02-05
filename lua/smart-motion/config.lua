@@ -28,6 +28,7 @@ M.defaults = {
 	history_max_size = HISTORY_MAX_SIZE,
 	auto_select_target = false,
 	native_search = true,
+	count_behavior = "target",
 }
 
 ---@type SmartMotionConfig
@@ -147,6 +148,13 @@ function M.validate(user_config)
 	--
 	if config.auto_select_target == nil or type(config.auto_select_target) ~= "boolean" then
 		config.auto_select_target = false
+	end
+
+	--
+	-- Validate count_behavior
+	--
+	if config.count_behavior ~= "target" and config.count_behavior ~= "native" then
+		config.count_behavior = "target"
 	end
 
 	M.validated = config

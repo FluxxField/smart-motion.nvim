@@ -68,6 +68,14 @@ Press j → labels appear on lines below → press 'a' → cursor jumps to that 
 gqj   — format from cursor to labeled line
 ```
 
+**Count prefix support:**
+```
+5j    — jumps to the 5th line target below (no labels shown)
+3k    — jumps to the 3rd line target above
+```
+
+When a count precedes `j` or `k`, SmartMotion skips the label step and auto-selects the Nth target. This can be changed to native vim behavior via `count_behavior = "native"` in config. See **[Configuration](Configuration.md#count-behavior)**.
+
 ---
 
 ## search

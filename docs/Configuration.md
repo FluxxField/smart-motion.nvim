@@ -43,6 +43,9 @@ Complete guide to configuring SmartMotion.
 
   -- Show labels during native / search (toggle with <C-s>)
   native_search = true,
+
+  -- How count prefix interacts with motions (j/k): "target" or "native"
+  count_behavior = "target",
 }
 ```
 
@@ -259,6 +262,30 @@ When enabled, if your motion finds exactly one target, it jumps immediately with
 
 ---
 
+## Count Behavior
+
+Control what happens when a count precedes a motion like `j` or `k`:
+
+```lua
+count_behavior = "target"  -- default
+```
+
+**`"target"` (default):** The count selects the Nth target directly — no labels shown, instant jump. `5j` jumps to the 5th line target below the cursor. If the count exceeds available targets, it clamps to the last one.
+
+**`"native"`:** The count bypasses SmartMotion entirely and feeds the native vim motion. `5j` moves 5 lines down, exactly like vanilla vim.
+
+```lua
+-- Jump to the 5th target (default)
+count_behavior = "target"
+
+-- Pass through to native vim motion
+count_behavior = "native"
+```
+
+**Currently applies to:** `j`, `k`
+
+---
+
 ## Background Dimming
 
 Dim non-target text for better label visibility:
@@ -296,6 +323,9 @@ The `.` repeat functionality uses this history.
 
     -- Auto-jump on single target
     auto_select_target = true,
+
+    -- Count selects nth target for j/k
+    count_behavior = "target",
 
     -- Custom highlights
     highlight = {

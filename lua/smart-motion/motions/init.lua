@@ -71,6 +71,21 @@ function motions.register_motion(name, motion, opts)
 
 		for _, mode in ipairs(modes) do
 			local handler = function()
+				if motion.count_passthrough and vim.v.count > 0 then
+					local count = vim.v.count
+					local cfg = require("smart-motion.config").validated
+					if cfg and cfg.count_behavior == "native" then
+						local keys = count .. motion.trigger_key
+						vim.api.nvim_feedkeys(
+							vim.api.nvim_replace_termcodes(keys, true, false, true),
+							"n",
+							false
+						)
+						return
+					end
+					engine.run(motion.trigger_key, { count_select = count })
+					return
+				end
 				engine.run(motion.trigger_key)
 			end
 

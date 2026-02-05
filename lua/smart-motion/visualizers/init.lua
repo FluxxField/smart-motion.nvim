@@ -1,5 +1,7 @@
 local hints = require("smart-motion.visualizers.hints")
 local pass_through = require("smart-motion.visualizers.pass_through")
+local quickfix = require("smart-motion.visualizers.quickfix")
+local telescope = require("smart-motion.visualizers.telescope")
 
 local HINT_POSITION = require("smart-motion.consts").HINT_POSITION
 
@@ -31,6 +33,14 @@ local visualizer_entries = {
 	pass_through = {
 		run = pass_through.run,
 		metadata = pass_through.metadata,
+	},
+	quickfix = {
+		run = quickfix.run,
+		metadata = quickfix.metadata,
+	},
+	telescope = {
+		run = telescope.run,
+		metadata = telescope.metadata,
 	},
 }
 

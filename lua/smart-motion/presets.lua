@@ -72,6 +72,7 @@ function presets.lines(exclude)
 			action = "jump_centered",
 			map = true,
 			modes = { "n", "v", "o" },
+			count_passthrough = true,
 			metadata = {
 				label = "Jump to Line after cursor",
 				description = "Jumps to the start of the line after the cursor",
@@ -85,6 +86,7 @@ function presets.lines(exclude)
 			action = "jump_centered",
 			map = true,
 			modes = { "n", "v", "o" },
+			count_passthrough = true,
 			metadata = {
 				label = "Jump to Line before cursor",
 				description = "Jumps to the start of the line before the cursor",
@@ -451,6 +453,12 @@ function presets.paste(exclude)
 end
 
 function presets.misc(exclude)
+	-- Function node types for quickfix output
+	local function_node_types = {
+		"function_declaration", "function_definition", "arrow_function",
+		"method_definition", "function_item", "method_declaration", "method",
+	}
+
 	presets._register({
 		["."] = {
 			collector = "history",
@@ -464,6 +472,116 @@ function presets.misc(exclude)
 			metadata = {
 				label = "Repeat Motion",
 				description = "Repeat previous motion",
+			},
+		},
+		-- Quickfix output motions: collect targets and populate quickfix list
+		["gQf"] = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			visualizer = "quickfix",
+			action = "jump", -- Not used, visualizer exits early
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Functions to Quickfix",
+				description = "List all functions in the buffer to quickfix",
+				motion_state = {
+					ts_node_types = function_node_types,
+				},
+			},
+		},
+		["gQd"] = {
+			collector = "diagnostics",
+			extractor = "pass_through",
+			visualizer = "quickfix",
+			action = "jump",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Diagnostics to Quickfix",
+				description = "List all diagnostics in the buffer to quickfix",
+			},
+		},
+		["gQe"] = {
+			collector = "diagnostics",
+			extractor = "pass_through",
+			visualizer = "quickfix",
+			action = "jump",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Errors to Quickfix",
+				description = "List all error diagnostics to quickfix",
+				motion_state = {
+					diagnostic_severity = vim.diagnostic.severity.ERROR,
+				},
+			},
+		},
+		["gQg"] = {
+			collector = "git_hunks",
+			extractor = "pass_through",
+			visualizer = "quickfix",
+			action = "jump",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Git Hunks to Quickfix",
+				description = "List all git changed regions to quickfix",
+			},
+		},
+		-- Telescope output motions: fuzzy find targets
+		["gTf"] = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			visualizer = "telescope",
+			action = "jump_centered",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Functions in Telescope",
+				description = "Fuzzy find functions in the buffer",
+				motion_state = {
+					ts_node_types = function_node_types,
+				},
+			},
+		},
+		["gTd"] = {
+			collector = "diagnostics",
+			extractor = "pass_through",
+			visualizer = "telescope",
+			action = "jump_centered",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Diagnostics in Telescope",
+				description = "Fuzzy find diagnostics in the buffer",
+			},
+		},
+		["gTe"] = {
+			collector = "diagnostics",
+			extractor = "pass_through",
+			visualizer = "telescope",
+			action = "jump_centered",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Errors in Telescope",
+				description = "Fuzzy find error diagnostics",
+				motion_state = {
+					diagnostic_severity = vim.diagnostic.severity.ERROR,
+				},
+			},
+		},
+		["gTg"] = {
+			collector = "git_hunks",
+			extractor = "pass_through",
+			visualizer = "telescope",
+			action = "jump_centered",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Git Hunks in Telescope",
+				description = "Fuzzy find git changed regions",
 			},
 		},
 	}, exclude)
@@ -789,7 +907,19 @@ function presets.treesitter(exclude)
 	-- Register R keymap for treesitter search (search text → select surrounding node)
 	if not (type(exclude) == "table" and exclude["R"] == false) then
 		vim.keymap.set({ "n", "x", "o" }, "R", function()
-			require("smart-motion.actions.treesitter_search").run()
+			local current_mode = vim.fn.mode(true)
+			if current_mode:find("o") then
+				-- In operator-pending mode, the callback runs inside feedkeys processing
+				-- where screen updates (echo, redraw) are suppressed. Schedule the search
+				-- to run after op-pending returns (zero cursor movement cancels the native
+				-- operator), then we handle the operation ourselves with the saved operator.
+				local operator = vim.v.operator
+				vim.schedule(function()
+					require("smart-motion.actions.treesitter_search").run(current_mode, operator)
+				end)
+			else
+				require("smart-motion.actions.treesitter_search").run()
+			end
 		end, { desc = "Treesitter search (select node containing match)", noremap = true, silent = true })
 	end
 end
