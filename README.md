@@ -386,7 +386,7 @@ sm.motions.register("jump_and_yank", {
 })
 ```
 
-For a full guide on building custom motions, see [docs/custom_motion.md](./docs/custom_motion.md).
+For a full guide on building custom motions, see the [Wiki](https://github.com/FluxxField/smart-motion.nvim/wiki/Building-Custom-Motions).
 
 ---
 
@@ -465,7 +465,7 @@ opts = {
 }
 ```
 
-For full configuration documentation, see [docs/config.md](./docs/config.md).
+For full configuration documentation, see the [Wiki](https://github.com/FluxxField/smart-motion.nvim/wiki/Configuration).
 
 </details>
 
@@ -493,9 +493,14 @@ Built by [FluxxField](https://github.com/FluxxField)
 
 ---
 
-📖 For full documentation, visit the [docs/](./docs) directory:
+## 📖 Documentation
 
-- [Configuration](./docs/config.md)
-- [Presets](./docs/presets.md)
-- [Custom Motions](./docs/custom_motion.md)
-- [Overview](./docs/overview.md)
+Visit the **[Wiki](https://github.com/FluxxField/smart-motion.nvim/wiki)** for full documentation:
+
+- **[Home](https://github.com/FluxxField/smart-motion.nvim/wiki)** — Overview and introduction
+- **[Why SmartMotion?](https://github.com/FluxxField/smart-motion.nvim/wiki/Why-SmartMotion)** — Philosophy and comparison with alternatives
+- **[Quick Start](https://github.com/FluxxField/smart-motion.nvim/wiki/Quick-Start)** — Install and configure in 60 seconds
+- **[Presets Guide](https://github.com/FluxxField/smart-motion.nvim/wiki/Presets)** — All 13 presets and 57+ keybindings
+- **[Build Your Own](https://github.com/FluxxField/smart-motion.nvim/wiki/Building-Custom-Motions)** — Create custom motions in minutes
+- **[Configuration](https://github.com/FluxxField/smart-motion.nvim/wiki/Configuration)** — All options explained
+- **[API Reference](https://github.com/FluxxField/smart-motion.nvim/wiki/API-Reference)** — Complete module reference
