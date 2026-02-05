@@ -434,6 +434,65 @@ Actions execute in order. This is how SmartMotion builds compound operations wit
 
 ---
 
+## Motion History
+
+`g.` opens a floating window showing your recent motion targets. Select an entry to jump back.
+
+### What's Shown
+
+Each entry displays:
+- **Label** — press to jump
+- **Motion key** — which motion triggered it (`w`, `dw`, `s`, `/`, `R`, etc.)
+- **Target text** — the text at the target location
+- **File:line** — where the target is
+- **Time elapsed** — how long ago (just now, 5m ago, 2h ago, 3d ago)
+
+### Persistent History
+
+History is saved to disk automatically and restored when you reopen Neovim. Your `g.` history survives across sessions.
+
+- **Storage location:** `~/.local/share/nvim/smart-motion/history/`
+- **Per-project:** Each git repo (or working directory) gets its own history file
+- **Saved on exit:** `VimLeavePre` autocmd writes history to disk
+- **Loaded on startup:** `setup()` loads previous session's history
+
+### Deduplication
+
+Jumping to the same location multiple times doesn't fill history with duplicates. When a new entry matches an existing one (same file and position), the old entry is replaced and the new one goes to the top.
+
+### Session Merging
+
+Multiple Neovim sessions in the same project merge their history on save. If session A saved entries and session B exits later, B's save merges both — no entries are lost.
+
+Current session entries take priority over disk entries at the same location. The merged result is sorted by timestamp (most recent first) and trimmed to `history_max_size`.
+
+### Stale Entry Pruning
+
+Entries pointing to files that no longer exist on disk are automatically removed when history is loaded at startup.
+
+### Entry Expiry
+
+Entries older than 30 days are automatically discarded during load.
+
+### Configuration
+
+```lua
+history_max_size = 20  -- default, controls both in-memory and on-disk size
+history_max_size = 50  -- keep more history
+history_max_size = 0   -- effectively disables persistence (nothing to save)
+```
+
+### Navigating to Entries
+
+The history browser handles three cases:
+1. **Buffer in a visible window** — switches to that window
+2. **Buffer loaded but hidden** — opens it in the current window
+3. **Buffer closed** — reopens the file from disk
+
+Jumplist integration: `m'` is saved before navigating, so `<C-o>` takes you back.
+
+---
+
 ## Next Steps
 
 → **[Building Custom Motions](Building-Custom-Motions.md)** — Create your own

@@ -20,7 +20,7 @@ SmartMotion ships with **13 presets** containing **57+ keybindings**. Each prese
 | `git` | `]g` `[g` | Git hunk navigation |
 | `quickfix` | `]q` `[q` `]l` `[l` | Quickfix/location list |
 | `marks` | `g'` `gm` | Mark navigation and setting |
-| `misc` | `.` `gmd` `gmy` | Repeat and multi-cursor |
+| `misc` | `.` `g.` `gmd` `gmy` | Repeat, history, and multi-cursor |
 
 ---
 
@@ -370,13 +370,22 @@ Press gm → labels appear on words → select target → type 'a' → mark 'a' 
 
 ## misc
 
-Repeat and multi-cursor operations.
+Repeat, history, and multi-cursor operations.
 
 | Key | Modes | What it does |
 |-----|-------|--------------|
 | `.` | n | **Repeat** last SmartMotion |
+| `g.` | n | **History browser** — browse and jump to past motion targets |
 | `gmd` | n | **Multi-cursor delete** — toggle-select multiple words, delete all |
 | `gmy` | n | **Multi-cursor yank** — toggle-select multiple words, yank all |
+
+### History Browser (`g.`)
+
+```
+Press g. → floating window shows recent motion targets → press label → jump to that location
+```
+
+Entries show the motion key, target text, file, line number, and time elapsed. History persists across Neovim sessions — see **[Advanced Features: Motion History](Advanced-Features.md#motion-history)** for details.
 
 ### Multi-Cursor (`gmd`/`gmy`)
 

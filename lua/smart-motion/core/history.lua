@@ -3,11 +3,22 @@ local log = require("smart-motion.core.log")
 
 local HISTORY_MAX_SIZE = consts.HISTORY_MAX_SIZE
 local HISTORY_VERSION = 1
+local HISTORY_MAX_AGE_SECS = 30 * 24 * 3600 -- 30 days
 
 local M = {
 	entries = {},
 	max_size = HISTORY_MAX_SIZE,
 }
+
+--- Returns a dedup key for an entry based on filepath and position.
+---@param entry table
+---@return string
+function M._entry_key(entry)
+	local fp = entry.filepath or ""
+	local row = entry.target and entry.target.start_pos and entry.target.start_pos.row or 0
+	local col = entry.target and entry.target.start_pos and entry.target.start_pos.col or 0
+	return fp .. ":" .. row .. ":" .. col
+end
 
 function M.add(entry)
 	-- Store filepath so we can reopen closed buffers later
@@ -15,6 +26,15 @@ function M.add(entry)
 		local ok, name = pcall(vim.api.nvim_buf_get_name, entry.target.metadata.bufnr)
 		if ok and name ~= "" then
 			entry.filepath = name
+		end
+	end
+
+	-- Deduplicate: remove existing entry at same location
+	local key = M._entry_key(entry)
+	for i = #M.entries, 1, -1 do
+		if M._entry_key(M.entries[i]) == key then
+			table.remove(M.entries, i)
+			break
 		end
 	end
 
@@ -110,7 +130,80 @@ function M._deserialize_entry(data)
 	return nil
 end
 
+--- Merges in-memory entries with existing disk entries for concurrent session support.
+--- In-memory entries take priority; disk-only entries are appended.
+--- Result is sorted by timestamp (most recent first) and trimmed to max_size.
+---@return table[] merged entries
+function M._merge_with_disk()
+	local filepath = M._get_history_filepath()
+
+	local f = io.open(filepath, "r")
+	if not f then
+		return M.entries
+	end
+
+	local read_ok, content = pcall(function()
+		local c = f:read("*a")
+		f:close()
+		return c
+	end)
+
+	if not read_ok or not content or content == "" then
+		pcall(function() f:close() end)
+		return M.entries
+	end
+
+	local decode_ok, data = pcall(vim.fn.json_decode, content)
+	if not decode_ok or type(data) ~= "table" or data.version ~= HISTORY_VERSION then
+		return M.entries
+	end
+
+	-- Start with in-memory entries (current session takes priority)
+	local seen = {}
+	local merged = {}
+
+	for _, entry in ipairs(M.entries) do
+		local key = M._entry_key(entry)
+		if not seen[key] then
+			seen[key] = true
+			table.insert(merged, entry)
+		end
+	end
+
+	-- Add disk entries not already present from current session
+	local now = os.time()
+	for _, raw in ipairs(data.entries or {}) do
+		local entry = M._deserialize_entry(raw)
+		if entry then
+			local key = M._entry_key(entry)
+			if not seen[key] then
+				-- Skip expired
+				local ts = entry.metadata and entry.metadata.time_stamp or 0
+				if (now - ts) <= HISTORY_MAX_AGE_SECS then
+					seen[key] = true
+					table.insert(merged, entry)
+				end
+			end
+		end
+	end
+
+	-- Sort by timestamp descending (most recent first)
+	table.sort(merged, function(a, b)
+		local ta = a.metadata and a.metadata.time_stamp or 0
+		local tb = b.metadata and b.metadata.time_stamp or 0
+		return ta > tb
+	end)
+
+	-- Trim to max_size
+	while #merged > M.max_size do
+		table.remove(merged)
+	end
+
+	return merged
+end
+
 --- Saves all history entries to disk as JSON.
+--- Merges with existing disk entries to preserve other sessions' history.
 function M._save()
 	local filepath = M._get_history_filepath()
 	local dir = M._get_history_dir()
@@ -118,8 +211,11 @@ function M._save()
 	-- Ensure directory exists
 	vim.fn.mkdir(dir, "p")
 
+	-- Merge with disk for concurrent session support
+	local entries_to_save = M._merge_with_disk()
+
 	local serialized = {}
-	for _, entry in ipairs(M.entries) do
+	for _, entry in ipairs(entries_to_save) do
 		local s = M._serialize_entry(entry)
 		if s then
 			table.insert(serialized, s)
@@ -187,12 +283,25 @@ function M._load()
 		return
 	end
 
+	local now = os.time()
 	local loaded = {}
 	for _, raw in ipairs(data.entries) do
 		local entry = M._deserialize_entry(raw)
 		if entry then
+			-- Expiry: skip entries older than 30 days
+			local ts = entry.metadata and entry.metadata.time_stamp or 0
+			if (now - ts) > HISTORY_MAX_AGE_SECS then
+				goto continue
+			end
+
+			-- Stale pruning: skip entries for files that no longer exist
+			if entry.filepath and entry.filepath ~= "" and vim.fn.filereadable(entry.filepath) == 0 then
+				goto continue
+			end
+
 			table.insert(loaded, entry)
 		end
+		::continue::
 	end
 
 	-- Trim to current max_size
