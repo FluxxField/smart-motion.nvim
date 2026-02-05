@@ -161,6 +161,38 @@ This reference documents all the motions included in the default SmartMotion pre
 
 ---
 
+## Preset: `quickfix`
+
+| Key  | Mode | Multi-window | Description                                     |
+| ---- | ---- | ------------ | ----------------------------------------------- |
+| `]q` | n, o | yes          | Jump to next quickfix entry after cursor        |
+| `[q` | n, o | yes          | Jump to previous quickfix entry before cursor   |
+| `]l` | n, o | yes          | Jump to next location list entry after cursor   |
+| `[l` | n, o | yes          | Jump to previous location list entry before cursor |
+
+> [!NOTE]
+> Quickfix entries come from `:vimgrep`, `:make`, `:grep`, LSP diagnostics, and other sources. The location list (`]l`/`[l`) is window-local — each window can have its own list.
+
+> [!NOTE]
+> The collector includes metadata like `entry_type` (E/W/I/N/H for error/warning/info/note/hint), `filename`, `qf_idx` (position in list), and `entry_text` for potential custom filtering or actions.
+
+---
+
+## Preset: `marks`
+
+| Key  | Mode | Multi-window | Description                                     |
+| ---- | ---- | ------------ | ----------------------------------------------- |
+| `g'` | n, o | yes          | Show labels on all marks, jump to selected one  |
+| `gm` | n    | yes          | Set mark at labeled target (prompts for mark name) |
+
+> [!NOTE]
+> `g'` displays labels on all vim marks (a-z local, A-Z global). This is faster than typing `'a`, `'b`, etc. when you have many marks. Global marks (A-Z) from other visible buffers are also shown in multi-window mode.
+
+> [!NOTE]
+> `gm` shows labels on word targets. After selecting a target, type a mark name (a-z for buffer-local, A-Z for global). The mark is set at that location without moving your cursor — great for bookmarking a location you want to return to later.
+
+---
+
 ## Preset: `misc`
 
 | Key   | Description                                                        |
