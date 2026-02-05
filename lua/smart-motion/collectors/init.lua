@@ -4,6 +4,7 @@ local treesitter = require("smart-motion.collectors.treesitter")
 local diagnostics = require("smart-motion.collectors.diagnostics")
 local git_hunks = require("smart-motion.collectors.git_hunks")
 local quickfix = require("smart-motion.collectors.quickfix")
+local marks = require("smart-motion.collectors.marks")
 
 ---@type SmartMotionRegistry<SmartMotionCollectorModuleEntry>
 local collectors = require("smart-motion.core.registry")("collectors")
@@ -16,6 +17,7 @@ collectors.register_many({
 	diagnostics = diagnostics,
 	git_hunks = git_hunks,
 	quickfix = quickfix,
+	marks = marks,
 })
 
 return collectors

@@ -178,6 +178,21 @@ This reference documents all the motions included in the default SmartMotion pre
 
 ---
 
+## Preset: `marks`
+
+| Key  | Mode | Multi-window | Description                                     |
+| ---- | ---- | ------------ | ----------------------------------------------- |
+| `g'` | n, o | yes          | Show labels on all marks, jump to selected one  |
+| `gm` | n    | yes          | Set mark at labeled target (prompts for mark name) |
+
+> [!NOTE]
+> `g'` displays labels on all vim marks (a-z local, A-Z global). This is faster than typing `'a`, `'b`, etc. when you have many marks. Global marks (A-Z) from other visible buffers are also shown in multi-window mode.
+
+> [!NOTE]
+> `gm` shows labels on word targets. After selecting a target, type a mark name (a-z for buffer-local, A-Z for global). The mark is set at that location without moving your cursor — great for bookmarking a location you want to return to later.
+
+---
+
 ## Preset: `misc`
 
 | Key   | Description                                                        |

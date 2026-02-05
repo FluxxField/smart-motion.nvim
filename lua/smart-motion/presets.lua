@@ -986,6 +986,45 @@ function presets.quickfix(exclude)
 	}, exclude)
 end
 
+--- @param exclude? SmartMotionPresetKey.Marks[]
+function presets.marks(exclude)
+	-- Register pipeline-based motion for jumping to marks
+	presets._register({
+		["g'"] = {
+			collector = "marks",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n", "o" },
+			metadata = {
+				label = "Jump to Mark",
+				description = "Show labels on all marks, jump to selected one",
+				motion_state = {
+					multi_window = true,
+				},
+			},
+		},
+	}, exclude)
+
+	-- Build excluded table from exclude param
+	local excluded = {}
+	if type(exclude) == "table" then
+		for _, key in ipairs(exclude) do
+			excluded[key] = true
+		end
+	end
+
+	-- Register gm keymap for setting mark at target
+	if not excluded["gm"] then
+		vim.keymap.set("n", "gm", function()
+			require("smart-motion.actions.set_mark").run()
+		end, { desc = "Set mark at labeled target", noremap = true, silent = true })
+	end
+end
+
 --- Internal registration logic with optional filtering.
 --- @param motions_list table<string, SmartMotionModule>
 --- @param exclude? string[]

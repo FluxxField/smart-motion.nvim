@@ -66,6 +66,7 @@ return {
       diagnostics = true,
       git = true,
       quickfix = true,
+      marks = true,
       misc = true,
     },
   },
