@@ -2,6 +2,7 @@ local log = require("smart-motion.core.log")
 local highlight = require("smart-motion.core.highlight")
 local consts = require("smart-motion.consts")
 local flow_state = require("smart-motion.core.flow_state")
+local targets = require("smart-motion.core.targets")
 
 local M = {}
 
@@ -58,6 +59,16 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 		end
 
 		log.debug("No matching hint found for input: " .. char)
+
+		-- Repeat motion key = act on target under cursor (e.g., dww deletes cursor word)
+		if motion_state.allow_quick_action and motion_state.motion_key and char == motion_state.motion_key then
+			local under_cursor = targets.get_target_under_cursor(ctx, cfg, motion_state)
+			if under_cursor then
+				motion_state.selected_jump_target = under_cursor
+				return
+			end
+		end
+
 		motion_state.selected_jump_target = nil
 
 		-- Fallthrough - We assume the key the user pressed is a motion if it doesn't match a label

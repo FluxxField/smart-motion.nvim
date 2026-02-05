@@ -49,18 +49,6 @@ function M.run(ctx, cfg, motion_state)
 		exit.throw(EXIT_TYPE.EARLY_EXIT)
 	end
 
-	--
-	-- Quick action on target under cursor
-	--
-	if motion_state.allow_quick_action then
-		local under_cursor_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
-
-		if under_cursor_target then
-			motion_state.selected_jump_target = under_cursor_target
-			modules.action.run(ctx, cfg, motion_state)
-			exit.throw(EXIT_TYPE.EARLY_EXIT)
-		end
-	end
 end
 
 return M
