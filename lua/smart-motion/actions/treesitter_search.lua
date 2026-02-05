@@ -145,14 +145,20 @@ function M.run(mode, operator)
 	local CONTINUE_TIMEOUT_MS = 500
 	local last_input_time = nil
 
-	while true do
-		-- Show/refresh prompt on every idle tick so it's always visible
+	-- Helper: redraw screen then display the search prompt in the message area.
+	local function redraw_with_prompt()
+		vim.cmd("redraw")
 		vim.api.nvim_echo(
-			{ { "Treesitter Search: ", "Comment" }, { motion_state.search_text, "Normal" } },
+			{ { "Treesitter Search: ", "Comment" }, { motion_state.search_text or "" } },
 			false,
 			{}
 		)
+	end
 
+	-- Show initial prompt
+	redraw_with_prompt()
+
+	while true do
 		-- Auto-proceed to selection after pause (only when there are targets to select)
 		if
 			last_input_time
@@ -166,9 +172,13 @@ function M.run(mode, operator)
 			end
 		end
 
-		-- Non-blocking key check
+		-- Non-blocking key check — re-display prompt (no redraw, so no flashing)
 		if vim.fn.getchar(1) == 0 then
-			vim.cmd("redraw")
+			vim.api.nvim_echo(
+				{ { "Treesitter Search: ", "Comment" }, { motion_state.search_text or "" } },
+				false,
+				{}
+			)
 			vim.cmd("sleep 10m")
 			goto continue
 		end
@@ -186,7 +196,6 @@ function M.run(mode, operator)
 		if char == "\027" then -- ESC
 			highlight.clear(ctx, cfg, motion_state)
 			vim.cmd("redraw")
-			vim.api.nvim_echo({ { "", "" } }, false, {})
 			return
 		elseif char == "\r" then -- Enter - proceed to selection immediately
 			break
@@ -213,19 +222,17 @@ function M.run(mode, operator)
 			else
 				motion_state.jump_targets = {}
 				motion_state.jump_target_count = 0
-				vim.cmd("redraw")
 			end
 		else
 			motion_state.jump_targets = {}
 			motion_state.jump_target_count = 0
-			vim.cmd("redraw")
 		end
+
+		-- Redraw to show updated hints, then re-display prompt
+		redraw_with_prompt()
 
 		::continue::
 	end
-
-	-- Clear prompt
-	vim.api.nvim_echo({ { "", "" } }, false, {})
 
 	-- If no targets, exit
 	if not motion_state.jump_targets or #motion_state.jump_targets == 0 then

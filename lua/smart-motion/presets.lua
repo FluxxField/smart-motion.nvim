@@ -907,20 +907,13 @@ function presets.treesitter(exclude)
 	-- Register R keymap for treesitter search (search text → select surrounding node)
 	if not (type(exclude) == "table" and exclude["R"] == false) then
 		vim.keymap.set({ "n", "x", "o" }, "R", function()
+			-- Capture mode/operator now since they change once the callback returns.
+			-- The function runs the interactive search inside the callback; only the
+			-- final operation (d/y/c) is deferred via vim.schedule inside M.run().
 			local current_mode = vim.fn.mode(true)
-			if current_mode:find("o") then
-				-- In operator-pending mode, the callback runs inside feedkeys processing
-				-- where screen updates (echo, redraw) are suppressed. Schedule the search
-				-- to run after op-pending returns (zero cursor movement cancels the native
-				-- operator), then we handle the operation ourselves with the saved operator.
-				local operator = vim.v.operator
-				vim.schedule(function()
-					require("smart-motion.actions.treesitter_search").run(current_mode, operator)
-				end)
-			else
-				require("smart-motion.actions.treesitter_search").run()
-			end
-		end, { desc = "Treesitter search (select node containing match)", noremap = true, silent = true })
+			local operator = current_mode:find("o") and vim.v.operator or nil
+			require("smart-motion.actions.treesitter_search").run(current_mode, operator)
+		end, { desc = "Treesitter search (select node containing match)", noremap = true })
 	end
 end
 
