@@ -36,6 +36,10 @@ function M.setup(user_config)
 	highlight_setup.setup(validated_config)
 	state.init_motion_state(validated_config)
 
+	-- Load persistent history before presets so g. has entries available
+	local history = require("smart-motion.core.history")
+	history.setup(validated_config)
+
 	--
 	-- Handle preset setup
 	--
