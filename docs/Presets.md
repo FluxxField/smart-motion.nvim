@@ -159,6 +159,18 @@ Press d → press ]] → labels appear on functions → select one → deleted t
 
 Works with ANY SmartMotion motion.
 
+### Repeat Motion Key (Quick Action)
+
+When labels appear, pressing the motion key **again** acts on the target under your cursor:
+
+```
+dww   — delete the word under the cursor (repeat 'w')
+djj   — delete to the current line target (repeat 'j')
+d]]]] — delete to the function at cursor (repeat ']]')
+```
+
+This gives you the best of both worlds: `dw` shows labels so you can pick any target, but `dww` is a fast shortcut for the common case of acting right where you are. The motion key is excluded from the label pool so there's never ambiguity.
+
 ### Delete Until (`dt`/`dT`)
 
 ```
@@ -192,6 +204,8 @@ Yank (copy) operations.
 
 Same patterns as delete, but yanks to register instead.
 
+Repeat motion key works here too: `yww` yanks the word under cursor, `yw` + label yanks a specific word.
+
 ---
 
 ## change
@@ -207,6 +221,8 @@ Change (delete + insert) operations.
 ```
 Press c → press w → select target → text deleted, insert mode activated
 ```
+
+Repeat motion key works here too: `cww` changes the word under cursor, `cw` + label changes a specific word.
 
 ---
 

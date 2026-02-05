@@ -25,7 +25,7 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 
 - ⚡ **Word, line, and search jumping** with home-row hint labels — forward, backward, start, end
 - 🌊 **Flow State** — chain motions without re-triggering; press `w` → select → press `w` again instantly
-- 🔀 **Composable d/y/c/p** — `d` + any motion deletes, `y` + any motion yanks, `c` + any motion changes, with visual feedback at every step
+- 🔀 **Composable d/y/c/p** — `d` + any motion deletes, `y` + any motion yanks, `c` + any motion changes, with visual feedback at every step. Repeat the motion key to act on the target under cursor (`dww` = delete this word, `dw` + label = delete that word)
 - ✂️ **Until motions** — `dt`, `yt`, `ct` operate from cursor to a labeled character on the current line
 - 📡 **Remote operations** — `rdw`, `rdl`, `ryw`, `ryl` delete or yank words and lines without moving the cursor
 - 🌳 **Treesitter-aware motions** — jump to functions (`]]`/`[[`), classes (`]c`/`[c`), scopes/blocks (`]b`/`[b`), delete/change/yank function names (`dfn`, `cfn`, `yfn`), and arguments (`daa`, `caa`, `yaa`)
@@ -140,7 +140,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 
 | Key   | Mode | Description                                    |
 |-------|------|------------------------------------------------|
-| `d`   | n    | Composable delete — press `d` then any motion  |
+| `d`   | n    | Composable delete — press `d` then any motion. Repeat motion key for cursor target (`dww`) |
 | `dt`  | n    | Delete from cursor until character (forward)   |
 | `dT`  | n    | Delete from cursor until character (backward)  |
 | `rdw` | n    | Remote delete word (cursor stays in place)      |
@@ -153,7 +153,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 
 | Key   | Mode | Description                                   |
 |-------|------|-----------------------------------------------|
-| `y`   | n    | Composable yank — press `y` then any motion   |
+| `y`   | n    | Composable yank — press `y` then any motion. Repeat motion key for cursor target (`yww`)  |
 | `yt`  | n    | Yank from cursor until character (forward)    |
 | `yT`  | n    | Yank from cursor until character (backward)   |
 | `ryw` | n    | Remote yank word (cursor stays in place)       |
@@ -166,7 +166,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 
 | Key  | Mode | Description                                    |
 |------|------|------------------------------------------------|
-| `c`  | n    | Composable change — press `c` then any motion  |
+| `c`  | n    | Composable change — press `c` then any motion. Repeat motion key for cursor target (`cww`) |
 | `ct` | n    | Change from cursor until character (forward)   |
 | `cT` | n    | Change from cursor until character (backward)  |
 

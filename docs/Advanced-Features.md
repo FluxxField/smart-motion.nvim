@@ -41,6 +41,48 @@ Flow state works between any registered motions. Common flows:
 
 ---
 
+## Repeat Motion Key (Quick Action)
+
+When using composable operators (`d`, `y`, `c`), pressing the motion key shows labels on all targets. But what if you just want to act on the target under your cursor?
+
+**Repeat the motion key.** The third keystroke being the same as the second means "act here":
+
+```
+dww   — delete the word under cursor
+yww   — yank the word under cursor
+cww   — change the word under cursor
+djj   — delete to current line target
+```
+
+### Why Not Just Act Instantly?
+
+A naive approach would be to immediately act on the cursor target when you type `dw`. But then you'd never see labels — you couldn't pick a *different* word to delete. By always showing labels first, you get both options:
+
+- **`dw` + label** — delete a specific word anywhere on screen
+- **`dww`** — delete the word right here
+
+### How It Works
+
+1. Type `dw` — the pipeline runs, labels appear on all word targets
+2. The motion key (`w`) is **excluded from the label pool** — it's reserved for quick action
+3. Press `w` again — the target under your cursor is selected and the action runs
+4. Or press any label key — that target is selected instead
+
+There's no timeout. You can take as long as you want to read the labels before deciding.
+
+### Works With All Motions
+
+Any single-character motion key works with the repeat pattern:
+
+```
+dw + w = delete word here       dw + label = delete word there
+dj + j = delete to line here    dj + label = delete to line there
+yw + w = yank word here         yw + label = yank word there
+cw + w = change word here       cw + label = change word there
+```
+
+---
+
 ## Operator-Pending Mode
 
 SmartMotion motions work with **any vim operator**.

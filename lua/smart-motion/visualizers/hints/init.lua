@@ -128,6 +128,22 @@ function M.run(ctx, cfg, motion_state)
 		end
 	end
 
+	-- Exclude the motion key from labels when quick action is available
+	-- This reserves the motion key for "repeat key = act on cursor target" (e.g., dww)
+	if motion_state.allow_quick_action and motion_state.motion_key and #motion_state.motion_key == 1 then
+		local motion_key_lower = motion_state.motion_key:lower()
+		local filtered_keys = vim.tbl_filter(function(key)
+			return key:lower() ~= motion_key_lower
+		end, effective_cfg.keys)
+		if #filtered_keys < #effective_cfg.keys then
+			if effective_cfg == cfg then
+				effective_cfg = vim.tbl_extend("force", {}, cfg)
+			end
+			effective_cfg.keys = filtered_keys
+			recalculate_label_counts(motion_state, #filtered_keys)
+		end
+	end
+
 	local label_pool = M.generate_hint_labels(ctx, effective_cfg, motion_state)
 
 	if #targets > #label_pool then
