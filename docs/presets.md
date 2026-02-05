@@ -161,6 +161,23 @@ This reference documents all the motions included in the default SmartMotion pre
 
 ---
 
+## Preset: `quickfix`
+
+| Key  | Mode | Multi-window | Description                                     |
+| ---- | ---- | ------------ | ----------------------------------------------- |
+| `]q` | n, o | yes          | Jump to next quickfix entry after cursor        |
+| `[q` | n, o | yes          | Jump to previous quickfix entry before cursor   |
+| `]l` | n, o | yes          | Jump to next location list entry after cursor   |
+| `[l` | n, o | yes          | Jump to previous location list entry before cursor |
+
+> [!NOTE]
+> Quickfix entries come from `:vimgrep`, `:make`, `:grep`, LSP diagnostics, and other sources. The location list (`]l`/`[l`) is window-local — each window can have its own list.
+
+> [!NOTE]
+> The collector includes metadata like `entry_type` (E/W/I/N/H for error/warning/info/note/hint), `filename`, `qf_idx` (position in list), and `entry_text` for potential custom filtering or actions.
+
+---
+
 ## Preset: `misc`
 
 | Key   | Description                                                        |

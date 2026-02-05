@@ -33,6 +33,7 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 - 🔎 **Treesitter search** — `R` searches text and selects the surrounding syntax node (works with operators: `dR`, `yR`, `cR`)
 - 🩺 **Diagnostics jumping** — navigate all diagnostics (`]d`/`[d`) or errors only (`]e`/`[e`)
 - 🔀 **Git hunk jumping** — navigate git changed regions (`]g`/`[g`) with gitsigns.nvim integration
+- 📋 **Quickfix/location list** — navigate quickfix (`]q`/`[q`) and location list (`]l`/`[l`) entries with labels
 - 🔎 **2-char find** — `f`/`F` for leap-style two-character search with labels
 - 🔍 **Live search** — `s` for incremental search with labeled results across all visible text
 - 🔎 **Fuzzy search** — `S` for fuzzy matching (type "fn" to match "function", "filename", etc.)
@@ -46,7 +47,7 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 - ✏️ **Multi-cursor edit** — `gmd`/`gmy` toggle-select multiple words, then delete or yank them all at once
 - 🔁 **Repeat** — `.` repeats the last SmartMotion
 - 🧩 **Fully modular pipeline** — Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action. Every stage is replaceable. Build entirely custom motions from scratch.
-- 📦 **11 presets, 50+ keybindings** — enable what you want, disable what you don't
+- 📦 **12 presets, 55+ keybindings** — enable what you want, disable what you don't
 
 ---
 
@@ -69,6 +70,7 @@ return {
       treesitter = true,   -- ]], [[, ]c, [c, ]b, [b, daa, caa, yaa, dfn, cfn, yfn, saa
       diagnostics = true,  -- ]d, [d, ]e, [e
       git = true,          -- ]g, [g
+      quickfix = true,     -- ]q, [q, ]l, [l
       misc = true,         -- . (repeat), gmd, gmy
     },
   },
@@ -234,6 +236,22 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 </details>
 
 <details>
+<summary><b>📋 Quickfix</b> — <code>]q</code> <code>[q</code> <code>]l</code> <code>[l</code> 🪟</summary>
+
+| Key  | Mode | Description                              |
+|------|------|------------------------------------------|
+| `]q` | n, o | Jump to next quickfix entry              |
+| `[q` | n, o | Jump to previous quickfix entry          |
+| `]l` | n, o | Jump to next location list entry         |
+| `[l` | n, o | Jump to previous location list entry     |
+
+> Quickfix entries come from `:vimgrep`, `:make`, `:grep`, LSP, etc. Location list (`]l`/`[l`) is window-local.
+
+> Multi-window: labels appear in all visible splits.
+
+</details>
+
+<details>
 <summary><b>🔁 Misc</b> — <code>.</code> <code>gmd</code> <code>gmy</code></summary>
 
 | Key   | Mode | Description                                          |
@@ -274,7 +292,7 @@ gqj   — format from cursor to labeled line
 >]]   — indent from cursor to labeled function
 ```
 
-All jump-only motions (`w`, `b`, `e`, `ge`, `j`, `k`, `s`, `f`, `F`, `t`, `T`, `]]`, `[[`, `]c`, `[c`, `]b`, `[b`, `]d`, `[d`, `]e`, `[e`, `]g`, `[g`) are available in operator-pending mode. SmartMotion's own operators (`d`, `y`, `c`, `p`, `P`) and standalone actions (`gs`, `saa`, `gmd`, `gmy`) are not — they handle operations internally.
+All jump-only motions (`w`, `b`, `e`, `ge`, `j`, `k`, `s`, `f`, `F`, `t`, `T`, `]]`, `[[`, `]c`, `[c`, `]b`, `[b`, `]d`, `[d`, `]e`, `[e`, `]g`, `[g`, `]q`, `[q`, `]l`, `[l`) are available in operator-pending mode. SmartMotion's own operators (`d`, `y`, `c`, `p`, `P`) and standalone actions (`gs`, `saa`, `gmd`, `gmy`) are not — they handle operations internally.
 
 ---
 
@@ -287,6 +305,7 @@ Enabled by default for:
 - **Treesitter navigation**: `]]`, `[[`, `]c`, `[c`, `]b`, `[b`
 - **Diagnostics**: `]d`, `[d`, `]e`, `[e`
 - **Git**: `]g`, `[g`
+- **Quickfix**: `]q`, `[q`, `]l`, `[l`
 
 Word and line motions (`w`, `b`, `e`, `ge`, `j`, `k`) stay single-window — directional motions within one window are the natural UX.
 

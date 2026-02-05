@@ -65,6 +65,7 @@ return {
       treesitter = true,
       diagnostics = true,
       git = true,
+      quickfix = true,
       misc = true,
     },
   },

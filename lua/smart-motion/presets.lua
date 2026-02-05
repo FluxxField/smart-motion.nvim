@@ -910,6 +910,82 @@ function presets.git(exclude)
 	}, exclude)
 end
 
+--- @param exclude? SmartMotionPresetKey.Quickfix[]
+function presets.quickfix(exclude)
+	presets._register({
+		["]q"] = {
+			collector = "quickfix",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_after_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n", "o" },
+			metadata = {
+				label = "Jump to Next Quickfix Entry",
+				description = "Jump to a quickfix entry after the cursor",
+				motion_state = {
+					multi_window = true,
+				},
+			},
+		},
+		["[q"] = {
+			collector = "quickfix",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_before_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n", "o" },
+			metadata = {
+				label = "Jump to Previous Quickfix Entry",
+				description = "Jump to a quickfix entry before the cursor",
+				motion_state = {
+					multi_window = true,
+				},
+			},
+		},
+		["]l"] = {
+			collector = "quickfix",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_after_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n", "o" },
+			metadata = {
+				label = "Jump to Next Location List Entry",
+				description = "Jump to a location list entry after the cursor",
+				motion_state = {
+					multi_window = true,
+					use_loclist = true,
+				},
+			},
+		},
+		["[l"] = {
+			collector = "quickfix",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_words_before_cursor",
+			visualizer = "hint_start",
+			action = "jump_centered",
+			map = true,
+			modes = { "n", "o" },
+			metadata = {
+				label = "Jump to Previous Location List Entry",
+				description = "Jump to a location list entry before the cursor",
+				motion_state = {
+					multi_window = true,
+					use_loclist = true,
+				},
+			},
+		},
+	}, exclude)
+end
+
 --- Internal registration logic with optional filtering.
 --- @param motions_list table<string, SmartMotionModule>
 --- @param exclude? string[]
