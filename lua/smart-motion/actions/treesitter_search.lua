@@ -102,8 +102,9 @@ local function matches_to_node_targets(matches, bufnr)
 end
 
 --- Runs the treesitter search motion.
----@param mode string|nil Override mode (for testing)
-function M.run(mode)
+---@param mode string|nil Override mode (for testing, or captured from op-pending context)
+---@param operator string|nil Saved operator from op-pending context (e.g. "d", "y", "c")
+function M.run(mode, operator)
 	local context = require("smart-motion.core.context")
 	local state = require("smart-motion.core.state")
 	local highlight = require("smart-motion.core.highlight")
@@ -122,6 +123,7 @@ function M.run(mode)
 	local captured_mode = mode or vim.fn.mode(true)
 	local is_operator_pending = captured_mode:find("o") ~= nil
 	local is_visual = captured_mode:find("[vV]") ~= nil or captured_mode == "\22"
+	local pending_operator = operator or (is_operator_pending and vim.v.operator or nil)
 
 	-- Check if treesitter is available
 	local ok, parser = pcall(vim.treesitter.get_parser, bufnr)
@@ -139,11 +141,38 @@ function M.run(mode)
 	motion_state.search_text = ""
 	motion_state.is_searching_mode = true
 
-	-- Show prompt
-	vim.api.nvim_echo({ { "Treesitter Search: ", "Comment" } }, false, {})
+	-- Input loop with auto-timeout (same 500ms as live search)
+	local CONTINUE_TIMEOUT_MS = 500
+	local last_input_time = nil
 
-	-- Input loop
 	while true do
+		-- Show/refresh prompt on every idle tick so it's always visible
+		vim.api.nvim_echo(
+			{ { "Treesitter Search: ", "Comment" }, { motion_state.search_text, "Normal" } },
+			false,
+			{}
+		)
+
+		-- Auto-proceed to selection after pause (only when there are targets to select)
+		if
+			last_input_time
+			and #motion_state.search_text > 0
+			and motion_state.jump_targets
+			and #motion_state.jump_targets > 0
+		then
+			local elapsed = vim.fn.reltimefloat(vim.fn.reltime(last_input_time)) * 1000
+			if elapsed > CONTINUE_TIMEOUT_MS then
+				break
+			end
+		end
+
+		-- Non-blocking key check
+		if vim.fn.getchar(1) == 0 then
+			vim.cmd("redraw")
+			vim.cmd("sleep 10m")
+			goto continue
+		end
+
 		local char_ok, char = pcall(vim.fn.getchar)
 		if not char_ok then
 			highlight.clear(ctx, cfg, motion_state)
@@ -159,7 +188,7 @@ function M.run(mode)
 			vim.cmd("redraw")
 			vim.api.nvim_echo({ { "", "" } }, false, {})
 			return
-		elseif char == "\r" then -- Enter - proceed to selection
+		elseif char == "\r" then -- Enter - proceed to selection immediately
 			break
 		elseif char == "\b" or char == vim.api.nvim_replace_termcodes("<BS>", true, false, true) then
 			motion_state.search_text = motion_state.search_text:sub(1, -2)
@@ -167,8 +196,7 @@ function M.run(mode)
 			motion_state.search_text = motion_state.search_text .. char
 		end
 
-		-- Update display
-		vim.api.nvim_echo({ { "Treesitter Search: ", "Comment" }, { motion_state.search_text, "Normal" } }, false, {})
+		last_input_time = vim.fn.reltime()
 
 		-- Find matches and convert to node targets
 		highlight.clear(ctx, cfg, motion_state)
@@ -192,6 +220,8 @@ function M.run(mode)
 			motion_state.jump_target_count = 0
 			vim.cmd("redraw")
 		end
+
+		::continue::
 	end
 
 	-- Clear prompt
@@ -203,6 +233,12 @@ function M.run(mode)
 		vim.cmd("redraw")
 		return
 	end
+
+	-- Transition from search to selection: brighten hints (matches pipeline exit.lua behavior)
+	motion_state.is_searching_mode = false
+	highlight.clear(ctx, cfg, motion_state)
+	hints.run(ctx, cfg, motion_state)
+	vim.cmd("redraw")
 
 	-- Wait for label selection
 	selection.wait_for_hint_selection(ctx, cfg, motion_state)
@@ -222,19 +258,29 @@ function M.run(mode)
 	local er = target.end_pos.row
 	local ec = target.end_pos.col
 
-	if is_operator_pending then
-		-- In operator-pending mode, set visual selection for the operator to act on
-		-- Exit operator-pending mode first, then select the range
-		vim.cmd("normal! v")
-		vim.api.nvim_win_set_cursor(winid, { sr + 1, sc })
-		vim.cmd("normal! o")
-		-- Handle end position (ec is exclusive)
-		if ec == 0 and er > sr then
-			local prev_line = vim.api.nvim_buf_get_lines(bufnr, er - 1, er, false)[1]
-			vim.api.nvim_win_set_cursor(winid, { er, math.max(#prev_line - 1, 0) })
-		else
-			vim.api.nvim_win_set_cursor(winid, { er + 1, math.max(ec - 1, 0) })
-		end
+	if is_operator_pending and pending_operator then
+		-- Defer the operation to run after the op-pending callback returns.
+		-- The callback returns with zero cursor movement, which cancels the native
+		-- operator. Then we perform the operation cleanly via API.
+		local op = pending_operator
+		vim.schedule(function()
+			local node_lines = vim.api.nvim_buf_get_text(bufnr, sr, sc, er, ec, {})
+			local text = table.concat(node_lines, "\n")
+
+			if op == "y" then
+				vim.fn.setreg('"', text, "v")
+				vim.api.nvim_win_set_cursor(winid, { sr + 1, sc })
+			elseif op == "d" then
+				vim.fn.setreg('"', text, "v")
+				vim.api.nvim_buf_set_text(bufnr, sr, sc, er, ec, { "" })
+				vim.api.nvim_win_set_cursor(winid, { sr + 1, math.max(sc, 0) })
+			elseif op == "c" then
+				vim.fn.setreg('"', text, "v")
+				vim.api.nvim_buf_set_text(bufnr, sr, sc, er, ec, { "" })
+				vim.api.nvim_win_set_cursor(winid, { sr + 1, sc })
+				vim.cmd("startinsert")
+			end
+		end)
 	elseif is_visual then
 		-- In visual mode, adjust selection to the node
 		vim.api.nvim_win_set_cursor(winid, { sr + 1, sc })

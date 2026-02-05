@@ -20,6 +20,7 @@
 ---@field flow_state_timeout_ms number
 ---@field disable_dim_background boolean
 ---@field native_search? boolean
+---@field count_behavior? "target" | "native"
 
 ---@class SmartMotionPresets
 ---@field words? true | SmartMotionPresetKey.Words[]
@@ -42,7 +43,7 @@
 ---@alias SmartMotionPresetKey.Yank "y" | "yt" | "yT" | "yf" | "yF" | "ryw" | "ryl"
 ---@alias SmartMotionPresetKey.Change "c" | "ct" | "cT" | "cf" | "cF"
 ---@alias SmartMotionPresetKey.Treesitter "]]" | "[[" | "]c" | "[c" | "]b" | "[b" | "daa" | "caa" | "yaa" | "dfn" | "cfn" | "yfn" | "saa" | "gS" | "R"
----@alias SmartMotionPresetKey.Misc "." | "gmd" | "gmy"
+---@alias SmartMotionPresetKey.Misc "." | "gmd" | "gmy" | "gQf" | "gQd" | "gQe" | "gQg" | "gTf" | "gTd" | "gTe" | "gTg"
 ---@alias SmartMotionPresetKey.Diagnostics "]d" | "[d" | "]e" | "[e"
 ---@alias SmartMotionPresetKey.Git "]g" | "[g"
 ---@alias SmartMotionPresetKey.Quickfix "]q" | "[q" | "]l" | "[l"
@@ -102,6 +103,7 @@
 --- @field timeout_after_input? boolean
 --- @field word_pattern? string
 --- @field multi_window? boolean
+--- @field count_select? integer
 --- @field paste_mode? 'before' | 'after'
 --- @field keys? fun(motion_state: SmartMotionMotionState): string[]
 --- @field ts_query? string -- Raw treesitter query string
@@ -184,6 +186,7 @@
 ---@field action string
 ---@field state? SmartMotionMotionState
 ---@field map? boolean
+---@field count_passthrough? boolean
 ---@field modes? string[]
 ---@field name? string
 ---@field metadata? { label?: string, description?: string }

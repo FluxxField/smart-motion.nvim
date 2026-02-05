@@ -21,6 +21,12 @@ function M.run(ctx, cfg, motion_state)
 		local targets = motion_state.jump_targets or {}
 		exit_event.throw_if(#targets == 0, EXIT_TYPE.EARLY_EXIT)
 
+		if motion_state.count_select and motion_state.count_select > 0 then
+			local idx = math.min(motion_state.count_select, #targets)
+			motion_state.selected_jump_target = targets[idx]
+			exit_event.throw(EXIT_TYPE.AUTO_SELECT)
+		end
+
 		if #targets == 1 then
 			if cfg.auto_select_target then
 				exit_event.throw(EXIT_TYPE.AUTO_SELECT)

@@ -65,22 +65,25 @@ end
 ---@param cfg SmartMotionConfig
 ---@param motion_state SmartMotionMotionState
 function M.reset_motion(ctx, cfg, motion_state)
-	if motion_state.motion.action == "run_motion" then
-		history.add({
-			motion = motion_state.selected_jump_target.motion,
-			target = motion_state.selected_jump_target,
-			metadata = {
-				time_stamp = os.time(),
-			},
-		})
-	else
-		history.add({
-			motion = motion_state.motion,
-			target = motion_state.selected_jump_target,
-			metadata = {
-				time_stamp = os.time(),
-			},
-		})
+	-- Only add to history if we have a selected target
+	if motion_state.selected_jump_target then
+		if motion_state.motion and motion_state.motion.action == "run_motion" then
+			history.add({
+				motion = motion_state.selected_jump_target.motion,
+				target = motion_state.selected_jump_target,
+				metadata = {
+					time_stamp = os.time(),
+				},
+			})
+		else
+			history.add({
+				motion = motion_state.motion,
+				target = motion_state.selected_jump_target,
+				metadata = {
+					time_stamp = os.time(),
+				},
+			})
+		end
 	end
 
 	-- Save char state for ;/, repeat if this was an f/F/t/T motion

@@ -116,6 +116,10 @@ function M.is_expired()
 		return false
 	end
 
+	if not M.last_motion_timestamp then
+		return true
+	end
+
 	local now = M.get_timestamp()
 	local elapsed = now - M.last_motion_timestamp
 	local flow_state_timeout_ms = config.validated.flow_state_timeout_ms or FLOW_STATE_TIMEOUT_MS

@@ -111,8 +111,8 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 
 | Key | Mode    | Description                  |
 |-----|---------|------------------------------|
-| `j` | n, v, o | Jump to line after cursor    |
-| `k` | n, v, o | Jump to line before cursor   |
+| `j` | n, v, o | Jump to line after cursor (supports count: `5j`)  |
+| `k` | n, v, o | Jump to line before cursor (supports count: `3k`) |
 
 </details>
 
@@ -431,6 +431,9 @@ Full default configuration:
 
   -- Enable label overlay during native / search (toggle with <C-s>)
   native_search = true,
+
+  -- How count prefix interacts with motions (j/k): "target" or "native"
+  count_behavior = "target",
 }
 ```
 

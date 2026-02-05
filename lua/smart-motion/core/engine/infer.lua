@@ -42,7 +42,10 @@ function M.run(ctx, cfg, motion_state)
 			end
 		end
 
-		vim.api.nvim_feedkeys(motion_state.motion.trigger_key .. motion_key, "n", false)
+		-- Feed trigger key with noremap to get native operator behavior (avoids recursion),
+		-- but feed the motion key with remap so user/plugin "o" mode keymaps fire (e.g. R).
+		vim.api.nvim_feedkeys(motion_state.motion.trigger_key, "n", false)
+		vim.api.nvim_feedkeys(motion_key, "m", false)
 		exit.throw(EXIT_TYPE.EARLY_EXIT)
 	end
 

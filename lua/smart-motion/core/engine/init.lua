@@ -15,11 +15,16 @@ local EXIT_TYPE = consts.EXIT_TYPE
 local M = {}
 
 --- @param trigger_key string
-function M.run(trigger_key)
+--- @param opts? { count_select?: integer }
+function M.run(trigger_key, opts)
 	local ctx, cfg, motion_state
 
 	local exit_type = exit_event.wrap(function()
 		ctx, cfg, motion_state = setup.run(trigger_key)
+
+		if opts and opts.count_select then
+			motion_state.count_select = opts.count_select
+		end
 
 		infer.run(ctx, cfg, motion_state)
 
