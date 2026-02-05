@@ -299,13 +299,17 @@ disable_dim_background = true   -- dimming disabled
 
 ## History
 
-Configure repeat history size:
+Configure motion history size:
 
 ```lua
 history_max_size = 20  -- default
+history_max_size = 50  -- keep more history
+history_max_size = 0   -- effectively disables persistence
 ```
 
-The `.` repeat functionality uses this history.
+Controls how many entries are stored for both `.` (repeat) and `g.` (history browser). History persists across Neovim sessions — stored per-project in `~/.local/share/nvim/smart-motion/history/`. Entries older than 30 days or pointing to deleted files are automatically pruned.
+
+See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)** for full details.
 
 ---
 
