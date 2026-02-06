@@ -10,7 +10,7 @@
 
 **The last motion plugin you'll ever need.**
 
-One plugin replaces hop, leap, flash, mini.jump, **and harpoon** — then goes further with treesitter-aware editing, diagnostics jumping, composable operators, and a pipeline architecture that lets you build any motion you can imagine.
+One plugin replaces hop, leap, flash, and mini.jump — then goes further with treesitter-aware editing, diagnostics jumping, composable operators, and a pipeline architecture that lets you build any motion you can imagine.
 
 > [!WARNING]
 > SmartMotion is under active development. The API is stabilizing but breaking changes may still occur.
@@ -48,8 +48,8 @@ One plugin replaces hop, leap, flash, mini.jump, **and harpoon** — then goes f
 - ✏️ **Multi-cursor edit** — `gmd`/`gmy` toggle-select multiple words, then delete or yank them all at once
 - 🔁 **Repeat** — `.` repeats the last SmartMotion
 - 🕰️ **Motion History** — `g.` opens a full-featured history browser with **pins** (`gp` to bookmark), **frecency ranking**, **j/k navigation with live preview**, **/search filtering**, and **action mode** (`d`/`y`/`c` to delete, yank, or change targets remotely). History persists across sessions.
-- 📌 **Direct Pin Jumps** — `g1`-`g9` jump instantly to numbered pins without opening the browser (like harpoon). `g0` jumps to your most recent location. `gp1`-`gp9` set pins at specific slots.
-- 🌍 **Global Pins** — `gP` creates cross-project bookmarks (`A`-`Z`). `gA`-`gZ` jump to global pins. Access your dotfiles, notes, or common configs from any project.
+- 📌 **Direct Pin Jumps** — `g1`-`g9` jump instantly to numbered pins. `g0` jumps to your most recent location. `gp1`-`gp9` set pins at specific slots.
+- 🌍 **Global Pins** — `gP` creates cross-project bookmarks (`A`-`Z`). `gA`-`gZ` jump to global pins from any project. Great for dotfiles, notes, or common configs.
 - 🧩 **Fully modular pipeline** — Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action. Every stage is replaceable. Build entirely custom motions from scratch.
 - 📦 **13 presets, 100+ keybindings** — enable what you want, disable what you don't
 
@@ -291,9 +291,9 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 
 ---
 
-## 📌 Pins — Your Harpoon Replacement
+## 📌 Pins — Quick File Navigation
 
-SmartMotion includes a complete pinning system that replaces harpoon and similar plugins. Pin locations, jump to them instantly, and organize your workflow.
+SmartMotion includes a built-in pinning system for fast file navigation. Pin locations, jump to them instantly — no separate plugin needed.
 
 ### Local Pins (Per-Project)
 

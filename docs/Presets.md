@@ -425,7 +425,7 @@ g1 → instantly jumps to location A
 g2 → instantly jumps to location B
 ```
 
-Like harpoon — jump directly to numbered pins without opening the browser.
+Jump directly to numbered pins without opening the browser — pure muscle memory.
 
 ### Jump to Most Recent (`g0`)
 
