@@ -72,6 +72,7 @@ function M.run(ctx, cfg, motion_state)
 
 				if motion_state.selected_jump_target then
 					line_action.run(ctx, cfg, motion_state)
+					exit.throw(EXIT_TYPE.EARLY_EXIT)
 				end
 			end
 		end
