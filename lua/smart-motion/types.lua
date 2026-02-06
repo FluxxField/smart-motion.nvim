@@ -180,6 +180,7 @@
 
 ---@class SmartMotionMotionEntry
 ---@field trigger_key? string
+---@field action_key? string
 ---@field infer? boolean
 ---@field pipeline { collector: string, extractor: string, visualizer: string, filter?: string }
 ---@field pipeline_wrapper? string
