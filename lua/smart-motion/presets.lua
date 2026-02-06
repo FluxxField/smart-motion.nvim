@@ -612,6 +612,62 @@ function presets.misc(exclude)
 			require("smart-motion.core.history").toggle_pin()
 		end, { desc = "Toggle pin at cursor", noremap = true, silent = true })
 	end
+
+	-- Register g1-g9 keymaps for direct pin jumps
+	for i = 1, 9 do
+		local key = "g" .. i
+		if not (type(exclude) == "table" and exclude[key] == false) then
+			vim.keymap.set("n", key, function()
+				require("smart-motion.core.history").jump_to_pin(i)
+			end, { desc = "Jump to pin " .. i, noremap = true, silent = true })
+		end
+	end
+
+	-- Register g0 keymap for jumping to most recent history entry
+	if not (type(exclude) == "table" and exclude["g0"] == false) then
+		vim.keymap.set("n", "g0", function()
+			require("smart-motion.core.history").jump_to_recent()
+		end, { desc = "Jump to most recent location", noremap = true, silent = true })
+	end
+
+	-- Register gp1-gp9 keymaps for setting pins at specific slots
+	for i = 1, 9 do
+		local key = "gp" .. i
+		if not (type(exclude) == "table" and exclude[key] == false) then
+			vim.keymap.set("n", key, function()
+				require("smart-motion.core.history").set_pin_at(i)
+			end, { desc = "Set pin at slot " .. i, noremap = true, silent = true })
+		end
+	end
+
+	-- Register gP keymap for toggling global pins (prompts for letter)
+	if not (type(exclude) == "table" and exclude["gP"] == false) then
+		vim.keymap.set("n", "gP", function()
+			require("smart-motion.core.history").toggle_global_pin()
+		end, { desc = "Toggle global pin (prompts A-Z)", noremap = true, silent = true })
+	end
+
+	-- Register g<letter> keymaps for jumping to global pins (A-Z)
+	for c = 65, 90 do -- ASCII A-Z
+		local letter = string.char(c)
+		local key = "g" .. letter
+		if not (type(exclude) == "table" and exclude[key] == false) then
+			vim.keymap.set("n", key, function()
+				require("smart-motion.core.history").jump_to_global_pin(letter)
+			end, { desc = "Jump to global pin " .. letter, noremap = true, silent = true })
+		end
+	end
+
+	-- Register gP<letter> keymaps for setting global pins directly (A-Z)
+	for c = 65, 90 do -- ASCII A-Z
+		local letter = string.char(c)
+		local key = "gP" .. letter
+		if not (type(exclude) == "table" and exclude[key] == false) then
+			vim.keymap.set("n", key, function()
+				require("smart-motion.core.history").set_global_pin(letter)
+			end, { desc = "Set global pin " .. letter, noremap = true, silent = true })
+		end
+	end
 end
 
 --- @param exclude? string[]

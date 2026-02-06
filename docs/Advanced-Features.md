@@ -605,9 +605,9 @@ Entries older than 30 days are automatically discarded during load.
 ### Configuration
 
 ```lua
-history_max_size = 20  -- default, controls both in-memory and on-disk size
-history_max_size = 50  -- keep more history
-history_max_size = 0   -- effectively disables persistence (nothing to save)
+history_max_size = 100  -- default, controls both in-memory and on-disk size
+history_max_size = 200  -- keep more history
+history_max_size = 0    -- effectively disables persistence (nothing to save)
 ```
 
 ### Navigating to Entries
@@ -622,6 +622,55 @@ Jumplist integration: `m'` is saved before navigating, so `<C-o>` takes you back
 ### Version Migration
 
 History files are versioned. Version 1 files (before pins and frecency) are loaded seamlessly — `visit_count` defaults to 1 and pins start empty. No manual migration needed.
+
+### Direct Pin Jumps (`g1`-`g9`)
+
+Jump instantly to numbered pins without opening the browser:
+
+```
+g1  — jump to pin 1
+g2  — jump to pin 2
+...
+g9  — jump to pin 9
+```
+
+Like harpoon's navigation — set your frequently-visited files as pins, then access them with muscle memory.
+
+### Jump to Most Recent (`g0`)
+
+```
+g0  — jump to your most recent history entry
+```
+
+Quick "go back" to wherever you just were. No browser, no labels, just instant navigation.
+
+### Pin Slot Assignment (`gp1`-`gp9`)
+
+Set the current location as a specific numbered pin:
+
+```
+gp3  — "Pin 3 set (3/9)" — current location becomes pin 3
+```
+
+Useful for organizing your pins in a consistent order (e.g., "pin 1 is always my main file, pin 2 is always tests").
+
+### Global Pins (`gP`, `gA`-`gZ`)
+
+Cross-project bookmarks that work anywhere:
+
+```
+gP   — prompts "Global pin letter (A-Z):"
+       type "A" → "Global pin A set"
+gA   — jumps to global pin A (even from a different project)
+gPA  — directly sets global pin A at cursor (no prompt)
+```
+
+Global pins are stored separately from project-specific history and work across all your Neovim sessions. Use them for:
+- Your dotfiles (`.zshrc`, `init.lua`)
+- Notes or TODO files
+- Frequently-edited configs across projects
+
+26 slots available (A-Z). They persist across sessions and are pruned if the target file no longer exists.
 
 ---
 

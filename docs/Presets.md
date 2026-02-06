@@ -1,6 +1,6 @@
 # Presets Guide
 
-SmartMotion ships with **13 presets** containing **57+ keybindings**. Each preset is a logical group of related motions. Enable what you need, disable what you don't.
+SmartMotion ships with **13 presets** containing **100+ keybindings**. Each preset is a logical group of related motions. Enable what you need, disable what you don't.
 
 ---
 
@@ -20,7 +20,7 @@ SmartMotion ships with **13 presets** containing **57+ keybindings**. Each prese
 | `git` | `]g` `[g` | Git hunk navigation |
 | `quickfix` | `]q` `[q` `]l` `[l` | Quickfix/location list |
 | `marks` | `g'` `gm` | Mark navigation and setting |
-| `misc` | `.` `g.` `gp` `gmd` `gmy` | Repeat, history, pins, and multi-cursor |
+| `misc` | `.` `g.` `g0` `g1`-`g9` `gp` `gp1`-`gp9` `gP` `gA`-`gZ` `gmd` `gmy` | Repeat, history, pins, global pins, and multi-cursor |
 
 ---
 
@@ -380,7 +380,13 @@ Repeat, history, pins, and multi-cursor operations.
 |-----|-------|--------------|
 | `.` | n | **Repeat** last SmartMotion |
 | `g.` | n | **History browser** — browse pins and past targets with frecency ranking and action mode |
+| `g0` | n | **Jump to most recent** — instant jump to your last location |
+| `g1`-`g9` | n | **Direct pin jump** — jump to pin N without opening browser |
 | `gp` | n | **Toggle pin** — bookmark/unbookmark the current cursor position |
+| `gp1`-`gp9` | n | **Set pin at slot** — set current location as pin N |
+| `gP` | n | **Toggle global pin** — cross-project bookmark (prompts A-Z) |
+| `gA`-`gZ` | n | **Jump to global pin** — jump to cross-project pin |
+| `gPA`-`gPZ` | n | **Set global pin** — set current location as global pin |
 | `gmd` | n | **Multi-cursor delete** — toggle-select multiple words, delete all |
 | `gmy` | n | **Multi-cursor yank** — toggle-select multiple words, yank all |
 
@@ -410,6 +416,26 @@ The browser shows:
 
 History persists across Neovim sessions. Visit counts accumulate over time, pushing frequently-visited locations to the top. See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)** for full details.
 
+### Direct Pin Jumps (`g1`-`g9`)
+
+```
+gp at location A → "Pinned (1/9)"
+gp at location B → "Pinned (2/9)"
+g1 → instantly jumps to location A
+g2 → instantly jumps to location B
+```
+
+Like harpoon — jump directly to numbered pins without opening the browser.
+
+### Jump to Most Recent (`g0`)
+
+```
+Navigate around, use motions...
+g0 → instantly jump back to your most recent location
+```
+
+Quick "go back" without opening the history browser.
+
 ### Pins (`gp`)
 
 ```
@@ -418,6 +444,26 @@ Press gp again at same spot → "Unpinned"
 ```
 
 Up to 9 pins. Pins persist across sessions and appear at the top of the history browser with number labels for instant access.
+
+### Pin Slot Assignment (`gp1`-`gp9`)
+
+```
+gp3 → "Pin 3 set (3/9)" — current location becomes pin 3
+```
+
+Set current location at a specific pin slot, replacing any existing pin there. Useful for organizing your pins in a consistent order.
+
+### Global Pins (`gP`, `gA`-`gZ`)
+
+Cross-project bookmarks that work across all your projects.
+
+```
+gP → prompts "Global pin letter (A-Z):" → type "A" → "Global pin A set"
+gA → jumps to global pin A (even if it's in a different project)
+gPA → directly sets global pin A at cursor (no prompt)
+```
+
+Global pins are stored separately from project pins and persist across all Neovim sessions. Use them for frequently-accessed files like your dotfiles, notes, or commonly-edited configs.
 
 ### Multi-Cursor (`gmd`/`gmy`)
 

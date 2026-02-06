@@ -10,7 +10,7 @@
 
 **The last motion plugin you'll ever need.**
 
-One plugin replaces hop, leap, flash, and mini.jump — then goes further with treesitter-aware editing, diagnostics jumping, composable operators, and a pipeline architecture that lets you build any motion you can imagine.
+One plugin replaces hop, leap, flash, mini.jump, **and harpoon** — then goes further with treesitter-aware editing, diagnostics jumping, composable operators, and a pipeline architecture that lets you build any motion you can imagine.
 
 > [!WARNING]
 > SmartMotion is under active development. The API is stabilizing but breaking changes may still occur.
@@ -48,8 +48,10 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 - ✏️ **Multi-cursor edit** — `gmd`/`gmy` toggle-select multiple words, then delete or yank them all at once
 - 🔁 **Repeat** — `.` repeats the last SmartMotion
 - 🕰️ **Motion History** — `g.` opens a full-featured history browser with **pins** (`gp` to bookmark), **frecency ranking**, **j/k navigation with live preview**, **/search filtering**, and **action mode** (`d`/`y`/`c` to delete, yank, or change targets remotely). History persists across sessions.
+- 📌 **Direct Pin Jumps** — `g1`-`g9` jump instantly to numbered pins without opening the browser (like harpoon). `g0` jumps to your most recent location. `gp1`-`gp9` set pins at specific slots.
+- 🌍 **Global Pins** — `gP` creates cross-project bookmarks (`A`-`Z`). `gA`-`gZ` jump to global pins. Access your dotfiles, notes, or common configs from any project.
 - 🧩 **Fully modular pipeline** — Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action. Every stage is replaceable. Build entirely custom motions from scratch.
-- 📦 **13 presets, 59+ keybindings** — enable what you want, disable what you don't
+- 📦 **13 presets, 100+ keybindings** — enable what you want, disable what you don't
 
 ---
 
@@ -74,7 +76,7 @@ return {
       git = true,          -- ]g, [g
       quickfix = true,     -- ]q, [q, ]l, [l
       marks = true,        -- g', gm
-      misc = true,         -- . (repeat), g. (history), gp (pin), gmd, gmy
+      misc = true,         -- . g. g0 g1-g9 gp gP gA-gZ gmd gmy (repeat, history, pins, global pins)
     },
   },
 }
@@ -269,17 +271,75 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 </details>
 
 <details>
-<summary><b>🔁 Misc</b> — <code>.</code> <code>g.</code> <code>gp</code> <code>gmd</code> <code>gmy</code></summary>
+<summary><b>🔁 Misc</b> — <code>.</code> <code>g.</code> <code>g0</code> <code>g1-g9</code> <code>gp</code> <code>gP</code> <code>gA-gZ</code> <code>gmd</code> <code>gmy</code></summary>
 
 | Key   | Mode | Description                                          |
 |-------|------|------------------------------------------------------|
 | `.`   | n    | Repeat last SmartMotion                               |
 | `g.`  | n    | History browser — pins, frecency, j/k nav with preview, /search, d/y/c actions |
-| `gp`  | n    | Toggle pin at cursor — bookmark locations for instant access (up to 9) |
+| `g0`  | n    | Jump to most recent location (quick "go back")        |
+| `g1`-`g9` | n | Jump directly to pin 1-9 (like harpoon)              |
+| `gp`  | n    | Toggle pin at cursor — bookmark locations (up to 9)   |
+| `gp1`-`gp9` | n | Set current location as pin N                      |
+| `gP`  | n    | Toggle global pin (prompts A-Z) — cross-project bookmark |
+| `gA`-`gZ` | n | Jump to global pin — works from any project          |
+| `gPA`-`gPZ` | n | Set global pin directly at cursor                  |
 | `gmd` | n    | Multi-cursor delete — toggle-select words, press Enter to delete all |
 | `gmy` | n    | Multi-cursor yank — toggle-select words, press Enter to yank all    |
 
 </details>
+
+---
+
+## 📌 Pins — Your Harpoon Replacement
+
+SmartMotion includes a complete pinning system that replaces harpoon and similar plugins. Pin locations, jump to them instantly, and organize your workflow.
+
+### Local Pins (Per-Project)
+
+```
+gp        → toggle pin at cursor ("Pinned 1/9" or "Unpinned")
+g1 - g9   → jump instantly to pin 1-9 (no browser, no labels)
+gp3       → set current location as pin 3 (organize your pins)
+g.        → open history browser (pins at top with number labels)
+```
+
+**Workflow example:**
+1. Open your main file, `gp` → "Pinned (1/9)"
+2. Open your test file, `gp` → "Pinned (2/9)"
+3. Open your config, `gp` → "Pinned (3/9)"
+4. Now from anywhere: `g1` = main file, `g2` = tests, `g3` = config
+
+Up to 9 pins per project. They persist across sessions and appear at the top of the history browser.
+
+### Global Pins (Cross-Project)
+
+```
+gP        → toggle global pin (prompts for letter A-Z)
+gA - gZ   → jump to global pin from ANY project
+gPA       → set global pin A directly (no prompt)
+```
+
+**26 slots (A-Z)** that work everywhere. Use them for:
+- Your dotfiles (`~/.zshrc`, `~/.config/nvim/init.lua`)
+- Notes or TODO files
+- Frequently-edited configs across all projects
+
+```
+# In any project:
+gA → jumps to your ~/.zshrc (if pinned as A)
+gB → jumps to your notes.md (if pinned as B)
+```
+
+### Quick Navigation
+
+| Key | What it does |
+|-----|--------------|
+| `g0` | Jump to most recent location (instant "go back") |
+| `g1`-`g9` | Jump to local pin N |
+| `gA`-`gZ` | Jump to global pin |
+
+No browser, no labels, just muscle memory.
 
 ---
 

@@ -4,10 +4,12 @@ local log = require("smart-motion.core.log")
 local HISTORY_MAX_SIZE = consts.HISTORY_MAX_SIZE
 local HISTORY_VERSION = 2
 local HISTORY_MAX_AGE_SECS = 30 * 24 * 3600 -- 30 days
+local GLOBAL_PINS_MAX = 26 -- A-Z
 
 local M = {
 	entries = {},
 	pins = {},
+	global_pins = {}, -- Cross-project pins keyed by letter A-Z
 	max_size = HISTORY_MAX_SIZE,
 	max_pins = consts.PINS_MAX_SIZE,
 }
@@ -142,6 +144,411 @@ function M.toggle_pin()
 
 	table.insert(M.pins, pin_entry)
 	vim.notify("Pinned (" .. #M.pins .. "/" .. M.max_pins .. ")", vim.log.levels.INFO)
+end
+
+--- Gets a pin by index (1-based).
+---@param n number
+---@return table|nil
+function M.get_pin(n)
+	if n < 1 or n > #M.pins then
+		return nil
+	end
+	return M.pins[n]
+end
+
+--- Jumps to pin at index n (1-based).
+---@param n number
+function M.jump_to_pin(n)
+	local pin = M.get_pin(n)
+	if not pin then
+		vim.notify("No pin at slot " .. n, vim.log.levels.WARN)
+		return
+	end
+
+	local filepath = pin.filepath
+	local target = pin.target
+	if not filepath or not target or not target.start_pos then
+		vim.notify("Invalid pin data", vim.log.levels.WARN)
+		return
+	end
+
+	-- Save to jumplist
+	vim.cmd("normal! m'")
+
+	-- Open file if needed
+	local current_file = vim.api.nvim_buf_get_name(0)
+	if current_file ~= filepath then
+		if vim.fn.filereadable(filepath) == 0 then
+			vim.notify("Pin file no longer exists: " .. vim.fn.fnamemodify(filepath, ":t"), vim.log.levels.WARN)
+			return
+		end
+		vim.cmd("edit " .. vim.fn.fnameescape(filepath))
+	end
+
+	-- Jump to position
+	local row = target.start_pos.row + 1 -- Convert to 1-indexed
+	local col = target.start_pos.col
+	local line_count = vim.api.nvim_buf_line_count(0)
+	if row > line_count then
+		row = line_count
+	end
+	vim.api.nvim_win_set_cursor(0, { row, col })
+	vim.cmd("normal! zv") -- Open folds
+end
+
+--- Jumps to the most recent history entry.
+function M.jump_to_recent()
+	local entry = M.entries[1]
+	if not entry then
+		vim.notify("No history entries", vim.log.levels.WARN)
+		return
+	end
+
+	local filepath = entry.filepath
+	local target = entry.target
+	if not filepath or not target or not target.start_pos then
+		vim.notify("Invalid history entry", vim.log.levels.WARN)
+		return
+	end
+
+	-- Save to jumplist
+	vim.cmd("normal! m'")
+
+	-- Open file if needed
+	local current_file = vim.api.nvim_buf_get_name(0)
+	if current_file ~= filepath then
+		if vim.fn.filereadable(filepath) == 0 then
+			vim.notify("History file no longer exists: " .. vim.fn.fnamemodify(filepath, ":t"), vim.log.levels.WARN)
+			return
+		end
+		vim.cmd("edit " .. vim.fn.fnameescape(filepath))
+	end
+
+	-- Jump to position
+	local row = target.start_pos.row + 1 -- Convert to 1-indexed
+	local col = target.start_pos.col
+	local line_count = vim.api.nvim_buf_line_count(0)
+	if row > line_count then
+		row = line_count
+	end
+	vim.api.nvim_win_set_cursor(0, { row, col })
+	vim.cmd("normal! zv") -- Open folds
+end
+
+--- Sets the current cursor location as pin at slot n (1-based).
+--- If n > current pin count, appends to end.
+--- Replaces existing pin at slot n.
+---@param n number
+function M.set_pin_at(n)
+	if n < 1 or n > M.max_pins then
+		vim.notify("Pin slot must be 1-" .. M.max_pins, vim.log.levels.WARN)
+		return
+	end
+
+	local filepath = vim.api.nvim_buf_get_name(0)
+	if filepath == "" then
+		vim.notify("Cannot pin: buffer has no file", vim.log.levels.WARN)
+		return
+	end
+
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local row = cursor[1] - 1 -- 0-indexed
+	local col = cursor[2]
+	local cword = vim.fn.expand("<cword>")
+
+	local pin_entry = {
+		filepath = filepath,
+		target = {
+			text = cword,
+			type = "pin",
+			start_pos = { row = row, col = col },
+			end_pos = { row = row, col = col + #cword },
+			metadata = {
+				pinned = true,
+				filetype = vim.bo.filetype,
+			},
+		},
+		metadata = { time_stamp = os.time() },
+	}
+
+	-- Remove any existing pin at same location (dedup)
+	local key = M._entry_key(pin_entry)
+	for i, pin in ipairs(M.pins) do
+		if M._entry_key(pin) == key then
+			table.remove(M.pins, i)
+			break
+		end
+	end
+
+	-- Insert at slot n (or append if n > current count)
+	if n > #M.pins + 1 then
+		n = #M.pins + 1
+	end
+
+	-- Remove existing pin at slot n if it exists
+	if M.pins[n] then
+		table.remove(M.pins, n)
+	end
+
+	table.insert(M.pins, n, pin_entry)
+
+	-- Trim if over max
+	while #M.pins > M.max_pins do
+		table.remove(M.pins)
+	end
+
+	vim.notify("Pin " .. n .. " set (" .. #M.pins .. "/" .. M.max_pins .. ")", vim.log.levels.INFO)
+end
+
+-- ============================================================================
+-- Global Pins (Cross-Project)
+-- ============================================================================
+
+--- Validates a global pin letter (A-Z).
+---@param letter string
+---@return boolean
+local function is_valid_global_pin_letter(letter)
+	return type(letter) == "string" and #letter == 1 and letter:match("^[A-Z]$") ~= nil
+end
+
+--- Gets the filepath for global pins storage.
+---@return string
+function M._get_global_pins_filepath()
+	return vim.fn.stdpath("data") .. "/smart-motion/global_pins.json"
+end
+
+--- Toggles a global pin at the current cursor position.
+--- Prompts for a letter A-Z.
+function M.toggle_global_pin()
+	local filepath = vim.api.nvim_buf_get_name(0)
+	if filepath == "" then
+		vim.notify("Cannot pin: buffer has no file", vim.log.levels.WARN)
+		return
+	end
+
+	vim.ui.input({ prompt = "Global pin letter (A-Z): " }, function(input)
+		if not input or input == "" then
+			return
+		end
+
+		local letter = input:upper()
+		if not is_valid_global_pin_letter(letter) then
+			vim.notify("Invalid pin letter. Use A-Z.", vim.log.levels.WARN)
+			return
+		end
+
+		local cursor = vim.api.nvim_win_get_cursor(0)
+		local row = cursor[1] - 1 -- 0-indexed
+		local col = cursor[2]
+		local cword = vim.fn.expand("<cword>")
+
+		-- Check if already pinned at this exact location with this letter
+		local existing = M.global_pins[letter]
+		if existing then
+			local existing_key = M._entry_key(existing)
+			local current_key = filepath .. ":" .. row .. ":" .. col
+			if existing_key == current_key then
+				-- Unpin
+				M.global_pins[letter] = nil
+				M._save_global_pins()
+				vim.notify("Global pin " .. letter .. " removed", vim.log.levels.INFO)
+				return
+			end
+		end
+
+		-- Set the global pin
+		M.global_pins[letter] = {
+			filepath = filepath,
+			target = {
+				text = cword,
+				type = "global_pin",
+				start_pos = { row = row, col = col },
+				end_pos = { row = row, col = col + #cword },
+				metadata = {
+					pinned = true,
+					global = true,
+					filetype = vim.bo.filetype,
+				},
+			},
+			metadata = { time_stamp = os.time() },
+		}
+
+		M._save_global_pins()
+		vim.notify("Global pin " .. letter .. " set", vim.log.levels.INFO)
+	end)
+end
+
+--- Sets a global pin at letter without prompting.
+---@param letter string
+function M.set_global_pin(letter)
+	letter = letter:upper()
+	if not is_valid_global_pin_letter(letter) then
+		vim.notify("Invalid pin letter. Use A-Z.", vim.log.levels.WARN)
+		return
+	end
+
+	local filepath = vim.api.nvim_buf_get_name(0)
+	if filepath == "" then
+		vim.notify("Cannot pin: buffer has no file", vim.log.levels.WARN)
+		return
+	end
+
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local row = cursor[1] - 1
+	local col = cursor[2]
+	local cword = vim.fn.expand("<cword>")
+
+	M.global_pins[letter] = {
+		filepath = filepath,
+		target = {
+			text = cword,
+			type = "global_pin",
+			start_pos = { row = row, col = col },
+			end_pos = { row = row, col = col + #cword },
+			metadata = {
+				pinned = true,
+				global = true,
+				filetype = vim.bo.filetype,
+			},
+		},
+		metadata = { time_stamp = os.time() },
+	}
+
+	M._save_global_pins()
+	vim.notify("Global pin " .. letter .. " set", vim.log.levels.INFO)
+end
+
+--- Jumps to a global pin by letter.
+---@param letter string
+function M.jump_to_global_pin(letter)
+	letter = letter:upper()
+	if not is_valid_global_pin_letter(letter) then
+		vim.notify("Invalid pin letter. Use A-Z.", vim.log.levels.WARN)
+		return
+	end
+
+	local pin = M.global_pins[letter]
+	if not pin then
+		vim.notify("No global pin at " .. letter, vim.log.levels.WARN)
+		return
+	end
+
+	local filepath = pin.filepath
+	local target = pin.target
+	if not filepath or not target or not target.start_pos then
+		vim.notify("Invalid global pin data", vim.log.levels.WARN)
+		return
+	end
+
+	-- Save to jumplist
+	vim.cmd("normal! m'")
+
+	-- Open file if needed
+	local current_file = vim.api.nvim_buf_get_name(0)
+	if current_file ~= filepath then
+		if vim.fn.filereadable(filepath) == 0 then
+			vim.notify("Global pin file no longer exists: " .. filepath, vim.log.levels.WARN)
+			return
+		end
+		vim.cmd("edit " .. vim.fn.fnameescape(filepath))
+	end
+
+	-- Jump to position
+	local row = target.start_pos.row + 1
+	local col = target.start_pos.col
+	local line_count = vim.api.nvim_buf_line_count(0)
+	if row > line_count then
+		row = line_count
+	end
+	vim.api.nvim_win_set_cursor(0, { row, col })
+	vim.cmd("normal! zv")
+end
+
+--- Saves global pins to disk.
+function M._save_global_pins()
+	local filepath = M._get_global_pins_filepath()
+	local dir = vim.fn.stdpath("data") .. "/smart-motion"
+
+	vim.fn.mkdir(dir, "p")
+
+	local serialized = {}
+	for letter, pin in pairs(M.global_pins) do
+		serialized[letter] = M._serialize_pin(pin)
+	end
+
+	local data = {
+		version = 1,
+		pins = serialized,
+	}
+
+	local ok, json = pcall(vim.fn.json_encode, data)
+	if not ok then
+		log.warn("Failed to encode global pins: " .. tostring(json))
+		return
+	end
+
+	local write_ok, err = pcall(function()
+		local f = io.open(filepath, "w")
+		if not f then
+			error("Cannot open file for writing: " .. filepath)
+		end
+		f:write(json)
+		f:close()
+	end)
+
+	if not write_ok then
+		log.warn("Failed to save global pins: " .. tostring(err))
+	end
+end
+
+--- Loads global pins from disk.
+function M._load_global_pins()
+	local filepath = M._get_global_pins_filepath()
+
+	local f = io.open(filepath, "r")
+	if not f then
+		return -- No file yet
+	end
+
+	local ok, content = pcall(function()
+		local c = f:read("*a")
+		f:close()
+		return c
+	end)
+
+	if not ok or not content or content == "" then
+		pcall(function()
+			f:close()
+		end)
+		return
+	end
+
+	local decode_ok, data = pcall(vim.fn.json_decode, content)
+	if not decode_ok or type(data) ~= "table" then
+		log.warn("Corrupt global pins file, starting fresh")
+		return
+	end
+
+	if data.version ~= 1 then
+		log.warn("Global pins version mismatch, starting fresh")
+		return
+	end
+
+	if type(data.pins) ~= "table" then
+		return
+	end
+
+	for letter, raw in pairs(data.pins) do
+		if is_valid_global_pin_letter(letter) then
+			local pin = M._deserialize_entry(raw)
+			if pin then
+				-- Stale check: skip if file doesn't exist
+				if pin.filepath and pin.filepath ~= "" and vim.fn.filereadable(pin.filepath) == 1 then
+					M.global_pins[letter] = pin
+				end
+			end
+		end
+	end
 end
 
 --- Gets the project root via git, falling back to cwd.
@@ -527,6 +934,7 @@ function M.setup(cfg)
 	end
 
 	M._load()
+	M._load_global_pins()
 	M._setup_autocmds()
 end
 
