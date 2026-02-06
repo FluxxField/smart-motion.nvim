@@ -45,10 +45,10 @@ function M.run(ctx, cfg, motion_state)
 		end
 	end
 
-	local modules = module_loader.get_modules(ctx, cfg, motion_state, { "extractor", "action" })
+	local modules = module_loader.get_modules(ctx, cfg, motion_state, { "extractor", "action", "visualizer", "filter" })
 
-	-- Merge inferred module metadata into motion_state (setup.run couldn't do this
-	-- because the extractor wasn't known yet before infer resolved the motion key)
+	-- Merge inferred module metadata into motion_state (setup.run merged metadata for the
+	-- original motion, but infer may have overridden extractor/visualizer/filter/action)
 	for _, module in pairs(modules) do
 		if state.module_has_motion_state(module) then
 			for k, v in pairs(module.metadata.motion_state) do

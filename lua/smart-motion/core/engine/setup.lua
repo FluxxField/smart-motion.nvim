@@ -16,8 +16,8 @@ function M.run(trigger_key)
 	local ctx, cfg, motion_state = utils.prepare_motion()
 	exit.throw_if(not ctx or not cfg or not motion_state, EXIT_TYPE.EARLY_EXIT)
 
-	-- Attach motion data to motion_state
-	motion_state.motion = motion
+	-- Shallow copy so infer mutations don't leak to the registry entry
+	motion_state.motion = vim.tbl_extend("force", {}, motion)
 
 	local modules = module_loader.get_modules(ctx, cfg, motion_state)
 
