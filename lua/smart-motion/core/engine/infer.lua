@@ -24,6 +24,27 @@ function M.run(ctx, cfg, motion_state)
 	motion_state.motion_key = motion_key
 	motion_state.target_type = consts.TARGET_TYPES_BY_KEY[motion_key]
 
+	-- Motion-based inference: look up a composable motion by motion_key.
+	-- This allows any registered composable motion (w, b, e, j, k, s, f, etc.)
+	-- to automatically work as a target for operators (d, y, c, p).
+	local motions_reg = require("smart-motion.motions")
+	local target_motion = motions_reg.get_by_key(motion_key)
+
+	if target_motion and target_motion.composable then
+		local motion = motion_state.motion
+		if target_motion.extractor then motion.extractor = target_motion.extractor end
+		if target_motion.filter then motion.filter = target_motion.filter end
+		if target_motion.visualizer then motion.visualizer = target_motion.visualizer end
+		if target_motion.collector then motion.collector = target_motion.collector end
+
+		-- Merge target motion's metadata into motion_state
+		if target_motion.metadata and target_motion.metadata.motion_state then
+			for k, v in pairs(target_motion.metadata.motion_state) do
+				motion_state[k] = v
+			end
+		end
+	end
+
 	local modules = module_loader.get_modules(ctx, cfg, motion_state, { "extractor", "action" })
 
 	-- Merge inferred module metadata into motion_state (setup.run couldn't do this

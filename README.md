@@ -25,8 +25,8 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 
 - ⚡ **Word, line, and search jumping** with home-row hint labels — forward, backward, start, end
 - 🌊 **Flow State** — chain motions without re-triggering; press `w` → select → press `w` again instantly
-- 🔀 **Composable d/y/c/p** — `d` + any motion deletes, `y` + any motion yanks, `c` + any motion changes, with visual feedback at every step. Repeat the motion key to act on the target under cursor (`dww` = delete this word, `dw` + label = delete that word)
-- ✂️ **Until motions** — `dt`, `yt`, `ct` operate from cursor to a labeled character on the current line
+- 🔀 **Composable operators** — `d`, `y`, `c`, `p` automatically compose with **every** motion. `dw` deletes a word, `db` deletes backward, `ds` deletes via live search, `yf` yanks to a 2-char find, `cj` changes a line below — all inferred, no explicit mappings needed. Repeat the motion key for the cursor target (`dww` = delete this word).
+- ✂️ **Until motions** — `dt`, `yt`, `ct` operate from cursor to a labeled character
 - 📡 **Remote operations** — `rdw`, `rdl`, `ryw`, `ryl` delete or yank words and lines without moving the cursor
 - 🌳 **Treesitter-aware motions** — jump to functions (`]]`/`[[`), classes (`]c`/`[c`), scopes/blocks (`]b`/`[b`), delete/change/yank function names (`dfn`, `cfn`, `yfn`), and arguments (`daa`, `caa`, `yaa`)
 - 🌲 **Treesitter incremental select** — `gS` selects node at cursor, `;` expands to parent, `,` shrinks to child
@@ -51,7 +51,7 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 - 📌 **Direct Pin Jumps** — `g1`-`g9` jump instantly to numbered pins. `g0` jumps to your most recent location. `gp1`-`gp9` set pins at specific slots.
 - 🌍 **Global Pins** — `gP` creates cross-project bookmarks (`A`-`Z`). `gA`-`gZ` jump to global pins from any project. Great for dotfiles, notes, or common configs.
 - 🧩 **Fully modular pipeline** — Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action. Every stage is replaceable. Build entirely custom motions from scratch.
-- 📦 **13 presets, 100+ keybindings** — enable what you want, disable what you don't
+- 📦 **13 presets, 55+ inferred compositions, 100+ keybindings** — enable what you want, disable what you don't
 
 ---
 
@@ -67,10 +67,10 @@ return {
       words = true,        -- w, b, e, ge
       lines = true,        -- j, k
       search = true,       -- s, f, F, t, T, ;, ,, gs
-      delete = true,       -- d, dt, dT, rdw, rdl
-      yank = true,         -- y, yt, yT, ryw, ryl
-      change = true,       -- c, ct, cT
-      paste = true,        -- p, P
+      delete = true,       -- d + any motion, dt, dT, rdw, rdl
+      yank = true,         -- y + any motion, yt, yT, ryw, ryl
+      change = true,       -- c + any motion, ct, cT
+      paste = true,        -- p/P + any motion
       treesitter = true,   -- ]], [[, ]c, [c, ]b, [b, daa, caa, yaa, dfn, cfn, yfn, saa
       diagnostics = true,  -- ]d, [d, ]e, [e
       git = true,          -- ]g, [g
@@ -139,49 +139,37 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>🗑️ Delete</b> — <code>d</code> <code>dt</code> <code>dT</code> <code>rdw</code> <code>rdl</code></summary>
+<summary><b>🔀 Composable Operators</b> — <code>d</code> <code>y</code> <code>c</code> <code>p</code> <code>P</code> + any motion</summary>
+
+Press an operator, then any motion key — SmartMotion infers the right pipeline automatically:
+
+| Combo | What it does |
+|-------|-------------|
+| `dw`  | Delete word after cursor |
+| `db`  | Delete word before cursor |
+| `de`  | Delete to end of word (labels at word ends) |
+| `dj`  | Delete line below |
+| `dk`  | Delete line above |
+| `ds`  | Delete via live search (type to find, pick label) |
+| `dS`  | Delete via fuzzy search |
+| `df`  | Delete to 2-char find forward |
+| `dF`  | Delete to 2-char find backward |
+| `dt`  | Delete till character forward |
+| `dT`  | Delete till character backward |
+| `dd`  | Delete current line |
+
+All of the above work identically with `y` (yank), `c` (change), and `p`/`P` (paste). That's **48+ compositions** from just 5 operator keys — no explicit mappings needed.
+
+Repeat the motion key to act on the target under cursor: `dww` = delete this word, `yww` = yank this word.
+
+**Additional explicit mappings:**
 
 | Key   | Mode | Description                                    |
 |-------|------|------------------------------------------------|
-| `d`   | n    | Composable delete — press `d` then any motion. Repeat motion key for cursor target (`dww`) |
-| `dt`  | n    | Delete from cursor until character (forward)   |
-| `dT`  | n    | Delete from cursor until character (backward)  |
 | `rdw` | n    | Remote delete word (cursor stays in place)      |
 | `rdl` | n    | Remote delete line (cursor stays in place)      |
-
-</details>
-
-<details>
-<summary><b>📋 Yank</b> — <code>y</code> <code>yt</code> <code>yT</code> <code>ryw</code> <code>ryl</code></summary>
-
-| Key   | Mode | Description                                   |
-|-------|------|-----------------------------------------------|
-| `y`   | n    | Composable yank — press `y` then any motion. Repeat motion key for cursor target (`yww`)  |
-| `yt`  | n    | Yank from cursor until character (forward)    |
-| `yT`  | n    | Yank from cursor until character (backward)   |
-| `ryw` | n    | Remote yank word (cursor stays in place)       |
-| `ryl` | n    | Remote yank line (cursor stays in place)       |
-
-</details>
-
-<details>
-<summary><b>✏️ Change</b> — <code>c</code> <code>ct</code> <code>cT</code></summary>
-
-| Key  | Mode | Description                                    |
-|------|------|------------------------------------------------|
-| `c`  | n    | Composable change — press `c` then any motion. Repeat motion key for cursor target (`cww`) |
-| `ct` | n    | Change from cursor until character (forward)   |
-| `cT` | n    | Change from cursor until character (backward)  |
-
-</details>
-
-<details>
-<summary><b>📌 Paste</b> — <code>p</code> <code>P</code></summary>
-
-| Key | Mode | Description                                   |
-|-----|------|-----------------------------------------------|
-| `p` | n    | Composable paste after — press `p` then motion |
-| `P` | n    | Composable paste before — press `P` then motion |
+| `ryw` | n    | Remote yank word (cursor stays in place)        |
+| `ryl` | n    | Remote yank line (cursor stays in place)        |
 
 </details>
 
@@ -375,6 +363,54 @@ All jump-only motions (`w`, `b`, `e`, `ge`, `j`, `k`, `s`, `f`, `F`, `t`, `T`, `
 
 ---
 
+## 🔀 Composable Operators — The Inference System
+
+This is one of SmartMotion's most powerful features. When you press `d`, `y`, `c`, or `p`, SmartMotion reads the next key and **automatically infers the full pipeline** — extractor, filter, visualizer, and metadata — from the target motion. No explicit mapping needed.
+
+```
+dw  →  d (delete action)  +  w (words extractor, after cursor filter)
+db  →  d (delete action)  +  b (words extractor, before cursor filter)
+ds  →  d (delete action)  +  s (live search extractor, multi-window)
+yf  →  y (yank action)    +  f (2-char search extractor, after cursor)
+cj  →  c (change action)  +  j (lines extractor, after cursor filter)
+```
+
+Every composable motion (`w`, `b`, `e`, `j`, `k`, `s`, `S`, `f`, `F`, `t`, `T`) works with every operator (`d`, `y`, `c`, `p`, `P`). That's **55 compositions** from 16 keys — each with the correct filter, visualizer, and behavior inherited from the target motion.
+
+If the motion key doesn't match any SmartMotion motion, it falls through to native vim. `d$`, `d0`, `dG` all work exactly as expected.
+
+### Why This Matters
+
+Most motion plugins require you to define every operator-motion combination explicitly. SmartMotion doesn't:
+
+```lua
+-- This is ALL you need. No dw, db, dj, ds, yf, ce mappings.
+presets = {
+  words = true,    -- registers w, b, e, ge as composable motions
+  lines = true,    -- registers j, k as composable motions
+  search = true,   -- registers s, S, f, F, t, T as composable motions
+  delete = true,   -- registers d operator (composes with ALL of the above)
+  yank = true,     -- registers y operator (composes with ALL of the above)
+  change = true,   -- registers c operator (composes with ALL of the above)
+}
+```
+
+Enable a motion preset and every operator can use it. Enable an operator preset and it works with every motion. The growth is multiplicative, not additive.
+
+### Custom Trigger Keys
+
+Operators support custom trigger keys without breaking composition:
+
+```lua
+presets = {
+  delete = {
+    d = { trigger_key = "<leader>d" },  -- <leader>d + w, <leader>d + s, etc.
+  },
+}
+```
+
+---
+
 ## 🪟 Multi-Window Jumping
 
 Search, treesitter navigation, and diagnostic motions collect targets from **all visible splits** — not just the current window. Labels from the current window get priority (closer targets get single-character labels), and selecting a label in another window jumps your cursor there.
@@ -425,7 +461,7 @@ Every motion plugin does one thing well. SmartMotion does all of them — and ex
 When all your motions flow through the same system, you get things no combination of separate plugins can offer:
 
 - **Motion History** — every jump, search, delete, and change is recorded. Pin locations with `gp`, browse frecency-ranked history with `g.`, and act on targets remotely with `d`/`y`/`c` from the browser.
-- **Composable operators** — `d`, `y`, `c` work with *every* motion: words, lines, search, treesitter nodes, diagnostics, marks.
+- **Composable operators** — `d`, `y`, `c`, `p` automatically compose with every motion via inference. 55+ compositions from 16 keys, zero explicit mappings.
 - **Flow State** — chain any motion into any other motion without re-triggering.
 - **Consistent labels** — the same home-row label system across 59+ keybindings. Learn it once.
 - **One config** — enable, disable, or remap everything from a single `opts` table.
