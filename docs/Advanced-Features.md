@@ -634,7 +634,7 @@ g2  — jump to pin 2
 g9  — jump to pin 9
 ```
 
-Like harpoon's navigation — set your frequently-visited files as pins, then access them with muscle memory.
+Set your frequently-visited files as pins, then access them with pure muscle memory.
 
 ### Jump to Most Recent (`g0`)
 
