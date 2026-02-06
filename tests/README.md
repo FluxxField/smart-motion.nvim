@@ -17,8 +17,8 @@ Interactive test files for every SmartMotion preset. Open them in Neovim with Sm
 | File | Presets Covered |
 |------|----------------|
 | `words_lines.lua` | `w`, `b`, `e`, `ge`, `j`, `k` |
-| `search.lua` | `s`, `f`, `F`, `t`, `T`, `;`, `,`, `gs`, native `/` search |
-| `operators.lua` | `d`, `dt`, `dT`, `rdw`, `rdl`, `y`, `yt`, `yT`, `ryw`, `ryl`, `c`, `ct`, `cT`, `p`, `P`, operator-pending (`>w`, `gUw`, etc.) |
+| `search.lua` | `s`, `S`, `f`, `F`, `t`, `T`, `;`, `,`, `gs`, native `/` search |
+| `operators.lua` | Composable operators (`d`, `y`, `c`, `p`, `P` + any motion), until (`dt`, `dT`, `yt`, `yT`, `ct`, `cT`), remote (`rdw`, `rdl`, `ryw`, `ryl`), operator-pending (`>w`, `gUw`, etc.) |
 | `treesitter.lua` | `]]`, `[[`, `]c`, `[c`, `]b`, `[b`, `daa`, `caa`, `yaa`, `dfn`, `cfn`, `yfn`, `saa` |
 | `diagnostics.lua` | `]d`, `[d`, `]e`, `[e` (requires LSP) |
 | `misc.lua` | `.` (repeat), `gmd`, `gmy` |

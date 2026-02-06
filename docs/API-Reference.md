@@ -36,6 +36,8 @@ require("smart-motion").register_motion(name, config)
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `trigger_key` | string | No | Override keybinding (defaults to `name`) |
+| `action_key` | string | No | Override action registry lookup key (defaults to `trigger_key`). Allows custom trigger keys without breaking operator inference. |
+| `composable` | boolean | No | If true, this motion can be used as a target for composable operators (`d`, `y`, `c`, `p`) |
 | `collector` | string | Yes | Collector module name |
 | `extractor` | string | Yes | Extractor module name |
 | `modifier` | string | No | Modifier module name |
@@ -45,7 +47,7 @@ require("smart-motion").register_motion(name, config)
 | `pipeline_wrapper` | string | No | Pipeline wrapper name |
 | `map` | boolean | No | Whether to create keymap (default: true) |
 | `modes` | string[] | No | Vim modes (default: {"n"}) |
-| `infer` | boolean | No | Enable operator inference |
+| `infer` | boolean | No | Enable operator inference (reads a second key and infers pipeline from composable motion) |
 | `metadata` | table | No | Additional metadata |
 
 **Example:**
@@ -167,25 +169,29 @@ require("smart-motion").map_motion("w")
 
 | Name | Description |
 |------|-------------|
-| `jump` | Move cursor |
+| `jump` | Move cursor to target |
 | `jump_centered` | Move cursor, center screen |
 | `center` | Center screen |
-| `delete` | Delete target |
-| `delete_until` | Delete cursor→target |
-| `delete_line` | Delete line |
-| `yank` | Yank target |
-| `yank_until` | Yank cursor→target |
-| `yank_line` | Yank line |
-| `change` | Change target |
-| `change_until` | Change cursor→target |
-| `change_line` | Change line |
-| `paste` | Paste at target |
-| `remote_delete` | Delete without moving |
-| `remote_delete_line` | Delete line without moving |
-| `remote_yank` | Yank without moving |
-| `remote_yank_line` | Yank line without moving |
+| `delete` | Delete target text (no cursor movement) |
+| `delete_jump` | Jump to target, then delete (key: `d`) |
+| `delete_line` | Jump to target, delete entire line (key: `D`) |
+| `yank` | Yank target text (no cursor movement) |
+| `yank_jump` | Jump to target, then yank (key: `y`) |
+| `yank_line` | Jump to target, yank entire line (key: `Y`) |
+| `change` | Delete target text, enter insert mode |
+| `change_jump` | Jump to target, delete, enter insert (key: `c`) |
+| `change_line` | Jump to target, change entire line (key: `C`) |
+| `paste` | Paste at target (no cursor movement) |
+| `paste_jump` | Jump to target, then paste (key: `p`/`P`) |
+| `paste_line` | Jump to target, paste entire line |
+| `remote_delete` | Jump, delete, restore cursor |
+| `remote_delete_line` | Jump, delete line, restore cursor |
+| `remote_yank` | Jump, yank, restore cursor |
+| `remote_yank_line` | Jump, yank line, restore cursor |
 | `restore` | Restore cursor position |
 | `run_motion` | Re-run from history |
+
+> **Note:** Actions with a `key` (shown in parentheses) are resolved by the infer system when composable operators look up their action. For example, pressing `d` + `w` resolves to `delete_jump` because it has `key: "d"`. The non-jump variants (`delete`, `yank`, etc.) are used by explicit presets like `daa`, `dt` that handle positioning differently.
 
 ### Pipeline Wrappers
 
@@ -207,6 +213,8 @@ The `motion_state` table is mutable state passed through all pipeline stages.
 |-------|------|-------------|
 | `name` | string | Motion name |
 | `trigger_key` | string | Key that triggered motion |
+| `action_key` | string | Key for action registry lookup (defaults to trigger_key) |
+| `motion_key` | string | Second key pressed during inference (e.g., `w` in `dw`) |
 | `direction` | string | `"before"` or `"after"` |
 | `hint_position` | string | `"start"`, `"end"`, `"middle"` |
 | `target_type` | string | `"word"`, `"line"`, `"char"`, etc. |
@@ -372,8 +380,8 @@ registries.filters.register("my_filter", MyModule)
 -- Get by name
 local filter = registries.filters.get_by_name("my_filter")
 
--- Get by key (for infer)
-local extractor = registries.extractors.get_by_key("w")
+-- Get by key (used by infer system for action resolution)
+local action = registries.actions.get_by_key("d")  -- returns delete_jump
 ```
 
 ---

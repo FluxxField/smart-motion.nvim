@@ -24,10 +24,31 @@ function M.run(ctx, cfg, motion_state)
 	motion_state.motion_key = motion_key
 	motion_state.target_type = consts.TARGET_TYPES_BY_KEY[motion_key]
 
-	local modules = module_loader.get_modules(ctx, cfg, motion_state, { "extractor", "action" })
+	-- Motion-based inference: look up a composable motion by motion_key.
+	-- This allows any registered composable motion (w, b, e, j, k, s, f, etc.)
+	-- to automatically work as a target for operators (d, y, c, p).
+	local motions_reg = require("smart-motion.motions")
+	local target_motion = motions_reg.get_by_key(motion_key)
 
-	-- Merge inferred module metadata into motion_state (setup.run couldn't do this
-	-- because the extractor wasn't known yet before infer resolved the motion key)
+	if target_motion and target_motion.composable then
+		local motion = motion_state.motion
+		if target_motion.extractor then motion.extractor = target_motion.extractor end
+		if target_motion.filter then motion.filter = target_motion.filter end
+		if target_motion.visualizer then motion.visualizer = target_motion.visualizer end
+		if target_motion.collector then motion.collector = target_motion.collector end
+
+		-- Merge target motion's metadata into motion_state
+		if target_motion.metadata and target_motion.metadata.motion_state then
+			for k, v in pairs(target_motion.metadata.motion_state) do
+				motion_state[k] = v
+			end
+		end
+	end
+
+	local modules = module_loader.get_modules(ctx, cfg, motion_state, { "extractor", "action", "visualizer", "filter" })
+
+	-- Merge inferred module metadata into motion_state (setup.run merged metadata for the
+	-- original motion, but infer may have overridden extractor/visualizer/filter/action)
 	for _, module in pairs(modules) do
 		if state.module_has_motion_state(module) then
 			for k, v in pairs(module.metadata.motion_state) do
@@ -41,14 +62,17 @@ function M.run(ctx, cfg, motion_state)
 			motion_state.target_type = "lines"
 
 			-- NOTE: We might need to set motion_state here if actions ever need to set it
+			-- Strip _jump suffix so delete_jump → delete_line, yank_jump → yank_line, etc.
+			local action_name = modules.action.name:gsub("_jump$", "")
 			local line_action =
-				module_loader.get_module_by_name(ctx, cfg, motion_state, "actions", modules.action.name .. "_line")
+				module_loader.get_module_by_name(ctx, cfg, motion_state, "actions", action_name .. "_line")
 
 			if line_action and line_action.run then
 				motion_state.selected_jump_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
 
 				if motion_state.selected_jump_target then
 					line_action.run(ctx, cfg, motion_state)
+					exit.throw(EXIT_TYPE.EARLY_EXIT)
 				end
 			end
 		end

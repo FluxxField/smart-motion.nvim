@@ -7,6 +7,7 @@ local presets = {}
 function presets.words(exclude)
 	presets._register({
 		w = {
+			composable = true,
 			collector = "lines",
 			extractor = "words",
 			filter = "filter_words_after_cursor",
@@ -20,6 +21,7 @@ function presets.words(exclude)
 			},
 		},
 		b = {
+			composable = true,
 			collector = "lines",
 			extractor = "words",
 			filter = "filter_words_before_cursor",
@@ -33,6 +35,7 @@ function presets.words(exclude)
 			},
 		},
 		e = {
+			composable = true,
 			collector = "lines",
 			extractor = "words",
 			filter = "filter_words_after_cursor",
@@ -65,6 +68,7 @@ end
 function presets.lines(exclude)
 	presets._register({
 		j = {
+			composable = true,
 			collector = "lines",
 			extractor = "lines",
 			filter = "filter_lines_after_cursor",
@@ -79,6 +83,7 @@ function presets.lines(exclude)
 			},
 		},
 		k = {
+			composable = true,
 			collector = "lines",
 			extractor = "lines",
 			filter = "filter_lines_before_cursor",
@@ -99,6 +104,7 @@ end
 function presets.search(exclude)
 	presets._register({
 		s = {
+			composable = true,
 			collector = "lines",
 			extractor = "live_search",
 			filter = "filter_visible",
@@ -115,6 +121,7 @@ function presets.search(exclude)
 			},
 		},
 		S = {
+			composable = true,
 			collector = "lines",
 			extractor = "fuzzy_search",
 			filter = "filter_visible",
@@ -131,6 +138,7 @@ function presets.search(exclude)
 			},
 		},
 		f = {
+			composable = true,
 			collector = "lines",
 			extractor = "text_search_2_char",
 			filter = "filter_words_after_cursor",
@@ -147,6 +155,7 @@ function presets.search(exclude)
 			},
 		},
 		F = {
+			composable = true,
 			collector = "lines",
 			extractor = "text_search_2_char",
 			filter = "filter_words_before_cursor",
@@ -163,6 +172,7 @@ function presets.search(exclude)
 			},
 		},
 		t = {
+			composable = true,
 			collector = "lines",
 			extractor = "text_search_1_char_until",
 			filter = "filter_words_after_cursor",
@@ -179,6 +189,7 @@ function presets.search(exclude)
 			},
 		},
 		T = {
+			composable = true,
 			collector = "lines",
 			extractor = "text_search_1_char_until",
 			filter = "filter_words_before_cursor",

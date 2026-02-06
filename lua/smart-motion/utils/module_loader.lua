@@ -32,17 +32,6 @@ function M.get_modules(ctx, cfg, motion_state, keys)
 				module = registry.get_by_key(action_key)
 			end
 
-			--
-			-- Special handle for extractors
-			--
-			if key == "extractor" and motion.infer and motion_key then
-				local inferred = registries.extractors.get_by_key(motion_key)
-
-				if inferred and inferred.run then
-					module = inferred
-				end
-			end
-
 			if (not module or not module.run) and registry.get_by_name("default") then
 				module = registry.get_by_name("default")
 			end

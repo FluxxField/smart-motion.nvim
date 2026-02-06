@@ -2,34 +2,53 @@
 -- Presets: d, dt, dT, rdw, rdl, y, yt, yT, ryw, ryl, c, ct, cT, p, P
 --          operator-pending: >w, gUw, =j, gqj, etc.
 --
--- INSTRUCTIONS:
---   d   → composable delete: press d, then a second motion (w/e/j/k/]]/etc.)
---   y   → composable yank: press y, then a second motion
---   c   → composable change: press c, then a second motion
+-- COMPOSABLE OPERATORS (Motion-Based Inference):
+--   d   → composable delete: press d, then a motion key (w/b/e/j/k/s/S/f/F/t/T)
+--         The infer system looks up the motion, inherits its pipeline (extractor,
+--         filter, visualizer), shows labels, then JUMPS to target and deletes.
+--   y   → composable yank: same — jumps to target and yanks
+--   c   → composable change: same — jumps to target, deletes, enters insert mode
+--   p/P → composable paste: same — jumps to target and pastes after/before
+--
+--   Key concept: operators compose with ANY registered composable motion.
+--   11 composable motions × 5 operators = 55+ auto-inferred compositions.
+--   No explicit mappings needed — enable a motion preset and every operator can use it.
+--
+--   Double-tap: dd/yy/cc act on the current line (like native vim).
+--   Repeat motion key: dww = delete word under cursor, yww = yank word under cursor.
+--   Unknown keys fall through to native vim: d$/d0/dG work as expected.
+--
+-- UNTIL MOTIONS:
 --   dt  → delete until: type a char, delete from cursor to just before match
 --   dT  → delete until backward
 --   yt  → yank until: type a char, yank from cursor to just before match
 --   yT  → yank until backward
 --   ct  → change until: type a char, change from cursor to just before match
 --   cT  → change until backward
+--
+-- REMOTE OPERATIONS (cursor stays in place):
 --   rdw → remote delete word: pick a word label anywhere, delete that word
 --   rdl → remote delete line: pick a line label, delete that entire line
 --   ryw → remote yank word: pick a word label, yank it
 --   ryl → remote yank line: pick a line label, yank it
---   p   → paste after: pick a label, paste register contents after that position
---   P   → paste before: pick a label, paste register contents before that position
 --
--- OPERATOR-PENDING:
+-- PASTE:
+--   p   → paste after: pick a label, jump there, paste register contents after
+--   P   → paste before: pick a label, jump there, paste register contents before
+--
+-- OPERATOR-PENDING (native vim operators with SmartMotion targets):
 --   >w  → indent to word target
 --   gUw → uppercase to word target
 --   =j  → auto-indent to line target
 --   gqj → format to line target
 
--- ── Section 1: Words to delete ────────────────────────────────
+-- ── Section 1: Composable delete with words ─────────────────────
 
--- Try: d then w — delete forward to a word
--- Try: d then e — delete to end of word
--- Try: d then b — delete backward to a word
+-- Try: dw — labels appear on words after cursor → pick one → cursor jumps there and word is deleted
+-- Try: de — labels appear at word ends → pick one → jumps and deletes
+-- Try: db — labels appear on words before cursor → pick one → jumps and deletes
+-- Try: dww — delete the word under cursor (repeat motion key = quick action)
+-- Try: dd — delete the current line (double-tap = line action)
 
 local temporary_variable = "delete me"
 local another_temporary = "also delete me"
@@ -41,10 +60,13 @@ local surplus_text = "extra content here"
 -- Try: rdw — labels appear on all words, pick one to delete just that word
 -- Try: rdl — labels appear on all lines, pick one to delete the entire line
 
--- ── Section 2: Lines to delete / yank ─────────────────────────
+-- ── Section 2: Composable delete/yank with lines ────────────────
 
--- Try: d then j — delete from cursor line down to a target line
--- Try: y then k — yank from a target line up to cursor line
+-- Try: dj — labels appear on lines below → pick one → jumps and deletes that line
+-- Try: dk — labels appear on lines above → pick one → jumps and deletes
+-- Try: yj — labels appear on lines below → pick one → jumps and yanks
+-- Try: yk — labels appear on lines above → pick one → jumps and yanks
+-- Try: djj — delete to current line (repeat motion key)
 -- Try: rdl — remote delete a specific line without moving cursor
 
 local line_one = "first line of content"
@@ -116,9 +138,10 @@ end
 
 -- ── Section 5: Paste operations ───────────────────────────────
 
--- First: yank something (yy to yank a line, or yw to yank a word)
--- Then: p — labels appear, pick where to paste AFTER
--- Or:   P — labels appear, pick where to paste BEFORE
+-- First: yank something (yy to yank a line, or yww to yank word under cursor)
+-- Then: pw — labels appear on words, pick where to paste AFTER (jumps there)
+-- Or:   Pw — labels appear on words, pick where to paste BEFORE (jumps there)
+-- Or:   pj — labels appear on lines, pick where to paste AFTER that line
 
 local paste_target_one = "paste something here →  ← or here"
 local paste_target_two = "another paste location →  ← fill this in"
@@ -129,9 +152,15 @@ local paste_target_three = "one more spot →  ← for pasting"
 -- 2. Press p, pick a label on one of the paste_target lines
 -- 3. The yanked line appears after the target
 
--- ── Section 6: Composable d/y/c with treesitter ──────────────
+-- ── Section 6: Composable d/y/c with search and treesitter ───
 
--- Try: d then ]] — delete to a function boundary
+-- Try: ds — live search: type text, labels appear, pick one → jumps and deletes
+-- Try: dS — fuzzy search: type partial text, labels on fuzzy matches → deletes
+-- Try: df — 2-char find forward: type 2 chars, labels appear → jumps and deletes
+-- Try: dF — 2-char find backward
+-- Try: ys — yank via live search
+-- Try: cs — change via live search
+-- Try: d then ]] — delete to a function boundary (treesitter)
 -- Try: y then [[ — yank to previous function
 -- Try: c then w — change to a word target
 
