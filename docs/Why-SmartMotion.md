@@ -104,6 +104,8 @@ Each stage is a module. Swap any module, combine modules, or write your own. The
 | Custom motion creation | Limited | Full pipeline |
 | Plugin interop | Limited | Registry system |
 
+**Treesitter Search (`R`) Difference**: Flash labels all ancestor nodes of all matches at once in a single step. SmartMotion uses a two-phase approach: first pick which match you care about, then pick the ancestor scope. This is more deliberate — with many matches, Flash can flood the screen with labels, while SmartMotion narrows down first. The end result is identical (the operator applies to the full node), but the UX is cleaner.
+
 **When to choose Flash**: It's excellent and you're already happy with it.
 
 **When to choose SmartMotion**: You want fuzzy search, multi-cursor operations, full composability, or the ability to build entirely custom motions.
