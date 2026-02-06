@@ -367,25 +367,44 @@ Quickly select increasingly larger code structures without counting or guessing 
 
 ## Treesitter Search
 
-`R` searches for text and selects the surrounding syntax node.
+`R` searches for text and lets you select the surrounding syntax node at any level of the tree.
+
+### Two-Phase Selection
+
+Unlike Flash's single-step approach (which labels all ancestor nodes of all matches at once), SmartMotion uses a deliberate two-phase flow:
+
+**Phase 1 — Pick the match:**
+1. Press `R` (or `dR`, `yR`, `cR`)
+2. Type search text
+3. Labels appear on the smallest named node at each match
+4. Select a label to choose which match you care about
+
+**Phase 2 — Pick the scope:**
+1. Labels appear on all ancestor nodes (identifier → statement → block → function → class, etc.)
+2. Select which level of the tree to operate on
+3. If there are no ancestors above (already at root), the match target is used directly
+
+### Why Two Phases?
+
+With many matches, Flash's single-step can flood the screen with labels — every match generates labels for itself AND all its ancestors simultaneously. SmartMotion's approach narrows down first (which match?), then shows a clean set of ancestors (how much to select?).
+
+The end result is identical: the operator applies to the full treesitter node range you select. The path to get there is just more deliberate.
 
 ### In Normal/Visual Mode
 
-1. Press `R`
-2. Type search text
-3. Labels appear on nodes containing matches (deduplicated by range)
-4. Select a label
-5. Node enters visual selection
+```
+Press R → type "config" → labels on matches → pick one → labels on ancestors → pick scope → visual selection
+```
 
-### In Operator-Pending Mode
-
-Works with any operator:
+### With Operators (`dR`, `yR`, `cR`)
 
 ```
-dR → type "error" → select → entire node containing "error" is deleted
-yR → type "func" → select → entire node containing "func" is yanked
-cR → type "name" → select → node changed, insert mode
+dR → type "error" → pick match → pick ancestor → entire node deleted
+yR → type "func" → pick match → pick ancestor → entire node yanked (with highlight flash)
+cR → type "name" → pick match → pick ancestor → node deleted, insert mode
 ```
+
+Cursor moves to the target start, and for yank operations, the full multiline range flashes to confirm what was copied.
 
 ---
 

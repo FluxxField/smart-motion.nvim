@@ -30,7 +30,7 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 - 📡 **Remote operations** — `rdw`, `rdl`, `ryw`, `ryl` delete or yank words and lines without moving the cursor
 - 🌳 **Treesitter-aware motions** — jump to functions (`]]`/`[[`), classes (`]c`/`[c`), scopes/blocks (`]b`/`[b`), delete/change/yank function names (`dfn`, `cfn`, `yfn`), and arguments (`daa`, `caa`, `yaa`)
 - 🌲 **Treesitter incremental select** — `gS` selects node at cursor, `;` expands to parent, `,` shrinks to child
-- 🔎 **Treesitter search** — `R` searches text and selects the surrounding syntax node (works with operators: `dR`, `yR`, `cR`)
+- 🔎 **Treesitter search** — `R` searches text, then lets you pick which surrounding syntax node to select (works with operators: `dR`, `yR`, `cR`)
 - 🩺 **Diagnostics jumping** — navigate all diagnostics (`]d`/`[d`) or errors only (`]e`/`[e`)
 - 🔀 **Git hunk jumping** — navigate git changed regions (`]g`/`[g`) with gitsigns.nvim integration
 - 📋 **Quickfix/location list** — navigate quickfix (`]q`/`[q`) and location list (`]l`/`[l`) entries with labels
@@ -202,7 +202,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 | `yfn` | n       | Yank function name                                    |
 | `saa` | n       | Swap two arguments — pick two, swap their positions   |
 | `gS`  | n, x    | Treesitter incremental select — `;` expand, `,` shrink |
-| `R`   | n, x, o | Treesitter search — search text, select surrounding node |
+| `R`   | n, x, o | Treesitter search — search text, pick match, pick ancestor scope |
 
 Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, and Ruby. Non-matching node types are safely ignored.
 

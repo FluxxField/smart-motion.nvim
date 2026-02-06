@@ -285,14 +285,18 @@ Press cfn → labels appear on function names → select one → name deleted, i
 | Key | Modes | What it does |
 |-----|-------|--------------|
 | `gS` | n, x | **Incremental select** — `;` expands to parent, `,` shrinks to child |
-| `R` | n, x, o | **Treesitter search** — search text, select surrounding node |
+| `R` | n, x, o | **Treesitter search** — search text, pick match, pick ancestor scope |
 
 ```
 Press gS → smallest node at cursor selected → press ; → expands to parent node → etc.
 Shows node type in echo area. Enter confirms, ESC cancels.
 
-Press dR → type "error" → labels appear on nodes containing "error" → select → node deleted
+Press R → type "error" → labels on matches → pick match → labels on ancestors → pick scope
+Press dR → type "error" → pick match → pick ancestor → entire node deleted
+Press yR → type "func" → pick match → pick ancestor → entire node yanked (with highlight flash)
 ```
+
+**Two-phase selection:** SmartMotion's approach differs from Flash. Instead of labeling all ancestor nodes of all matches at once (which can flood the screen), you first pick which match location you care about, then pick how much of the syntax tree to select. See **[Advanced Features: Treesitter Search](Advanced-Features.md#treesitter-search)** for details.
 
 ---
 
