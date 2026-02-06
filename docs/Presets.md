@@ -144,7 +144,7 @@ Delete operations with visual feedback.
 
 | Key | Modes | What it does |
 |-----|-------|--------------|
-| `d` | n | **Composable delete** — press `d` then any motion |
+| `d` | n | **Composable delete** — press `d` then any composable motion (jumps to target, deletes) |
 | `dt` | n | Delete from cursor **until** character (forward) |
 | `dT` | n | Delete from cursor **until** character (backward) |
 | `rdw` | n | **Remote delete word** — delete a word without moving cursor |
@@ -153,11 +153,12 @@ Delete operations with visual feedback.
 ### Composable Delete (`d`)
 
 ```
-Press d → press w → labels appear → select target → text deleted from cursor to target
-Press d → press ]] → labels appear on functions → select one → deleted to that function
+Press d → press w → labels appear on words → select target → cursor jumps there, word deleted
+Press d → press ]] → labels appear on functions → select one → cursor jumps there, deleted
+Press d → press s → live search → type text → labels appear → select → jump and delete
 ```
 
-Works with ANY SmartMotion motion.
+Works with ANY composable SmartMotion motion (`w`, `b`, `e`, `j`, `k`, `s`, `S`, `f`, `F`, `t`, `T`). Unknown keys fall through to native vim (`d$`, `d0`, `dG` work as expected).
 
 ### Repeat Motion Key (Quick Action)
 
@@ -196,13 +197,13 @@ Yank (copy) operations.
 
 | Key | Modes | What it does |
 |-----|-------|--------------|
-| `y` | n | **Composable yank** — press `y` then any motion |
+| `y` | n | **Composable yank** — press `y` then any composable motion (jumps to target, yanks) |
 | `yt` | n | Yank from cursor **until** character (forward) |
 | `yT` | n | Yank from cursor **until** character (backward) |
 | `ryw` | n | **Remote yank word** — yank a word without moving cursor |
 | `ryl` | n | **Remote yank line** — yank a line without moving cursor |
 
-Same patterns as delete, but yanks to register instead.
+Same patterns as delete, but yanks to register instead. Cursor jumps to the target.
 
 Repeat motion key works here too: `yww` yanks the word under cursor, `yw` + label yanks a specific word.
 
@@ -214,12 +215,12 @@ Change (delete + insert) operations.
 
 | Key | Modes | What it does |
 |-----|-------|--------------|
-| `c` | n | **Composable change** — press `c` then any motion |
+| `c` | n | **Composable change** — press `c` then any composable motion (jumps to target, deletes, enters insert) |
 | `ct` | n | Change from cursor **until** character (forward) |
 | `cT` | n | Change from cursor **until** character (backward) |
 
 ```
-Press c → press w → select target → text deleted, insert mode activated
+Press c → press w → labels appear → select target → cursor jumps there, text deleted, insert mode
 ```
 
 Repeat motion key works here too: `cww` changes the word under cursor, `cw` + label changes a specific word.
@@ -232,11 +233,11 @@ Paste at target location.
 
 | Key | Modes | What it does |
 |-----|-------|--------------|
-| `p` | n | **Paste after** — select target, paste after it |
-| `P` | n | **Paste before** — select target, paste before it |
+| `p` | n | **Paste after** — press `p` then a motion, jump to target, paste after it |
+| `P` | n | **Paste before** — press `P` then a motion, jump to target, paste before it |
 
 ```
-Yank some text → press p → select a word → yanked text pastes after that word
+Yank some text → press pw → select a word target → cursor jumps there, yanked text pastes after
 ```
 
 ---

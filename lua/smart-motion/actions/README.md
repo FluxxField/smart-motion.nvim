@@ -51,12 +51,26 @@ This means `delete` and `delete_until` share the same module — behavior is con
 
 ---
 
+## Action Variants
+
+Actions follow a naming pattern:
+
+| Pattern | What it does | Example Use |
+| --- | --- | --- |
+| `delete`, `yank`, `change` | Operate on target text, no cursor movement | Explicit presets (`daa`, `dt`) |
+| `delete_jump`, `yank_jump`, `change_jump` | Jump to target first, then operate | Composable operators (`dw`, `yw`, `cj`) |
+| `remote_delete`, `remote_yank` | Jump, operate, restore cursor | Remote presets (`rdw`, `ryw`) |
+| `*_line` | Line-wise variant | Double-tap (`dd`, `yy`, `cc`) |
+
+The `*_jump` variants have `keys` registered in the action registry (e.g., `delete_jump` has `keys = { "d" }`). This is how the infer system resolves the correct action when composable operators look up their action by key.
+
 ## When to Use an Action?
 
 | Use Case | Example Action |
 | --- | --- |
 | Jump to a target | `jump`, `jump_centered` |
-| Delete/yank/change text | `delete`, `yank`, `change` |
-| Paste at a target | `paste`, `paste_line` |
+| Jump and delete/yank/change | `delete_jump`, `yank_jump`, `change_jump` |
+| Delete/yank/change without moving | `delete`, `yank`, `change` |
+| Paste at a target | `paste_jump`, `paste_line` |
 | Remote operations | `remote_delete`, `remote_yank` |
 | Repeat a motion | `run_motion` |

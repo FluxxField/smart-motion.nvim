@@ -33,7 +33,6 @@ local action_entries = {
 		},
 	},
 	change = {
-		keys = { "c" },
 		run = merge({ require("smart-motion.actions.change") }),
 		metadata = {
 			label = "Change",
@@ -48,6 +47,7 @@ local action_entries = {
 		},
 	},
 	change_jump = {
+		keys = { "c" },
 		run = merge({
 			require("smart-motion.actions.jump"),
 			require("smart-motion.actions.change"),
@@ -69,7 +69,6 @@ local action_entries = {
 		},
 	},
 	delete = {
-		keys = { "d" },
 		run = merge({ require("smart-motion.actions.delete") }),
 		metadata = {
 			label = "Delete",
@@ -77,6 +76,7 @@ local action_entries = {
 		},
 	},
 	delete_jump = {
+		keys = { "d" },
 		run = merge({
 			require("smart-motion.actions.jump"),
 			require("smart-motion.actions.delete"),
@@ -98,7 +98,6 @@ local action_entries = {
 		},
 	},
 	yank = {
-		keys = { "y" },
 		run = merge({ require("smart-motion.actions.yank") }),
 		metadata = {
 			label = "Yank",
@@ -113,6 +112,7 @@ local action_entries = {
 		},
 	},
 	yank_jump = {
+		keys = { "y" },
 		run = merge({
 			require("smart-motion.actions.jump"),
 			require("smart-motion.actions.yank"),
@@ -185,7 +185,6 @@ local action_entries = {
 		},
 	},
 	paste = {
-		keys = { "p", "P" },
 		run = merge({ require("smart-motion.actions.paste") }),
 		metadata = {
 			label = "Paste",
@@ -193,6 +192,7 @@ local action_entries = {
 		},
 	},
 	paste_jump = {
+		keys = { "p", "P" },
 		run = merge({
 			require("smart-motion.actions.jump"),
 			require("smart-motion.actions.paste"),

@@ -141,24 +141,24 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 <details>
 <summary><b>🔀 Composable Operators</b> — <code>d</code> <code>y</code> <code>c</code> <code>p</code> <code>P</code> + any motion</summary>
 
-Press an operator, then any motion key — SmartMotion infers the right pipeline automatically:
+Press an operator, then any motion key — SmartMotion looks up the composable motion, inherits its pipeline, shows labels, and **jumps to the target** before performing the action:
 
 | Combo | What it does |
 |-------|-------------|
-| `dw`  | Delete word after cursor |
-| `db`  | Delete word before cursor |
-| `de`  | Delete to end of word (labels at word ends) |
-| `dj`  | Delete line below |
-| `dk`  | Delete line above |
-| `ds`  | Delete via live search (type to find, pick label) |
-| `dS`  | Delete via fuzzy search |
-| `df`  | Delete to 2-char find forward |
-| `dF`  | Delete to 2-char find backward |
-| `dt`  | Delete till character forward |
+| `dw`  | Jump to word after cursor, delete it |
+| `db`  | Jump to word before cursor, delete it |
+| `de`  | Jump to end of word, delete it |
+| `dj`  | Jump to line below, delete it |
+| `dk`  | Jump to line above, delete it |
+| `ds`  | Live search → pick label → jump and delete |
+| `dS`  | Fuzzy search → pick label → jump and delete |
+| `df`  | 2-char find forward → pick label → jump and delete |
+| `dF`  | 2-char find backward → pick label → jump and delete |
+| `dt`  | Delete till character forward (from cursor to target) |
 | `dT`  | Delete till character backward |
 | `dd`  | Delete current line |
 
-All of the above work identically with `y` (yank), `c` (change), and `p`/`P` (paste). That's **48+ compositions** from just 5 operator keys — no explicit mappings needed.
+All of the above work identically with `y` (yank), `c` (change), and `p`/`P` (paste). That's **55+ compositions** from just 5 operator keys — no explicit mappings needed.
 
 Repeat the motion key to act on the target under cursor: `dww` = delete this word, `yww` = yank this word.
 
@@ -365,14 +365,14 @@ All jump-only motions (`w`, `b`, `e`, `ge`, `j`, `k`, `s`, `f`, `F`, `t`, `T`, `
 
 ## 🔀 Composable Operators — The Inference System
 
-This is one of SmartMotion's most powerful features. When you press `d`, `y`, `c`, or `p`, SmartMotion reads the next key and **automatically infers the full pipeline** — extractor, filter, visualizer, and metadata — from the target motion. No explicit mapping needed.
+This is one of SmartMotion's most powerful features. When you press `d`, `y`, `c`, or `p`, SmartMotion reads the next key and **automatically infers the full pipeline** — extractor, filter, visualizer, and metadata — from the target motion. The operator then **jumps to the selected target** and performs its action. No explicit mapping needed.
 
 ```
-dw  →  d (delete action)  +  w (words extractor, after cursor filter)
-db  →  d (delete action)  +  b (words extractor, before cursor filter)
-ds  →  d (delete action)  +  s (live search extractor, multi-window)
-yf  →  y (yank action)    +  f (2-char search extractor, after cursor)
-cj  →  c (change action)  +  j (lines extractor, after cursor filter)
+dw  →  d (jump + delete)  +  w (words extractor, after cursor filter)
+db  →  d (jump + delete)  +  b (words extractor, before cursor filter)
+ds  →  d (jump + delete)  +  s (live search extractor, multi-window)
+yf  →  y (jump + yank)    +  f (2-char search extractor, after cursor)
+cj  →  c (jump + change)  +  j (lines extractor, after cursor filter)
 ```
 
 Every composable motion (`w`, `b`, `e`, `j`, `k`, `s`, `S`, `f`, `F`, `t`, `T`) works with every operator (`d`, `y`, `c`, `p`, `P`). That's **55 compositions** from 16 keys — each with the correct filter, visualizer, and behavior inherited from the target motion.
@@ -399,12 +399,13 @@ Enable a motion preset and every operator can use it. Enable an operator preset 
 
 ### Custom Trigger Keys
 
-Operators support custom trigger keys without breaking composition:
+Operators support custom trigger keys via `action_key` decoupling. The `trigger_key` controls the keymap, while `action_key` (defaults to the registration name) is used for action registry lookup and double-tap detection:
 
 ```lua
 presets = {
   delete = {
     d = { trigger_key = "<leader>d" },  -- <leader>d + w, <leader>d + s, etc.
+    -- action_key stays "d" → resolves delete_jump, double-tap still works
   },
 }
 ```

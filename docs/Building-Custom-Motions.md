@@ -110,22 +110,30 @@ Each stage is optional (except collector, extractor, visualizer, action). Each s
 |--------|--------------|
 | `jump` | Move cursor to target |
 | `jump_centered` | Move cursor and center screen |
-| `delete` | Delete target text |
-| `delete_until` | Delete from cursor to target |
-| `delete_line` | Delete entire target line |
-| `yank` | Yank target text |
-| `yank_until` | Yank from cursor to target |
-| `yank_line` | Yank entire target line |
-| `change` | Delete and enter insert mode |
-| `change_until` | Change from cursor to target |
-| `change_line` | Change entire target line |
-| `paste` | Paste at target |
-| `remote_delete` | Delete without moving cursor |
-| `remote_delete_line` | Delete line without moving |
-| `remote_yank` | Yank without moving cursor |
-| `remote_yank_line` | Yank line without moving |
+| `delete` | Delete target text (no cursor movement) |
+| `delete_jump` | Jump to target, then delete |
+| `delete_line` | Jump to target, delete entire line |
+| `yank` | Yank target text (no cursor movement) |
+| `yank_jump` | Jump to target, then yank |
+| `yank_line` | Jump to target, yank entire line |
+| `change` | Delete target and enter insert mode |
+| `change_jump` | Jump to target, delete, enter insert |
+| `change_line` | Jump to target, change entire line |
+| `paste` | Paste at target (no cursor movement) |
+| `paste_jump` | Jump to target, then paste |
+| `paste_line` | Jump to target, paste entire line |
+| `remote_delete` | Delete target, restore cursor (stays in place) |
+| `remote_delete_line` | Delete line, restore cursor |
+| `remote_yank` | Yank target, restore cursor |
+| `remote_yank_line` | Yank line, restore cursor |
 | `center` | Center screen on cursor |
 | `restore` | Restore cursor to original position |
+
+**Action naming pattern:**
+- `delete`/`yank`/`change`/`paste` — operate on target text without moving cursor
+- `*_jump` — jump to target first, then operate (used by composable operators like `dw`)
+- `remote_*` — jump, operate, restore cursor (cursor stays in place, for `rdw`/`ryw`)
+- `*_line` — line-wise variants (used by double-tap: `dd`, `yy`, `cc`)
 
 ---
 
@@ -478,23 +486,100 @@ action = "notify_target"
 
 ## Infer Mode (Advanced)
 
-The `infer` flag enables composable operators like `d` + motion:
+The `infer` flag enables composable operators. Press an operator key, then a motion key — SmartMotion automatically looks up the motion, inherits its entire pipeline, and runs it with the operator's action.
+
+### How It Works
 
 ```lua
 require("smart-motion").register_motion("d", {
   infer = true,
-  action = "delete",
+  collector = "lines",           -- default pipeline (overridden by target motion)
+  filter = "filter_visible",     -- default filter (overridden by target motion)
+  visualizer = "hint_start",     -- default visualizer (overridden by target motion)
   map = true,
   modes = { "n" },
+  metadata = {
+    motion_state = {
+      allow_quick_action = true,  -- enable repeat-key quick action (dww)
+    },
+  },
 })
 ```
 
 When `infer = true`:
 1. First keypress (`d`) triggers the operator
-2. Second keypress (`w`) determines the motion
-3. Pipeline runs with the motion, action is applied
+2. Second keypress (`w`) is read via `getchar()`
+3. The infer system looks up a **composable motion** registered with that key
+4. If found, the operator's pipeline is overridden with the motion's extractor, filter, visualizer, collector, and metadata
+5. The pipeline runs, labels appear, user picks a target
+6. The action executes — for `d`/`y`/`c`/`p`, this is **jump to target + action** (e.g., `delete_jump`)
 
-This is how SmartMotion creates `dw`, `cj`, `y]]` etc. without defining every combination.
+If the motion key doesn't match any composable motion, it falls through to native vim (`d$`, `d0`, `dG` all work as expected).
+
+### Motion-Based Inference
+
+The key to the infer system is the `composable` flag on motions. Any motion can opt in:
+
+```lua
+require("smart-motion").register_motion("w", {
+  composable = true,    -- ← this makes it work with d, y, c, p
+  collector = "lines",
+  extractor = "words",
+  filter = "filter_words_after_cursor",
+  visualizer = "hint_start",
+  action = "jump_centered",
+  map = true,
+  modes = { "n", "v", "o" },
+})
+```
+
+Now `dw`, `yw`, `cw`, `pw` all work — each inherits `words` extractor + `filter_words_after_cursor` + `hint_start` visualizer from the `w` motion. The 11 built-in composable motions (`w`, `b`, `e`, `j`, `k`, `s`, `S`, `f`, `F`, `t`, `T`) × 5 operators = **55+ compositions** from zero explicit mappings.
+
+### Action Key Decoupling
+
+Operators use `action_key` (not `trigger_key`) for registry lookups, enabling custom trigger keys:
+
+```lua
+require("smart-motion").register_motion("d", {
+  infer = true,
+  trigger_key = "<leader>d",  -- custom keybinding
+  -- action_key defaults to "d" (the registration name)
+  -- ...
+})
+```
+
+Now `<leader>d` + `w` works identically to `d` + `w`. The `action_key` is what the infer system uses to find the right action in the registry (`delete_jump` for `"d"`, `yank_jump` for `"y"`, etc.) and to detect double-tap (`<leader>d` + `d` = delete line).
+
+### Double-Tap and Quick Action
+
+- **Double-tap** (`dd`, `yy`, `cc`): When the second key matches `action_key`, the line action runs (e.g., `delete_line`)
+- **Repeat motion key** (`dww`, `yww`): When the third key matches the motion key, the target under cursor is selected
+
+### Creating Custom Composable Operators
+
+```lua
+-- A custom "highlight" operator that composes with all motions
+require("smart-motion").register_motion("gh", {
+  infer = true,
+  collector = "lines",
+  filter = "filter_visible",
+  visualizer = "hint_start",
+  map = true,
+  modes = { "n" },
+})
+
+-- Register a custom action with key "h" so the infer system finds it
+require("smart-motion.core.registries"):get().actions.register("highlight_jump", {
+  keys = { "h" },
+  run = function(ctx, cfg, motion_state)
+    -- jump then highlight
+    require("smart-motion.actions.jump").run(ctx, cfg, motion_state)
+    -- your custom highlight logic here
+  end,
+})
+```
+
+Now `ghw`, `ghj`, `ghs` etc. all work automatically.
 
 ---
 

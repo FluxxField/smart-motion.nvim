@@ -62,8 +62,10 @@ function M.run(ctx, cfg, motion_state)
 			motion_state.target_type = "lines"
 
 			-- NOTE: We might need to set motion_state here if actions ever need to set it
+			-- Strip _jump suffix so delete_jump → delete_line, yank_jump → yank_line, etc.
+			local action_name = modules.action.name:gsub("_jump$", "")
 			local line_action =
-				module_loader.get_module_by_name(ctx, cfg, motion_state, "actions", modules.action.name .. "_line")
+				module_loader.get_module_by_name(ctx, cfg, motion_state, "actions", action_name .. "_line")
 
 			if line_action and line_action.run then
 				motion_state.selected_jump_target = targets.get_target_under_cursor(ctx, cfg, motion_state)
