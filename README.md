@@ -47,7 +47,7 @@ One plugin replaces hop, leap, flash, and mini.jump — then goes further with t
 - 🔄 **Argument swap** — `saa` picks two treesitter arguments and swaps them
 - ✏️ **Multi-cursor edit** — `gmd`/`gmy` toggle-select multiple words, then delete or yank them all at once
 - 🔁 **Repeat** — `.` repeats the last SmartMotion
-- 🕰️ **Motion History** — `g.` opens a labeled history with **pins** at top (`gp` to bookmark, `1`-`9` to jump), **frecency-ranked** entries below, and **action mode** (`d`/`y`/`c` to delete, yank, or change targets remotely without leaving your position). History persists across sessions with visit counts that push frequently-visited locations to the top.
+- 🕰️ **Motion History** — `g.` opens a full-featured history browser with **pins** (`gp` to bookmark), **frecency ranking**, **j/k navigation with live preview**, **/search filtering**, and **action mode** (`d`/`y`/`c` to delete, yank, or change targets remotely). History persists across sessions.
 - 🧩 **Fully modular pipeline** — Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action. Every stage is replaceable. Build entirely custom motions from scratch.
 - 📦 **13 presets, 59+ keybindings** — enable what you want, disable what you don't
 
@@ -274,7 +274,7 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 | Key   | Mode | Description                                          |
 |-------|------|------------------------------------------------------|
 | `.`   | n    | Repeat last SmartMotion                               |
-| `g.`  | n    | History browser — pins at top, frecency-ranked entries, action mode (`d`/`y`/`c`) |
+| `g.`  | n    | History browser — pins, frecency, j/k nav with preview, /search, d/y/c actions |
 | `gp`  | n    | Toggle pin at cursor — bookmark locations for instant access (up to 9) |
 | `gmd` | n    | Multi-cursor delete — toggle-select words, press Enter to delete all |
 | `gmy` | n    | Multi-cursor yank — toggle-select words, press Enter to yank all    |
@@ -335,18 +335,20 @@ Multi-window is automatically disabled in operator-pending mode, since vim opera
 
 ## 🕰️ Motion History
 
-Every motion you take through SmartMotion is recorded. Press `g.` to open a full-featured history browser with **pins**, **frecency ranking**, and **remote actions**:
+Every motion you take through SmartMotion is recorded. Press `g.` to open a full-featured history browser with **pins**, **frecency ranking**, **remote actions**, **navigation with preview**, and **search**:
 
 ```
  1  *  "authenticate"            auth.lua:42
  2  *  "render"                  app.tsx:15
 ────────────────────────────────────────────────
  f  s   "config"          ████   config.lua:8     just now
- j  dw  "handle_error"    ███    server.lua:30    5m ago
- k  w   "validate"        ██     utils.lua:12     2h ago
+ a  dw  "handle_error"    ███    server.lua:30    5m ago
+ s  w   "validate"        ██     utils.lua:12     2h ago
+────────────────────────────────────────────────
+ j/k navigate  /search  d/y/c action  Enter select  Esc cancel
 ```
 
-**Pins** (`gp`) bookmark up to 9 locations — they stick to the top with number labels for instant access. **Frecency** ranks entries by how often and how recently you visit them — your most-used locations rise to the top automatically. **Action mode** lets you press `d`, `y`, or `c` inside the browser to delete, yank, or change a target's text remotely without ever navigating there.
+**Pins** (`gp`) bookmark up to 9 locations — they stick to the top with number labels for instant access. **Frecency** ranks entries by how often and how recently you visit them — your most-used locations rise to the top automatically. **Navigation** (`j`/`k`) moves through the list with a live **preview window** showing context around each target. **Search** (`/`) fuzzy-filters entries by target text, filename, or motion key. **Action mode** (`d`/`y`/`c`) lets you delete, yank, or change a target's text remotely without ever navigating there.
 
 Press a label to jump back instantly. If the buffer was closed, SmartMotion reopens it from the file path. History and pins persist across sessions — your frecency scores, visit counts, and bookmarks survive restarts.
 

@@ -30,6 +30,17 @@ local visualizer_entries = {
 			},
 		},
 	},
+	hint_before = {
+		run = hints.run,
+		metadata = {
+			label = "Hint Before Visualizer",
+			description = "Applies hints inline before targets (beacon style)",
+			motion_state = {
+				hint_position = HINT_POSITION.START,
+				virt_text_pos = "inline",
+			},
+		},
+	},
 	pass_through = {
 		run = pass_through.run,
 		metadata = pass_through.metadata,

@@ -31,6 +31,22 @@ function M.add(entry)
 		end
 	end
 
+	-- Consecutive dedup: if the most recent entry has the same trigger key,
+	-- replace it instead of adding a new one (e.g., jjjjj → just keep final j)
+	local trigger_key = entry.motion and entry.motion.trigger_key
+	if trigger_key and #M.entries > 0 then
+		local last_entry = M.entries[1]
+		local last_trigger_key = last_entry.motion and last_entry.motion.trigger_key
+		if last_trigger_key == trigger_key then
+			-- Same motion key as previous — replace it
+			-- Carry forward visit_count from the entry we're replacing
+			entry.visit_count = (last_entry.visit_count or 1)
+			table.remove(M.entries, 1)
+			table.insert(M.entries, 1, entry)
+			return
+		end
+	end
+
 	-- Deduplicate: remove existing entry at same location, carry forward visit_count
 	local key = M._entry_key(entry)
 	local carried_visit_count = 0
