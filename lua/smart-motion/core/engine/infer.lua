@@ -53,6 +53,14 @@ function M.run(ctx, cfg, motion_state)
 			end
 		end
 
+		-- Special case: R (treesitter search) called from operator context (yR, dR, cR).
+		-- Call treesitter_search directly with the operator instead of feeding keys
+		-- through operator-pending mode, which has timing issues with vim.schedule.
+		if motion_key == "R" then
+			require("smart-motion.actions.treesitter_search").run(nil, motion_state.motion.trigger_key)
+			exit.throw(EXIT_TYPE.EARLY_EXIT)
+		end
+
 		-- Feed trigger key with noremap to get native operator behavior (avoids recursion),
 		-- but feed the motion key with remap so user/plugin "o" mode keymaps fire (e.g. R).
 		vim.api.nvim_feedkeys(motion_state.motion.trigger_key, "n", false)
