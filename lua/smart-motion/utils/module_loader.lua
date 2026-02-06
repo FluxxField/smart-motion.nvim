@@ -9,7 +9,7 @@ local M = {}
 function M.get_modules(ctx, cfg, motion_state, keys)
 	local registries = require("smart-motion.core.registries"):get()
 	local motion = motion_state.motion
-	local trigger_key = motion.trigger_key
+	local action_key = motion.action_key
 	local motion_key = motion_state.motion_key
 	local modules = {}
 
@@ -28,8 +28,8 @@ function M.get_modules(ctx, cfg, motion_state, keys)
 			--
 			-- Special handle for actions
 			--
-			if key == "action" and motion.infer and trigger_key then
-				module = registry.get_by_key(trigger_key)
+			if key == "action" and motion.infer and action_key then
+				module = registry.get_by_key(action_key)
 			end
 
 			--

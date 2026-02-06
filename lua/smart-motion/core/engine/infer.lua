@@ -37,7 +37,7 @@ function M.run(ctx, cfg, motion_state)
 	end
 
 	if not modules.extractor or not modules.extractor.run then
-		if motion_key == motion_state.motion.trigger_key then
+		if motion_key == motion_state.motion.action_key then
 			motion_state.target_type = "lines"
 
 			-- NOTE: We might need to set motion_state here if actions ever need to set it
@@ -57,13 +57,14 @@ function M.run(ctx, cfg, motion_state)
 		-- Call treesitter_search directly with the operator instead of feeding keys
 		-- through operator-pending mode, which has timing issues with vim.schedule.
 		if motion_key == "R" then
-			require("smart-motion.actions.treesitter_search").run(nil, motion_state.motion.trigger_key)
+			require("smart-motion.actions.treesitter_search").run(nil, motion_state.motion.action_key)
 			exit.throw(EXIT_TYPE.EARLY_EXIT)
 		end
 
 		-- Feed trigger key with noremap to get native operator behavior (avoids recursion),
 		-- but feed the motion key with remap so user/plugin "o" mode keymaps fire (e.g. R).
-		vim.api.nvim_feedkeys(motion_state.motion.trigger_key, "n", false)
+		local resolved_trigger = vim.api.nvim_replace_termcodes(motion_state.motion.trigger_key, true, false, true)
+		vim.api.nvim_feedkeys(resolved_trigger, "n", false)
 		vim.api.nvim_feedkeys(motion_key, "m", false)
 		exit.throw(EXIT_TYPE.EARLY_EXIT)
 	end
