@@ -455,7 +455,7 @@ Actions execute in order. This is how SmartMotion builds compound operations wit
 
 ## Motion History
 
-`g.` opens a floating window showing your motion history. But this isn't just a list of recent jumps — it's a full-featured history system with **pins**, **frecency ranking**, and **remote actions**.
+`g.` opens a floating window showing your motion history. But this isn't just a list of recent jumps — it's a full-featured history browser with **pins**, **frecency ranking**, **remote actions**, **navigation**, **preview**, and **search**.
 
 ### The Browser
 
@@ -464,13 +464,52 @@ Actions execute in order. This is how SmartMotion builds compound operations wit
  2  *  "render"                app.tsx:15
 ────────────────────────────────────────────────
  f  s   "config"        ████   config.lua:8     just now
- j  dw  "handle_error"  ███    server.lua:30    5m ago
- k  w   "validate"      ██     utils.lua:12     2h ago
+ a  dw  "handle_error"  ███    server.lua:30    5m ago
+ s  w   "validate"      ██     utils.lua:12     2h ago
+────────────────────────────────────────────────
+ j/k navigate  /search  d/y/c action  Enter select  Esc cancel
 ```
 
-Two sections:
+Two sections plus a help bar:
 - **Pins** (top) — your bookmarked locations, numbered `1`-`9`, marked with `*`
-- **Entries** (bottom) — all history, sorted by frecency, with letter labels
+- **Entries** (middle) — all history, sorted by frecency, with letter labels
+- **Help bar** (bottom) — contextual hints for available actions
+
+**Note:** `j`, `k`, `d`, `y`, and `c` are reserved keys and won't appear as labels.
+
+### Navigation (`j`/`k`)
+
+Navigate the list with `j` (down) and `k` (up):
+
+- Cursor highlights the current entry
+- **Preview window** appears to the side showing ~7 lines of context around the target
+- Preview updates as you navigate
+- Press `Enter` to jump to the highlighted entry
+- Or press a label to jump directly
+
+This gives you two modes:
+- **Quick mode** — press a label and you're there instantly
+- **Browse mode** — `j`/`k` to explore with preview, `Enter` to confirm
+
+### Search (`/`)
+
+Press `/` to enter search mode:
+
+```
+ j/k navigate  /search  d/y/c action  Enter select  Esc cancel
+```
+
+becomes:
+
+```
+ /config█  Backspace clear  Enter done  Esc cancel
+```
+
+- Type to fuzzy-filter entries by target text, filename, or motion key
+- List updates live as you type
+- Backspace to delete characters
+- `Enter` to confirm filter and return to normal mode
+- `ESC` to clear filter and cancel
 
 ### Pins (`gp`)
 

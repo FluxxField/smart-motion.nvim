@@ -387,13 +387,26 @@ Repeat, history, pins, and multi-cursor operations.
 ### History Browser (`g.`)
 
 ```
-Press g. → floating window with pins at top, frecency-ranked entries below
+Press g. → floating window with pins at top, frecency-ranked entries below, help bar at bottom
+→ j/k to navigate with live preview
+→ / to search/filter entries
 → press number (1-9) to jump to a pin
 → press letter label to jump to an entry
-→ press d/y/c to enter action mode, then press label to act on that target remotely
+→ d/y/c to enter action mode, then press label to act on that target remotely
+→ Enter to select highlighted entry, Esc to cancel
 ```
 
-The browser shows two sections: **pins** (numbered `1`-`9` with `*` marker) and **entries** (letter labels, sorted by frecency with `█` bar indicators). Press `d`, `y`, or `c` to enter action mode — the title changes to `[D]`/`[Y]`/`[C]`, then press a label to delete, yank, or change that target without navigating there.
+The browser shows:
+- **Pins** (numbered `1`-`9` with `*` marker)
+- **Entries** (letter labels, sorted by frecency with `█` bar indicators)
+- **Help bar** (contextual hints that update based on mode)
+- **Preview window** (appears when navigating with `j`/`k`, shows context around target)
+
+**Navigation:** Use `j`/`k` to move through entries with a live preview window showing ~7 lines of context. Press `Enter` to jump to the highlighted entry.
+
+**Search:** Press `/` to filter entries by target text, filename, or motion key. The list updates live as you type.
+
+**Action mode:** Press `d`, `y`, or `c` — the title changes to `[D]`/`[Y]`/`[C]`, then press a label to delete, yank, or change that target without navigating there.
 
 History persists across Neovim sessions. Visit counts accumulate over time, pushing frequently-visited locations to the top. See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)** for full details.
 

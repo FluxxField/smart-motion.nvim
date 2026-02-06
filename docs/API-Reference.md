@@ -159,8 +159,9 @@ require("smart-motion").map_motion("w")
 
 | Name | Description |
 |------|-------------|
-| `hint_start` | Label at target start |
-| `hint_end` | Label at target end |
+| `hint_start` | Label overlays target start |
+| `hint_end` | Label overlays target end |
+| `hint_before` | Label inserted before target (beacon style) |
 
 ### Actions
 
