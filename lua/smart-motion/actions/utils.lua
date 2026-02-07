@@ -37,4 +37,43 @@ function M.resolve_range(ctx, motion_state)
 	return target.start_pos.row, target.start_pos.col, target.end_pos.row, target.end_pos.col
 end
 
+--- Sets register with proper clipboard sync, marks, and TextYankPost firing.
+--- This ensures native-like behavior for yank/delete/change operations.
+--- @param bufnr integer Buffer number
+--- @param start_row integer 0-indexed start row
+--- @param start_col integer 0-indexed start column
+--- @param end_row integer 0-indexed end row
+--- @param end_col integer 0-indexed end column
+--- @param text string The text to put in the register
+--- @param regtype string Register type: "l" for linewise, "c" for characterwise
+--- @param operator string The operator: "y", "d", or "c"
+function M.set_register(bufnr, start_row, start_col, end_row, end_col, text, regtype, operator)
+	-- Set unnamed register
+	vim.fn.setreg('"', text, regtype)
+
+	-- Clipboard sync based on clipboard option
+	local clipboard = vim.o.clipboard or ""
+	if clipboard:find("unnamedplus") then
+		vim.fn.setreg("+", text, regtype)
+	end
+	if clipboard:find("unnamed") then
+		vim.fn.setreg("*", text, regtype)
+	end
+
+	-- Set change marks (needed for vim.hl.on_yank to know the region)
+	vim.api.nvim_buf_set_mark(bufnr, "[", start_row + 1, start_col, {})
+	vim.api.nvim_buf_set_mark(bufnr, "]", end_row + 1, end_col, {})
+
+	-- Fire TextYankPost for user autocmds
+	vim.api.nvim_exec_autocmds("TextYankPost", {
+		pattern = "*",
+		data = {
+			operator = operator,
+			regtype = regtype,
+			regcontents = vim.split(text, "\n"),
+			regname = "",
+		},
+	})
+end
+
 return M
