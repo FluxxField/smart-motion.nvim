@@ -20,12 +20,29 @@ function M.run(ctx, cfg, motion_state)
 		row = target.end_pos.row
 	end
 
-	-- Till offset: exclude_target stops one position before the match
-	if motion_state.exclude_target then
-		if motion_state.direction == "after_cursor" then
-			col = col - 1
-		elseif motion_state.direction == "before_cursor" then
-			col = col + 1
+	-- Operator-pending mode: custom mappings are exclusive by default, but
+	-- native vim motions (f/F/t/T) are inclusive. Compensate so behavior matches:
+	-- - f-style (no exclude_target): move 1 past target so exclusive includes it
+	-- - t-style (exclude_target): keep at target pos, let exclusive handle "till"
+	local is_op_pending = ctx.mode and ctx.mode:find("o")
+
+	if is_op_pending then
+		if not motion_state.exclude_target then
+			-- Forward (or unknown direction): nudge cursor 1 right so the
+			-- exclusive operator range still includes the target character.
+			if motion_state.direction ~= "before_cursor" then
+				col = col + 1
+			end
+		end
+		-- exclude_target: no offset needed — exclusive naturally excludes the target
+	else
+		-- Normal/visual mode: apply till offset for t/T motions
+		if motion_state.exclude_target then
+			if motion_state.direction == "after_cursor" then
+				col = col - 1
+			elseif motion_state.direction == "before_cursor" then
+				col = col + 1
+			end
 		end
 	end
 
@@ -44,7 +61,25 @@ function M.run(ctx, cfg, motion_state)
 	end
 
 	local pos = { row + 1, math.max(col, 0) }
+
+	-- In op-pending mode with col+1 compensation, the target may be past end of
+	-- line. Temporarily allow cursor past EOL so the operator range is correct.
+	local saved_ve
+	if is_op_pending and not motion_state.exclude_target and motion_state.direction ~= "before_cursor" then
+		local line = vim.api.nvim_buf_get_lines(bufnr, row, row + 1, false)[1]
+		if col >= #(line or "") then
+			saved_ve = vim.o.virtualedit
+			vim.o.virtualedit = "onemore"
+		end
+	end
+
 	local success, err = pcall(vim.api.nvim_win_set_cursor, winid or 0, pos)
+
+	if saved_ve ~= nil then
+		vim.schedule(function()
+			vim.o.virtualedit = saved_ve
+		end)
+	end
 
 	if not success then
 		log.error("Failed to move cursor: " .. tostring(err))
@@ -52,7 +87,9 @@ function M.run(ctx, cfg, motion_state)
 	end
 
 	-- Open any folds at the target position
-	vim.cmd("normal! zv")
+	if not is_op_pending then
+		vim.cmd("normal! zv")
+	end
 
 	log.debug(string.format("Cursor moved to line %d, col %d", row, col))
 end
