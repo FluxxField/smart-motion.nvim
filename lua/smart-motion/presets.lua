@@ -175,34 +175,28 @@ function presets.search(exclude)
 			composable = true,
 			collector = "lines",
 			extractor = "text_search_1_char_until",
-			filter = "filter_words_after_cursor",
+			filter = "filter_words_on_cursor_line_after_cursor",
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
 			modes = { "n", "o" },
 			metadata = {
 				label = "Till Character After Cursor",
-				description = "Jump to just before the searched character after cursor",
-				motion_state = {
-					multi_window = true,
-				},
+				description = "Jump to just before the searched character after cursor (line-constrained)",
 			},
 		},
 		T = {
 			composable = true,
 			collector = "lines",
 			extractor = "text_search_1_char_until",
-			filter = "filter_words_before_cursor",
+			filter = "filter_words_on_cursor_line_before_cursor",
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
 			modes = { "n", "o" },
 			metadata = {
 				label = "Till Character Before Cursor",
-				description = "Jump to just after the searched character before cursor",
-				motion_state = {
-					multi_window = true,
-				},
+				description = "Jump to just after the searched character before cursor (line-constrained)",
 			},
 		},
 	}, exclude)

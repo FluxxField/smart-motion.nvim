@@ -85,17 +85,17 @@ local line_eight = "eighth line of content"
 -- Try: ct then type a character — change from cursor to just before that char
 
 local function process_pipeline(input, stages)
-  local result = input
-  for _, stage in ipairs(stages) do
-    result = stage.transform(result)
-    if stage.validate then
-      local ok, err = stage.validate(result)
-      if not ok then
-        return nil, "Stage '" .. stage.name .. "' failed: " .. err
-      end
-    end
-  end
-  return result
+	local result = input
+	for _, stage in ipairs(stages) do
+		result = stage.transform(result)
+		if stage.validate then
+			local ok, err = stage.validate(result)
+			if not ok then
+				return nil, "Stage '" .. stage.name .. "' failed: " .. err
+			end
+		end
+	end
+	return result
 end
 
 -- Place cursor on "local" and try dt( — deletes "local function process_pipeline"
@@ -110,30 +110,30 @@ end
 -- Try: ryl — cursor stays put, a remote line is yanked
 
 local inventory = {
-  { name = "Widget Alpha", quantity = 42, price = 9.99 },
-  { name = "Widget Beta", quantity = 17, price = 14.50 },
-  { name = "Widget Gamma", quantity = 83, price = 7.25 },
-  { name = "Widget Delta", quantity = 5, price = 29.99 },
-  { name = "Widget Epsilon", quantity = 61, price = 3.75 },
-  { name = "Widget Zeta", quantity = 28, price = 19.00 },
+	{ name = "Widget Alpha", quantity = 42, price = 9.99 },
+	{ name = "Widget Beta", quantity = 17, price = 14.50 },
+	{ name = "Widget Gamma", quantity = 83, price = 7.25 },
+	{ name = "Widget Delta", quantity = 5, price = 29.99 },
+	{ name = "Widget Epsilon", quantity = 61, price = 3.75 },
+	{ name = "Widget Zeta", quantity = 28, price = 19.00 },
 }
 
 local function calculate_total(items)
-  local total = 0
-  for _, item in ipairs(items) do
-    total = total + (item.quantity * item.price)
-  end
-  return total
+	local total = 0
+	for _, item in ipairs(items) do
+		total = total + (item.quantity * item.price)
+	end
+	return total
 end
 
 local function find_expensive(items, threshold)
-  local expensive = {}
-  for _, item in ipairs(items) do
-    if item.price > threshold then
-      expensive[#expensive + 1] = item
-    end
-  end
-  return expensive
+	local expensive = {}
+	for _, item in ipairs(items) do
+		if item.price > threshold then
+			expensive[#expensive + 1] = item
+		end
+	end
+	return expensive
 end
 
 -- ── Section 5: Paste operations ───────────────────────────────
@@ -165,34 +165,38 @@ local paste_target_three = "one more spot →  ← for pasting"
 -- Try: c then w — change to a word target
 
 local function format_item(item)
-  return string.format("%-20s qty:%-4d $%.2f", item.name, item.quantity, item.price)
+	return string.format("%-20s qty:%-4d $%.2f", item.name, item.quantity, item.price)
 end
 
 local function print_report(items)
-  print("=== Inventory Report ===")
-  for _, item in ipairs(items) do
-    print(format_item(item))
-  end
-  print("========================")
-  print(string.format("Total value: $%.2f", calculate_total(items)))
+	print("=== Inventory Report ===")
+	for _, item in ipairs(items) do
+		print(format_item(item))
+	end
+	print("========================")
+	print(string.format("Total value: $%.2f", calculate_total(items)))
 end
 
 local function sort_by_price(items)
-  local sorted = {}
-  for _, item in ipairs(items) do
-    sorted[#sorted + 1] = item
-  end
-  table.sort(sorted, function(a, b) return a.price < b.price end)
-  return sorted
+	local sorted = {}
+	for _, item in ipairs(items) do
+		sorted[#sorted + 1] = item
+	end
+	table.sort(sorted, function(a, b)
+		return a.price < b.price
+	end)
+	return sorted
 end
 
 local function sort_by_quantity(items)
-  local sorted = {}
-  for _, item in ipairs(items) do
-    sorted[#sorted + 1] = item
-  end
-  table.sort(sorted, function(a, b) return a.quantity > b.quantity end)
-  return sorted
+	local sorted = {}
+	for _, item in ipairs(items) do
+		sorted[#sorted + 1] = item
+	end
+	table.sort(sorted, function(a, b)
+		return a.quantity > b.quantity
+	end)
+	return sorted
 end
 
 -- ── Section 7: Operator-pending mode ──────────────────────────
@@ -203,10 +207,10 @@ end
 --   =j  → press =, then pick a line target — auto-indents to target line
 --   gqj → press gq, then pick a line target — formats to target line
 
-    local poorly_indented = "this line needs fixing"
-      local also_bad = "indentation is wrong here"
-  local very_wrong = "way off on indentation"
-        local terrible = "really bad indent"
+local poorly_indented = "this line needs fixing"
+local also_bad = "indentation is wrong here"
+local very_wrong = "way off on indentation"
+local terrible = "really bad indent"
 local flush_left = "no indent at all"
 
 local lowercase_words = "these words should be uppercased"
