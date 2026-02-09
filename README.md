@@ -462,28 +462,102 @@ History persists across sessions.
 
 ## 🧩 Why SmartMotion?
 
-### One Plugin, Compound Benefits
+### Standing on the Shoulders of Giants
 
-- **Motion History** - every jump, search, delete recorded. Pin locations, browse frecency-ranked history, act remotely.
-- **Composable operators** - 55+ compositions from 16 keys, zero explicit mappings.
-- **Flow State** - chain any motion into any other without re-triggering.
-- **Consistent labels** - same home-row system across 100+ keybindings.
-- **One config** - enable, disable, remap from a single `opts` table.
+SmartMotion wouldn't exist without the plugins that came before it. [hop.nvim](https://github.com/phaazon/hop.nvim) pioneered hint-based jumping in Neovim. [leap.nvim](https://github.com/ggandor/leap.nvim) (and [lightspeed.nvim](https://github.com/ggandor/lightspeed.nvim) before it) introduced the elegant 2-character search pattern. [flash.nvim](https://github.com/folke/flash.nvim) raised the bar with treesitter integration and search-based jumping. [mini.jump](https://github.com/echasnovski/mini.nvim#mini.jump) showed that minimalism can be a feature.
 
-### The Pipeline
+These are all excellent plugins. If you're happy with any of them, that's a perfectly good choice.
 
-Every motion flows through:
+SmartMotion's goal is different: take the best ideas from all of them, unify them under one architecture, and then go further — into territory no motion plugin has explored.
+
+### What SmartMotion Does That Others Don't
+
+**Zero-config composability.** Enable `words` and `delete` as presets. Now `dw`, `db`, `de`, `dge` all work — no mappings defined. Enable `yank` too. Now `yw`, `yb`, `ye`, `yge` also work. Enable `search` — now `ds`, `dS`, `df`, `dt` all work too. Every motion preset **multiplies** with every operator preset. 11 composable motions × 5 operators = **55+ compositions from 16 keys**, all inferred automatically.
+
+```
+Enable a motion → every operator can use it
+Enable an operator → it works with every motion
+The growth is multiplicative, not additive
+```
+
+**Flow State.** Select a target, then press any motion key within 300ms — instant movement, no labels. Hold `w` and it flows word-by-word like native Vim. Chain different motions: `w` → `j` → `b` → `w`, all without hints. No other motion plugin does this.
+
+**Pipeline-based text objects.** `af`, `if`, `ac`, `ic`, `aa`, `ia`, `fn` are real text objects registered in operator-pending and visual mode. They work with *any* vim operator — not just `d`/`y`/`c`, but `gq`, `=`, `>`, `gU`, `!`, `zf`, anything. `gqaf` formats a function. `=if` indents a function body. `>ac` indents a class. No explicit mappings needed.
+
+**Multi-char motion inference.** Type `dfn` quickly and SmartMotion resolves `fn` as "function name." Type `df` and pause — it falls through to find-char. Timeout-based resolution means no conflicts, no ambiguity.
+
+**Label conflict avoidance.** When searching for "fu", SmartMotion won't assign "n" as a label if the match is followed by "n" — because pressing "n" would be ambiguous (select target or continue typing "fun"?). Labels are always unambiguous.
+
+**A full history system.** `g.` opens a floating browser with frecency-ranked history, persistent pins (`gp`, like harpoon), `j`/`k` navigation with live preview, `/search` filtering, and remote action mode (`d`/`y`/`c` on any entry without navigating there). `g1`-`g9` jump instantly to pins. History persists across sessions.
+
+**It's a framework, not just a plugin.** Every built-in motion uses the same public API you do. The pipeline is open:
 
 ```
 Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action
 ```
 
-Every stage is a module. Build custom motions by combining them:
+Every stage is a swappable module. Register custom collectors, extractors, filters, actions. Build motions that don't exist yet. No other motion plugin exposes this.
+
+### Honest Comparison
+
+<details>
+<summary><b>Feature matrix</b></summary>
+
+| Feature | hop | leap | flash | SmartMotion |
+|---------|-----|------|-------|-------------|
+| Word/line jumping | ✓ | ✓ | ✓ | ✓ |
+| 2-char search | | ✓ | ✓ | ✓ |
+| Live incremental search | | | ✓ | ✓ |
+| Fuzzy search | | | | ✓ |
+| Treesitter navigation | | | ✓ | ✓ |
+| Treesitter text objects | | | | ✓ |
+| Composable d/y/c/p | | | partial | full |
+| Remote operations | | | ✓ | ✓ |
+| Multi-window | | via plugin | ✓ | ✓ |
+| Operator-pending mode | ✓ | ✓ | ✓ | ✓ |
+| Label conflict avoidance | | | | ✓ |
+| Flow state chaining | | | | ✓ |
+| Multi-cursor selection | | | | ✓ |
+| Argument swap | | | | ✓ |
+| Visual range selection | | | | ✓ |
+| Motion history + pins | | | | ✓ |
+| Global cross-project pins | | | | ✓ |
+| Extensible pipeline | | | | ✓ |
+| Build custom motions | limited | limited | limited | full |
+
+</details>
+
+### When to Choose Something Else
+
+**[hop.nvim](https://github.com/phaazon/hop.nvim)** — Simpler and more battle-tested. If you just need word/line jumping with hints and don't want the extra features, hop does its job well with less surface area.
+
+**[leap.nvim](https://github.com/ggandor/leap.nvim)** — The 2-character search UX is beautifully refined. Leap is laser-focused on one thing and does it exceptionally. If that's your primary motion pattern, leap's polish is hard to beat.
+
+**[flash.nvim](https://github.com/folke/flash.nvim)** — The most feature-complete alternative. Excellent treesitter integration, well-maintained, large community. Flash's single-step treesitter search (labeling all ancestor nodes at once) can be faster than SmartMotion's two-phase approach for simple cases. If you're already happy with flash, it's a great plugin.
+
+**[mini.jump](https://github.com/echasnovski/mini.nvim#mini.jump)** — If you're invested in the mini.nvim ecosystem and want a lightweight character jump, mini.jump fits perfectly.
+
+### What You Consolidate
+
+With all presets enabled, SmartMotion can replace several plugins at once:
+
+```
+Before                                          After
+──────                                          ─────
+flash.nvim (motions + search)                   smart-motion.nvim
+harpoon (file pins + quick navigation)            with one opts table
+nvim-treesitter-textobjects (af/if/ac/ic)
+mini.ai (around/inside text objects)
+```
+
+One plugin, one config, and everything composes with everything else. Your pin system knows about your motion history. Your text objects work with flow state. Your operators compose with motions you haven't even thought of yet.
+
+### The Pipeline
+
+Every motion flows through the same architecture:
 
 ```lua
-local sm = require("smart-motion")
-
-sm.motions.register("custom_jump", {
+require("smart-motion").register_motion("custom_jump", {
   collector = "lines",
   extractor = "words",
   filter = "filter_words_after_cursor",
@@ -494,6 +568,8 @@ sm.motions.register("custom_jump", {
   trigger = "<leader>j",
 })
 ```
+
+This isn't a simplified wrapper. This is the exact same system that powers every built-in motion. What SmartMotion uses internally, you can use too.
 
 For more, see the [Wiki](https://github.com/FluxxField/smart-motion.nvim/wiki/Building-Custom-Motions).
 
@@ -528,18 +604,6 @@ For more, see the [Wiki](https://github.com/FluxxField/smart-motion.nvim/wiki/Bu
 See [Wiki Configuration](https://github.com/FluxxField/smart-motion.nvim/wiki/Configuration) for details.
 
 </details>
-
----
-
-## 📦 Alternatives
-
-SmartMotion is inspired by and unifies ideas from:
-
-- [hop.nvim](https://github.com/phaazon/hop.nvim)
-- [flash.nvim](https://github.com/folke/flash.nvim)
-- [lightspeed.nvim](https://github.com/ggandor/lightspeed.nvim)
-- [leap.nvim](https://github.com/ggandor/leap.nvim)
-- [mini.jump](https://github.com/echasnovski/mini.nvim#mini.jump)
 
 ---
 
