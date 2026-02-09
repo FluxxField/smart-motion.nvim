@@ -29,6 +29,7 @@ One plugin replaces hop, leap, flash, and mini.jump - then goes further with tre
 - [Motion History](#️-motion-history)
 - [Why SmartMotion?](#-why-smartmotion)
 - [Configuration](#️-configuration)
+  - [Customizing Motions](#customizing-motions)
 
 ---
 
@@ -589,8 +590,7 @@ For more, see the [Wiki](https://github.com/FluxxField/smart-motion.nvim/wiki/Bu
 
 ---
 
-<details>
-<summary><h2>⚙️ Configuration</h2></summary>
+## ⚙️ Configuration
 
 ```lua
 {
@@ -617,10 +617,7 @@ For more, see the [Wiki](https://github.com/FluxxField/smart-motion.nvim/wiki/Bu
 
 See [Wiki Configuration](https://github.com/FluxxField/smart-motion.nvim/wiki/Configuration) for details.
 
-</details>
-
-<details>
-<summary><h3>Customizing Motions</h3></summary>
+### Customizing Motions
 
 Individual motions within a preset can be tweaked by passing a table instead of `true`. For example, `f`/`F` and `t`/`T` are line-constrained by default. To make them work across multiple lines:
 
@@ -654,9 +651,7 @@ presets = {
 }
 ```
 
-You can override any motion property this way — `extractor`, `filter`, `visualizer`, `action`, `modes`, etc.
-
-</details>
+You can override any motion property this way — `extractor`, `filter`, `visualizer`, `action`, `modes`, etc. For a full list of available extractors, filters, visualizers, actions, and collectors, see the [Building Custom Motions](https://github.com/FluxxField/smart-motion.nvim/wiki/Building-Custom-Motions) guide.
 
 ---
 
