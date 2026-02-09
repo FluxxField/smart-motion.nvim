@@ -116,10 +116,10 @@ require("smart-motion").map_motion("w")
 
 **Treesitter collector modes:**
 
-1. `ts_query` — Raw treesitter query string
-2. `ts_node_types` — Match node types
-3. `ts_node_types` + `ts_child_field` — Yield named field
-4. `ts_node_types` + `ts_yield_children` — Yield children
+1. `ts_query`: Raw treesitter query string
+2. `ts_node_types`: Match node types
+3. `ts_node_types` + `ts_child_field`: Yield named field
+4. `ts_node_types` + `ts_yield_children`: Yield children
 
 ### Extractors
 
@@ -192,7 +192,7 @@ require("smart-motion").map_motion("w")
 | `run_motion` | Re-run from history |
 | `textobject_select` | Set charwise visual selection spanning target range (for text objects) |
 
-> **Note:** Actions with a `key` (shown in parentheses) are resolved by the infer system when composable operators look up their action. For example, pressing `d` + `w` resolves to `delete_jump` because it has `key: "d"`. The non-jump variants (`delete`, `yank`, etc.) are used by explicit presets like `dt` that handle positioning differently. The `textobject_select` action is used by treesitter text objects (`af`, `if`, `ac`, `ic`, `aa`, `ia`, `fn`) — it sets a visual selection that the pending operator applies to.
+> **Note:** Actions with a `key` (shown in parentheses) are resolved by the infer system when composable operators look up their action. For example, pressing `d` + `w` resolves to `delete_jump` because it has `key: "d"`. The non-jump variants (`delete`, `yank`, etc.) are used by explicit presets like `dt` that handle positioning differently. The `textobject_select` action is used by treesitter text objects (`af`, `if`, `ac`, `ic`, `aa`, `ia`, `fn`). It sets a visual selection that the pending operator applies to.
 
 ### Pipeline Wrappers
 
@@ -517,8 +517,8 @@ end
 
 ## Next Steps
 
-→ **[Building Custom Motions](Building-Custom-Motions.md)** — Practical examples
+→ **[Building Custom Motions](Building-Custom-Motions.md)**: Practical examples
 
-→ **[Pipeline Architecture](Pipeline-Architecture.md)** — How it works
+→ **[Pipeline Architecture](Pipeline-Architecture.md)**: How it works
 
-→ **[Debugging](Debugging.md)** — Troubleshooting
+→ **[Debugging](Debugging.md)**: Troubleshooting

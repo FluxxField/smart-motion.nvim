@@ -189,13 +189,13 @@ opts = {
 You're ready to use SmartMotion. Here's where to go next:
 
 ### Learn the Keybindings
-→ **[Presets Guide](Presets.md)** — Every preset explained with examples
+→ **[Presets Guide](Presets.md)**: Every preset explained with examples
 
 ### Understand the Power
-→ **[Advanced Features](Advanced-Features.md)** — Flow state, multi-window, operator-pending mode
+→ **[Advanced Features](Advanced-Features.md)**: Flow state, multi-window, operator-pending mode
 
 ### Build Your Own
-→ **[Build Your Own Motions](Building-Custom-Motions.md)** — Create custom motions in minutes
+→ **[Build Your Own Motions](Building-Custom-Motions.md)**: Create custom motions in minutes
 
 ### Configure Everything
-→ **[Configuration](Configuration.md)** — All options explained
+→ **[Configuration](Configuration.md)**: All options explained

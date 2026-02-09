@@ -49,9 +49,9 @@ end
 ```
 
 The coroutine design enables:
-- **Early-exit** — Stop collecting when you have enough targets
-- **Memory efficiency** — Don't load everything at once
-- **Streaming** — Process data as it's produced
+- **Early-exit**: Stop collecting when you have enough targets
+- **Memory efficiency**: Don't load everything at once
+- **Streaming**: Process data as it's produced
 
 ### Built-in Collectors
 
@@ -112,7 +112,7 @@ When `motion_state.multi_window = true`, the pipeline automatically wraps collec
 2. Injects `metadata.bufnr` and `metadata.winid` into each yielded item
 3. Current window is processed first (for label priority)
 
-This is transparent to collectors — they don't need modification.
+This is transparent to collectors. They don't need modification.
 
 ### Creating a Custom Collector
 
@@ -146,7 +146,7 @@ require("smart-motion.core.registries"):get().collectors.register("my_collector"
 
 ## Extractors
 
-Extractors process collected data and produce **targets** — the things users can jump to.
+Extractors process collected data and produce **targets**: the things users can jump to.
 
 ### How They Work
 
@@ -255,7 +255,7 @@ require("smart-motion.core.registries"):get().extractors.register("my_extractor"
 
 ## Modifiers
 
-Modifiers enrich targets with **metadata** after extraction but before filtering. They don't remove targets — they add information.
+Modifiers enrich targets with **metadata** after extraction but before filtering. They don't remove targets, they add information.
 
 ### When to Use
 
@@ -378,7 +378,7 @@ require("smart-motion.core.registries"):get().filters.register("my_filter", M)
 
 ## Visualizers
 
-Visualizers render targets to the user — typically as hint labels.
+Visualizers render targets to the user, typically as hint labels.
 
 ### How They Work
 
@@ -403,9 +403,9 @@ end
 ### Label System
 
 Labels are generated based on:
-- `cfg.keys` — Available characters
-- Number of targets — Single chars for few, double for many
-- Label conflict avoidance — In search mode, labels can't be valid continuations
+- `cfg.keys`: Available characters
+- Number of targets: Single chars for few, double for many
+- Label conflict avoidance: In search mode, labels can't be valid continuations
 
 ### Creating a Custom Visualizer
 
@@ -592,12 +592,12 @@ Every module receives three arguments:
 See **[API Reference](API-Reference.md)** for complete motion_state documentation.
 
 Key fields:
-- `targets` — List of targets after filtering
-- `selected_jump_target` — The target user selected
-- `search_text` — Current search input
-- `multi_window` — Whether multi-window is enabled
-- `ts_node_types` — For treesitter collector
-- `diagnostic_severity` — For diagnostics collector
+- `targets`: List of targets after filtering
+- `selected_jump_target`: The target user selected
+- `search_text`: Current search input
+- `multi_window`: Whether multi-window is enabled
+- `ts_node_types`: For treesitter collector
+- `diagnostic_severity`: For diagnostics collector
 
 ---
 
@@ -631,8 +631,8 @@ This enables:
 
 ## Next Steps
 
-→ **[Building Custom Motions](Building-Custom-Motions.md)** — Practical examples
+→ **[Building Custom Motions](Building-Custom-Motions.md)**: Practical examples
 
-→ **[API Reference](API-Reference.md)** — Complete reference
+→ **[API Reference](API-Reference.md)**: Complete reference
 
-→ **[Debugging](Debugging.md)** — Troubleshooting
+→ **[Debugging](Debugging.md)**: Troubleshooting
