@@ -71,8 +71,8 @@ Each stage is optional (except collector, extractor, visualizer, action). Each s
 | `words` | Word boundaries via regex |
 | `lines` | Entire lines as targets |
 | `text_search_1_char` | Single character matches |
-| `text_search_1_char_until` | Single char, exclude target (for `t`/`T`) |
-| `text_search_2_char` | Two character matches |
+| `text_search_2_char` | Two character matches (for `f`/`F`) |
+| `text_search_2_char_until` | Two char, exclude target (for `t`/`T`) |
 | `live_search` | Incremental search as you type |
 | `fuzzy_search` | Fuzzy matching |
 | `pass_through` | Use collector output directly |

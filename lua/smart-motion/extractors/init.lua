@@ -34,18 +34,18 @@ extractors.register_many({
 			motion_state = {
 				num_of_char = 1,
 				should_show_prefix = false,
+				cursor_to_target = true,
 			},
 		}),
 	},
-	text_search_1_char_until = {
+	text_search_2_char_until = {
 		keys = { "t" },
 		run = utils.module_wrapper(text_search.run, {
 			before_input_loop = text_search.before_input_loop,
 		}),
 		metadata = vim.tbl_deep_extend("force", text_search.metadata, {
 			motion_state = {
-				num_of_char = 1,
-				should_show_prefix = false,
+				num_of_char = 2,
 				exclude_target = true,
 			},
 		}),
@@ -57,6 +57,7 @@ extractors.register_many({
 		metadata = vim.tbl_deep_extend("force", text_search.metadata, {
 			motion_state = {
 				num_of_char = 2,
+				cursor_to_target = true,
 			},
 		}),
 	},
@@ -64,13 +65,21 @@ extractors.register_many({
 		run = utils.module_wrapper(live_search.run, {
 			before_input_loop = live_search.before_input_loop,
 		}),
-		metadata = live_search.metadata,
+		metadata = vim.tbl_deep_extend("force", live_search.metadata, {
+			motion_state = {
+				cursor_to_target = true,
+			},
+		}),
 	},
 	fuzzy_search = {
 		run = utils.module_wrapper(fuzzy_search.run, {
 			before_input_loop = fuzzy_search.before_input_loop,
 		}),
-		metadata = fuzzy_search.metadata,
+		metadata = vim.tbl_deep_extend("force", fuzzy_search.metadata, {
+			motion_state = {
+				cursor_to_target = true,
+			},
+		}),
 	},
 	pass_through = {
 		run = utils.module_wrapper(pass_through.run),

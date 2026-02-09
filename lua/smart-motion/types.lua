@@ -95,6 +95,7 @@
 --- @field last_search_text? string | nil
 --- @field is_searching_mode? boolean
 --- @field exclude_target? boolean -- Used to exclude hinted character and act like "until"
+--- @field cursor_to_target? boolean -- Range from cursor to target end (inclusive find mode)
 --- @field num_of_char? number
 --- @field should_show_prefix? boolean
 --- @field allow_quick_action? boolean -- Used to control if we should run action on target under cursor

@@ -12,7 +12,8 @@ function M.merge(actions)
 end
 
 --- Resolves the operation range for an action.
---- When exclude_target is set (until mode), the range is from cursor to target.
+--- When exclude_target is set (until mode), the range is from cursor to target start (exclusive).
+--- When cursor_to_target is set (find mode), the range is from cursor to target end (inclusive).
 --- Otherwise, the range is the target itself (start_pos to end_pos).
 --- Handles both forward and backward directions automatically.
 --- @param ctx SmartMotionContext
@@ -31,6 +32,19 @@ function M.resolve_range(ctx, motion_state)
 		else
 			-- Backward until: target end → cursor (exclusive of target char)
 			return target.end_pos.row, target.end_pos.col, ctx.cursor_line, ctx.cursor_col
+		end
+	end
+
+	if motion_state.cursor_to_target then
+		local cursor_before = ctx.cursor_line < target.start_pos.row
+			or (ctx.cursor_line == target.start_pos.row and ctx.cursor_col < target.start_pos.col)
+
+		if cursor_before then
+			-- Forward find: cursor → target end (inclusive of target)
+			return ctx.cursor_line, ctx.cursor_col, target.end_pos.row, target.end_pos.col
+		else
+			-- Backward find: target start → cursor (inclusive of target)
+			return target.start_pos.row, target.start_pos.col, ctx.cursor_line, ctx.cursor_col
 		end
 	end
 

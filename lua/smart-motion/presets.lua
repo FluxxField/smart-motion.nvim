@@ -141,40 +141,34 @@ function presets.search(exclude)
 			composable = true,
 			collector = "lines",
 			extractor = "text_search_2_char",
-			filter = "filter_words_after_cursor",
+			filter = "filter_words_on_cursor_line_after_cursor",
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
 			modes = { "n", "o" },
 			metadata = {
 				label = "2 Character Find After Cursor",
-				description = "Labels 2 Character Searches and jump to target",
-				motion_state = {
-					multi_window = true,
-				},
+				description = "Labels 2 Character Searches and jump to target (line-constrained)",
 			},
 		},
 		F = {
 			composable = true,
 			collector = "lines",
 			extractor = "text_search_2_char",
-			filter = "filter_words_before_cursor",
+			filter = "filter_words_on_cursor_line_before_cursor",
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
 			modes = { "n", "o" },
 			metadata = {
 				label = "2 Character Find Before Cursor",
-				description = "Labels 2 Character Searches and jump to target",
-				motion_state = {
-					multi_window = true,
-				},
+				description = "Labels 2 Character Searches and jump to target (line-constrained)",
 			},
 		},
 		t = {
 			composable = true,
 			collector = "lines",
-			extractor = "text_search_1_char_until",
+			extractor = "text_search_2_char_until",
 			filter = "filter_words_on_cursor_line_after_cursor",
 			visualizer = "hint_start",
 			action = "jump_centered",
@@ -188,7 +182,7 @@ function presets.search(exclude)
 		T = {
 			composable = true,
 			collector = "lines",
-			extractor = "text_search_1_char_until",
+			extractor = "text_search_2_char_until",
 			filter = "filter_words_on_cursor_line_before_cursor",
 			visualizer = "hint_start",
 			action = "jump_centered",
@@ -241,7 +235,7 @@ function presets.delete(exclude)
 		},
 		dt = {
 			collector = "lines",
-			extractor = "text_search_1_char_until",
+			extractor = "text_search_2_char_until",
 			filter = "filter_words_on_cursor_line_after_cursor",
 			visualizer = "hint_start",
 			action = "delete",
@@ -254,7 +248,7 @@ function presets.delete(exclude)
 		},
 		dT = {
 			collector = "lines",
-			extractor = "text_search_1_char_until",
+			extractor = "text_search_2_char_until",
 			filter = "filter_words_on_cursor_line_before_cursor",
 			visualizer = "hint_start",
 			action = "delete",
@@ -317,7 +311,7 @@ function presets.yank(exclude)
 		},
 		yt = {
 			collector = "lines",
-			extractor = "text_search_1_char_until",
+			extractor = "text_search_2_char_until",
 			filter = "filter_words_on_cursor_line_after_cursor",
 			visualizer = "hint_start",
 			action = "yank_until",
@@ -330,7 +324,7 @@ function presets.yank(exclude)
 		},
 		yT = {
 			collector = "lines",
-			extractor = "text_search_1_char_until",
+			extractor = "text_search_2_char_until",
 			filter = "filter_words_on_cursor_line_before_cursor",
 			visualizer = "hint_start",
 			action = "yank_until",
@@ -393,7 +387,7 @@ function presets.change(exclude)
 		},
 		ct = {
 			collector = "lines",
-			extractor = "text_search_1_char_until",
+			extractor = "text_search_2_char_until",
 			filter = "filter_words_on_cursor_line_after_cursor",
 			visualizer = "hint_start",
 			action = "change_until",
@@ -406,7 +400,7 @@ function presets.change(exclude)
 		},
 		cT = {
 			collector = "lines",
-			extractor = "text_search_1_char_until",
+			extractor = "text_search_2_char_until",
 			filter = "filter_words_on_cursor_line_before_cursor",
 			visualizer = "hint_start",
 			action = "change_until",
@@ -460,8 +454,13 @@ end
 function presets.misc(exclude)
 	-- Function node types for quickfix output
 	local function_node_types = {
-		"function_declaration", "function_definition", "arrow_function",
-		"method_definition", "function_item", "method_declaration", "method",
+		"function_declaration",
+		"function_definition",
+		"arrow_function",
+		"method_definition",
+		"function_item",
+		"method_declaration",
+		"method",
 	}
 
 	presets._register({
@@ -719,18 +718,37 @@ function presets.treesitter(exclude)
 
 	local scope_node_types = {
 		-- Control flow
-		"if_statement", "if_expression", "else_clause", "elif_clause",
-		"switch_statement", "switch_expression", "match_expression",
-		"case_statement", "case_clause",
+		"if_statement",
+		"if_expression",
+		"else_clause",
+		"elif_clause",
+		"switch_statement",
+		"switch_expression",
+		"match_expression",
+		"case_statement",
+		"case_clause",
 		-- Loops
-		"while_statement", "while_expression",
-		"for_statement", "for_expression", "for_in_statement", "for_of_statement",
-		"do_statement", "loop_expression", "repeat_statement",
+		"while_statement",
+		"while_expression",
+		"for_statement",
+		"for_expression",
+		"for_in_statement",
+		"for_of_statement",
+		"do_statement",
+		"loop_expression",
+		"repeat_statement",
 		-- Exception handling
-		"try_statement", "catch_clause", "except_clause", "finally_clause",
+		"try_statement",
+		"catch_clause",
+		"except_clause",
+		"finally_clause",
 		-- Blocks/closures
-		"block", "closure_expression", "lambda", "lambda_expression",
-		"with_statement", "do_block",
+		"block",
+		"closure_expression",
+		"lambda",
+		"lambda_expression",
+		"with_statement",
+		"do_block",
 	}
 
 	presets._register({

@@ -128,8 +128,8 @@ require("smart-motion").map_motion("w")
 | `words` | Word boundaries |
 | `lines` | Entire lines |
 | `text_search_1_char` | Single char matches |
-| `text_search_1_char_until` | Single char, exclude target |
-| `text_search_2_char` | Two char matches |
+| `text_search_2_char` | Two char matches (inclusive) |
+| `text_search_2_char_until` | Two char, exclude target (till) |
 | `live_search` | Incremental search |
 | `fuzzy_search` | Fuzzy matching |
 | `pass_through` | Collector output unchanged |

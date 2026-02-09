@@ -198,8 +198,8 @@ A target should have:
 | `words` | Word boundaries via regex |
 | `lines` | Entire lines as targets |
 | `text_search_1_char` | Single character matches |
-| `text_search_1_char_until` | Single char with `exclude_target = true` |
-| `text_search_2_char` | Two character matches |
+| `text_search_2_char` | Two character matches (inclusive) |
+| `text_search_2_char_until` | Two char with `exclude_target = true` (till) |
 | `live_search` | Incremental search matches |
 | `fuzzy_search` | Fuzzy matched targets |
 | `pass_through` | Collector output unchanged |
