@@ -39,17 +39,17 @@ One plugin replaces hop, leap, flash, and mini.jump - then goes further with tre
 - ⚡ **Word, line, and search jumping** with home-row hint labels - forward, backward, start, end
 - 🌳 **Treesitter-aware motions** - jump to functions (`]]`/`[[`), classes (`]c`/`[c`), scopes/blocks (`]b`/`[b`), text objects for functions (`af`/`if`), classes (`ac`/`ic`), arguments (`aa`/`ia`), and function names (`fn`)
 - 📡 **Remote operations** - `rdw`, `rdl`, `ryw`, `ryl` delete or yank words and lines without moving the cursor
-- ✂️ **Until motions** - `dt`, `yt`, `ct` operate from cursor to a labeled character
+- ✂️ **Find & Till operators** - `df`/`yf`/`cf` operate from cursor to target (inclusive), `dt`/`yt`/`ct` operate from cursor to just before target (exclusive)
 - 🌲 **Treesitter incremental select** - `gS` selects node at cursor, `;` expands to parent, `,` shrinks to child
 - 🔎 **Treesitter search** - `R` searches text, then lets you pick which surrounding syntax node to select (works with operators: `dR`, `yR`, `cR`)
 - 🩺 **Diagnostics jumping** - navigate all diagnostics (`]d`/`[d`) or errors only (`]e`/`[e`)
 - 🔀 **Git hunk jumping** - navigate git changed regions (`]g`/`[g`) with gitsigns.nvim integration
 - 📋 **Quickfix/location list** - navigate quickfix (`]q`/`[q`) and location list (`]l`/`[l`) entries with labels
 - 🔖 **Marks integration** - jump to any mark with labels (`g'`), set marks remotely (`gm`)
-- 🔎 **2-char find** - `f`/`F` for leap-style two-character search with labels
+- 🔎 **2-char find** - `f`/`F` for leap-style two-character search with labels (inclusive)
+- 🎯 **2-char till** - `t`/`T` for two-character till (jump to just before/after the match, exclusive), with `;`/`,` to repeat
 - 🔍 **Live search** - `s` for incremental search with labeled results across all visible text
 - 🔎 **Fuzzy search** - `S` for fuzzy matching (type "fn" to match "function", "filename", etc.)
-- 🎯 **Till motions** - `t`/`T` for single-character till (jump to just before/after the match), with `;`/`,` to repeat
 - 🔎 **Native search labels** - `/` shows labels incrementally as you type, `<C-s>` toggles labels on/off
 - 🧠 **Label conflict avoidance** - labels can't be valid search continuations (no ambiguity)
 - 🪟 **Multi-window jumping** - search, treesitter, and diagnostic motions show labels across all visible splits. Select a label in another window and jump there instantly.
@@ -157,7 +157,7 @@ When you press `d`, `y`, `c`, or `p`, SmartMotion reads the next key and **autom
 dw    d (delete)  +  w (words extractor, after cursor filter)
 db    d (delete)  +  b (words extractor, before cursor filter)
 ds    d (delete)  +  s (live search extractor, multi-window)
-yf    y (yank)    +  f (2-char search extractor)
+yf    y (yank)    +  f (2-char search, inclusive)
 cj    c (change)  +  j (lines extractor, after cursor filter)
 ```
 
@@ -243,10 +243,10 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 |------|------|------------------------------------------------------|
 | `s`  | n, o | Live search across all visible text with labels      |
 | `S`  | n, o | Fuzzy search - type partial patterns to match words  |
-| `f`  | n, o | 2-char find forward with labels                      |
-| `F`  | n, o | 2-char find backward with labels                     |
-| `t`  | n, o | Till character forward (jump to just before match)   |
-| `T`  | n, o | Till character backward (jump to just after match)   |
+| `f`  | n, o | 2-char find forward (inclusive) - line-constrained   |
+| `F`  | n, o | 2-char find backward (inclusive) - line-constrained  |
+| `t`  | n, o | 2-char till forward (exclusive, just before match) - line-constrained |
+| `T`  | n, o | 2-char till backward (exclusive, just after match) - line-constrained |
 | `;`  | n, v | Repeat last f/F/t/T motion (same direction)          |
 | `,`  | n, v | Repeat last f/F/t/T motion (reversed direction)      |
 | `gs` | n    | Visual select via labels - pick two targets, enter visual mode |
@@ -266,8 +266,8 @@ Press an operator, then any motion key - SmartMotion infers the pipeline, shows 
 | `db`  | Jump to word before cursor, delete it |
 | `dj`  | Jump to line below, delete it |
 | `ds`  | Live search → pick label → delete |
-| `df`  | 2-char find → pick label → delete |
-| `dt`  | Delete till character (from cursor to target) |
+| `df`  | 2-char find → delete from cursor to target (inclusive) |
+| `dt`  | 2-char till → delete from cursor to just before target (exclusive) |
 | `dd`  | Delete current line |
 
 All work identically with `y` (yank), `c` (change), and `p`/`P` (paste).
@@ -427,9 +427,9 @@ gPA        set global pin A directly
 
 Search, treesitter, diagnostic, git, quickfix, and mark motions show labels across **all visible splits**. Select a label in another window and jump there.
 
-Enabled by default for: `s`, `f`, `F`, `t`, `T`, `]]`, `[[`, `]c`, `[c`, `]b`, `[b`, `]d`, `[d`, `]e`, `[e`, `]g`, `[g`, `]q`, `[q`, `]l`, `[l`, `g'`, `gm`
+Enabled by default for: `s`, `S`, `]]`, `[[`, `]c`, `[c`, `]b`, `[b`, `]d`, `[d`, `]e`, `[e`, `]g`, `[g`, `]q`, `[q`, `]l`, `[l`, `g'`, `gm`
 
-Word/line motions (`w`, `b`, `e`, `ge`, `j`, `k`) stay single-window - directional motions within one window are the natural UX.
+Word/line/find/till motions (`w`, `b`, `e`, `ge`, `j`, `k`, `f`, `F`, `t`, `T`) stay single-window and line-constrained by default. See [Customization](#customizing-motions) for how to make them multi-line or multi-window.
 
 ---
 
@@ -616,6 +616,45 @@ For more, see the [Wiki](https://github.com/FluxxField/smart-motion.nvim/wiki/Bu
 ```
 
 See [Wiki Configuration](https://github.com/FluxxField/smart-motion.nvim/wiki/Configuration) for details.
+
+</details>
+
+<details>
+<summary><h3>Customizing Motions</h3></summary>
+
+Individual motions within a preset can be tweaked by passing a table instead of `true`. For example, `f`/`F` and `t`/`T` are line-constrained by default. To make them work across multiple lines:
+
+```lua
+presets = {
+  search = {
+    -- Make f/F search across all lines (not just current line)
+    f = { filter = "filter_words_after_cursor" },
+    F = { filter = "filter_words_before_cursor" },
+    -- Make t/T search across all lines too
+    t = { filter = "filter_words_after_cursor" },
+    T = { filter = "filter_words_before_cursor" },
+  },
+}
+```
+
+To also enable multi-window jumping for find/till:
+
+```lua
+presets = {
+  search = {
+    f = {
+      filter = "filter_words_after_cursor",
+      metadata = { motion_state = { multi_window = true } },
+    },
+    F = {
+      filter = "filter_words_before_cursor",
+      metadata = { motion_state = { multi_window = true } },
+    },
+  },
+}
+```
+
+You can override any motion property this way — `extractor`, `filter`, `visualizer`, `action`, `modes`, etc.
 
 </details>
 

@@ -80,17 +80,11 @@ function M.run(ctx, cfg, motion_state)
 					end
 
 					local targets = motion_state.jump_targets or {}
-					exit_event.throw_if(#targets == 0, EXIT_TYPE.EARLY_EXIT)
 
-					if #targets == 1 then
-						if cfg.auto_select_target then
-							exit_event.throw(EXIT_TYPE.AUTO_SELECT)
-						else
-							exit_event.throw(EXIT_TYPE.CONTINUE_TO_SELECTION)
-						end
+					if #targets > 0 then
+						visualizer.run(ctx, cfg, motion_state)
 					end
 
-					visualizer.run(ctx, cfg, motion_state)
 					motion_state.last_search_text = motion_state.search_text
 				end
 
