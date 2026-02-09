@@ -57,7 +57,7 @@ Actions follow a naming pattern:
 
 | Pattern | What it does | Example Use |
 | --- | --- | --- |
-| `delete`, `yank`, `change` | Operate on target text, no cursor movement | Explicit presets (`daa`, `dt`) |
+| `delete`, `yank`, `change` | Operate on target text, no cursor movement | Explicit presets (`dt`) |
 | `delete_jump`, `yank_jump`, `change_jump` | Jump to target first, then operate | Composable operators (`dw`, `yw`, `cj`) |
 | `remote_delete`, `remote_yank` | Jump, operate, restore cursor | Remote presets (`rdw`, `ryw`) |
 | `*_line` | Line-wise variant | Double-tap (`dd`, `yy`, `cc`) |

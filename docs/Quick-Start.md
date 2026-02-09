@@ -76,7 +76,10 @@ Press `s` → type characters → labels appear on matches as you type → press
 ### 4. Jump to a Function
 Press `]]` → labels appear on all function definitions → press a label
 
-### 5. Delete an Argument
+### 5. Delete Around Function
+Press `daf` → labels appear on all functions → select one → entire function deleted
+
+### 6. Delete an Argument
 With cursor in a function call, press `daa` → labels appear on arguments → select one → argument deleted (including comma)
 
 ---
@@ -94,7 +97,7 @@ With all presets enabled, you have **59+ keybindings**:
 | **yank** | `y` `yt` `yT` `ryw` `ryl` |
 | **change** | `c` `ct` `cT` |
 | **paste** | `p` `P` |
-| **treesitter** | `]]` `[[` `]c` `[c` `]b` `[b` `daa` `caa` `yaa` `dfn` `cfn` `yfn` `saa` `gS` `R` |
+| **treesitter** | `]]` `[[` `]c` `[c` `]b` `[b` `af` `if` `ac` `ic` `aa` `ia` `fn` `saa` `gS` `R` |
 | **diagnostics** | `]d` `[d` `]e` `[e` |
 | **git** | `]g` `[g` |
 | **quickfix** | `]q` `[q` `]l` `[l` |

@@ -190,8 +190,9 @@ require("smart-motion").map_motion("w")
 | `remote_yank_line` | Jump, yank line, restore cursor |
 | `restore` | Restore cursor position |
 | `run_motion` | Re-run from history |
+| `textobject_select` | Set charwise visual selection spanning target range (for text objects) |
 
-> **Note:** Actions with a `key` (shown in parentheses) are resolved by the infer system when composable operators look up their action. For example, pressing `d` + `w` resolves to `delete_jump` because it has `key: "d"`. The non-jump variants (`delete`, `yank`, etc.) are used by explicit presets like `daa`, `dt` that handle positioning differently.
+> **Note:** Actions with a `key` (shown in parentheses) are resolved by the infer system when composable operators look up their action. For example, pressing `d` + `w` resolves to `delete_jump` because it has `key: "d"`. The non-jump variants (`delete`, `yank`, etc.) are used by explicit presets like `dt` that handle positioning differently. The `textobject_select` action is used by treesitter text objects (`af`, `if`, `ac`, `ic`, `aa`, `ia`, `fn`) — it sets a visual selection that the pending operator applies to.
 
 ### Pipeline Wrappers
 
@@ -276,6 +277,8 @@ The `motion_state` table is mutable state passed through all pipeline stages.
 | `ts_child_field` | string | Named field to yield |
 | `ts_yield_children` | boolean | Yield container children |
 | `ts_around_separator` | boolean | Include separators |
+| `ts_inner_body` | boolean | Yield inner body (trims `{`/`}` delimiters) |
+| `is_textobject` | boolean | Bypass op-pending jump override for text objects |
 
 ### Multi-Window Fields
 

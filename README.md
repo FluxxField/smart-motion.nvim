@@ -23,7 +23,7 @@ One plugin replaces hop, leap, flash, and mini.jump - then goes further with tre
 - 🌊 **Flow State** - chain motions without re-triggering hints. Select a target, then press any motion key within 300ms for instant movement. Hold `w` and watch it flow like native Vim. **No other motion plugin does this.**
 - 🔀 **Composable operators** - `d`, `y`, `c`, `p` automatically compose with **every** motion via inference. `dw`, `ds`, `yf`, `cj` - 55+ compositions from 16 keys, zero explicit mappings needed.
 - ⚡ **Word, line, and search jumping** with home-row hint labels - forward, backward, start, end
-- 🌳 **Treesitter-aware motions** - jump to functions (`]]`/`[[`), classes (`]c`/`[c`), scopes/blocks (`]b`/`[b`), delete/change/yank function names (`dfn`, `cfn`, `yfn`), and arguments (`daa`, `caa`, `yaa`)
+- 🌳 **Treesitter-aware motions** - jump to functions (`]]`/`[[`), classes (`]c`/`[c`), scopes/blocks (`]b`/`[b`), text objects for functions (`af`/`if`), classes (`ac`/`ic`), arguments (`aa`/`ia`), and function names (`fn`)
 - 📡 **Remote operations** - `rdw`, `rdl`, `ryw`, `ryl` delete or yank words and lines without moving the cursor
 - ✂️ **Until motions** - `dt`, `yt`, `ct` operate from cursor to a labeled character
 - 🌲 **Treesitter incremental select** - `gS` selects node at cursor, `;` expands to parent, `,` shrinks to child
@@ -68,7 +68,7 @@ return {
       yank = true,         -- y + any motion, yt, yT, ryw, ryl
       change = true,       -- c + any motion, ct, cT
       paste = true,        -- p/P + any motion
-      treesitter = true,   -- ]], [[, ]c, [c, ]b, [b, daa, caa, yaa, dfn, cfn, yfn, saa
+      treesitter = true,   -- ]], [[, ]c, [c, ]b, [b, af, if, ac, ic, aa, ia, fn, saa
       diagnostics = true,  -- ]d, [d, ]e, [e
       git = true,          -- ]g, [g
       quickfix = true,     -- ]q, [q, ]l, [l
@@ -272,7 +272,7 @@ Repeat the motion key for cursor target: `dww` = delete this word.
 </details>
 
 <details>
-<summary><b>🌳 Treesitter</b> - <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>]b</code> <code>[b</code> <code>daa</code> <code>caa</code> <code>yaa</code> <code>dfn</code> <code>cfn</code> <code>yfn</code> <code>saa</code> <code>gS</code> <code>R</code> 🪟</summary>
+<summary><b>🌳 Treesitter</b> - <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>]b</code> <code>[b</code> <code>af</code> <code>if</code> <code>ac</code> <code>ic</code> <code>aa</code> <code>ia</code> <code>fn</code> <code>saa</code> <code>gS</code> <code>R</code> 🪟</summary>
 
 | Key   | Mode    | Description                                           |
 |-------|---------|-------------------------------------------------------|
@@ -282,15 +282,18 @@ Repeat the motion key for cursor target: `dww` = delete this word.
 | `[c`  | n, o    | Jump to previous class/struct                         |
 | `]b`  | n, o    | Jump to next block/scope (if, for, while, try, etc.)  |
 | `[b`  | n, o    | Jump to previous block/scope                          |
-| `daa` | n       | Delete around argument (includes separator)           |
-| `caa` | n       | Change argument                                       |
-| `yaa` | n       | Yank argument                                         |
-| `dfn` | n       | Delete function name                                  |
-| `cfn` | n       | Change function name (rename)                         |
-| `yfn` | n       | Yank function name                                    |
+| `af`  | x, o    | Select around function (works with any operator: `daf`, `yaf`, `gqaf`) |
+| `if`  | x, o    | Select inside function body                           |
+| `ac`  | x, o    | Select around class/struct                            |
+| `ic`  | x, o    | Select inside class/struct body                       |
+| `aa`  | x, o    | Select around argument (includes separator)           |
+| `ia`  | x, o    | Select inside argument                                |
+| `fn`  | o       | Select function name (works with operators: `dfn`, `cfn`, `yfn`) |
 | `saa` | n       | Swap two arguments - pick two, swap their positions   |
 | `gS`  | n, x    | Treesitter incremental select - `;` expand, `,` shrink |
 | `R`   | n, x, o | Treesitter search - search text, pick match, pick ancestor scope |
+
+Text objects compose with **any vim operator** automatically — `daf` deletes a function, `yaa` yanks an argument, `gqaf` formats a function, `=if` indents a function body, etc. Multi-char `fn` uses timeout-based resolution: `dfn` typed quickly selects function name, `df` + pause falls through to find-char.
 
 Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, and Ruby.
 

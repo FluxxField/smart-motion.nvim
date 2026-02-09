@@ -131,11 +131,12 @@ SmartMotion's **own operators** and **standalone actions** are not in `"o"` mode
 - `d`, `y`, `c`, `p`, `P` (composable operators)
 - `dt`, `yt`, `ct` (until operations)
 - `rdw`, `rdl`, `ryw`, `ryl` (remote operations)
-- `daa`, `caa`, `yaa`, `dfn`, `cfn`, `yfn` (treesitter editing)
 - `saa` (swap)
 - `gs` (visual select)
 - `gmd`, `gmy` (multi-cursor)
 - `gm` (set mark)
+
+**Note:** Treesitter text objects (`af`, `if`, `ac`, `ic`, `aa`, `ia`, `fn`) **are** registered in `"o"` mode — they work with any operator via operator-pending composition.
 
 These handle their operations internally.
 

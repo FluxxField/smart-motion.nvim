@@ -1,5 +1,5 @@
 -- SmartMotion Playground: Treesitter Motions
--- Presets: ]], [[, ]c, [c, ]b, [b, daa, caa, yaa, dfn, cfn, yfn, saa, gS, R
+-- Presets: ]], [[, ]c, [c, ]b, [b, af, if, ac, ic, aa, ia, fn, saa, gS, R
 --
 -- INSTRUCTIONS:
 --   ]]  → jump to next function definition
@@ -8,12 +8,29 @@
 --   [c  → jump to previous class/module table
 --   ]b  → jump to next block/scope (if, for, while, pcall)
 --   [b  → jump to previous block/scope
---   daa → delete around argument (pick an argument to delete, including comma)
---   caa → change around argument
---   yaa → yank around argument
---   dfn → delete function name
---   cfn → change function name
---   yfn → yank function name
+--
+-- TEXT OBJECTS (work in visual + operator-pending — compose with ANY operator):
+--   af  → around function (select entire function)
+--   if  → inside function (select function body only)
+--   ac  → around class/struct
+--   ic  → inside class/struct body
+--   aa  → around argument (including separator/comma)
+--   ia  → inside argument (without separator)
+--   fn  → function name (select just the name identifier)
+--
+-- COMPOSITION (text objects work with any operator via infer fallthrough):
+--   daf → delete around function       vaf → visually select function
+--   cif → change inside function        yaa → yank around argument
+--   gqaf → format function              =af → auto-indent function
+--   >ic → indent inside class           gUfn → uppercase function name
+--   dfn → delete function name (multi-char infer: d + fn)
+--   cfn → change function name          yfn → yank function name
+--
+-- MULTI-CHAR INFER (fn vs f):
+--   dfn  (typed quickly) → resolves as "fn" composable → labels on function names
+--   df   (typed + pause) → resolves as "f" (find-char) after timeoutlen
+--
+-- OTHER:
 --   saa → swap two arguments (pick first, pick second, they swap)
 --   gS  → treesitter incremental select (start at cursor, ; expand, , shrink)
 --   R   → treesitter search (search text → select surrounding node)
@@ -285,11 +302,17 @@ end
 -- Try: ]b from top — labels on if, for, while, pcall blocks
 -- Try: [b from bottom — same in reverse
 
--- ── Section 4: Arguments for daa, caa, yaa, saa ──────────────
+-- ── Section 4: Arguments for aa, ia, saa ────────────────────
 
--- Try: daa near a function call — labels appear on arguments, delete one
--- Try: caa — same but enters insert mode after deleting
--- Try: yaa — yanks the argument (check :reg ")
+-- TEXT OBJECTS (visual / operator-pending):
+-- Try: vaa near a function call — labels on arguments, visually select one (with comma)
+-- Try: via — same but without separator
+-- Try: daa — delete around argument (operator composes via infer fallthrough)
+-- Try: caa — change around argument
+-- Try: yaa — yank around argument (check :reg ")
+-- Try: gUaa — uppercase an argument
+--
+-- STANDALONE:
 -- Try: saa — pick two arguments, they swap positions
 
 local function create_user(name, email, role, department, active)
@@ -323,11 +346,17 @@ local server = configure_server("0.0.0.0", 8080, 4, 30000, true, "/var/log/app.l
 
 -- Try: saa on the create_user call — swap "Alice" with "admin" for example
 
--- ── Section 5: Function names for dfn, cfn, yfn ──────────────
+-- ── Section 5: Function names (fn text object + multi-char infer) ──
 
--- Try: dfn — labels on function names, delete one
--- Try: cfn — labels on function names, change one (enters insert mode)
--- Try: yfn — labels on function names, yank one
+-- TEXT OBJECT (operator-pending only — no visual mode to avoid f delay):
+-- Try: dfn (type quickly) — multi-char infer resolves "fn", labels on function names, delete one
+-- Try: cfn (type quickly) — same, change one (enters insert mode)
+-- Try: yfn (type quickly) — same, yank one
+-- Try: df  (type + pause) — resolves as find-char (2-char search), NOT function name
+--
+-- ARBITRARY OPERATORS (via op-pending fn keymap):
+-- Try: gUfn — uppercase a function name
+-- Try: gqfn — format a function name
 
 local function validate_email(address)
 	return address:match("^[%w.]+@[%w.]+%.%w+$") ~= nil
@@ -355,8 +384,9 @@ local function unescape_html(text)
 	return text:gsub("&%w+;", entities)
 end
 
--- Try: dfn — labels appear on validate_email, validate_phone, validate_url, etc.
+-- Try: dfn (quick) — labels appear on validate_email, validate_phone, validate_url, etc.
 -- Try: cfn on validate_email — deletes the name, enters insert mode to type new one
+-- Try: df (pause) — should trigger find-char, NOT function name
 
 -- ── Section 6: Treesitter Incremental Select (gS) ─────────────
 
@@ -437,4 +467,98 @@ local function another_search_target()
 	for _, user in ipairs(users) do
 		print(user.name .. " is " .. user.role)
 	end
+end
+
+-- ── Section 8: Function text objects (af, if) ──────────────────
+
+-- AROUND FUNCTION (af):
+-- Try: vaf — labels on all functions, pick one → visually selects entire function
+-- Try: daf — delete an entire function
+-- Try: yaf — yank an entire function
+-- Try: gqaf — format an entire function
+-- Try: =af — auto-indent a function
+-- Try: >af — indent a function
+
+-- INSIDE FUNCTION (if):
+-- Try: vif — labels on functions, pick one → selects only the body (no signature/end)
+-- Try: dif — delete function body
+-- Try: cif — change function body (enters insert mode)
+-- Try: =if — auto-indent function body
+
+local function short_function_one()
+	return 42
+end
+
+local function short_function_two()
+	return "hello"
+end
+
+local function multi_line_function(x, y)
+	local sum = x + y
+	local product = x * y
+	if sum > product then
+		return sum
+	else
+		return product
+	end
+end
+
+local function another_multi_line(items)
+	local filtered = {}
+	for _, item in ipairs(items) do
+		if item.active then
+			filtered[#filtered + 1] = item
+		end
+	end
+	return filtered
+end
+
+-- Try: vaf on short_function_one — should select from "local function" to "end"
+-- Try: vif on multi_line_function — should select body only (inside the function)
+-- Try: daf on short_function_two — should delete entire function
+-- Try: cif on another_multi_line — should change the function body
+
+-- ── Section 9: Class/struct text objects (ac, ic) ──────────────
+
+-- AROUND CLASS (ac):
+-- Try: vac — labels on class/module tables, pick one → visually selects entire table
+-- Try: dac — delete an entire class
+-- Try: yac — yank an entire class
+
+-- INSIDE CLASS (ic):
+-- Try: vic — selects only the body (inside the table braces)
+-- Try: dic — delete class body
+-- Try: cic — change class body
+
+-- Note: Lua doesn't have native classes, but module tables match class_node_types.
+-- For best results, test ac/ic in a JavaScript/TypeScript/Python file.
+
+-- ── Section 10: Multi-char infer timing test ───────────────────
+
+-- This section tests the f vs fn disambiguation.
+-- The timeoutlen setting controls how long the system waits.
+-- Default is usually 1000ms. Check with :set timeoutlen?
+--
+-- QUICK TYPING TEST:
+--   1. Type dfn quickly (all 3 keys within timeoutlen) → should show function name labels
+--   2. Type cfn quickly → should show function name labels, pick one → enters insert mode
+--   3. Type yfn quickly → should show function name labels, pick one → yanks name
+--
+-- SLOW TYPING TEST:
+--   1. Type d, then f, then WAIT more than timeoutlen → should resolve as find-char
+--   2. The extractor will ask for 2 search characters (normal f behavior)
+--
+-- ESC TEST:
+--   1. Type d, then f, then ESC during the wait → should resolve as find-char immediately
+
+local function fn_timing_test_alpha()
+	return "alpha"
+end
+
+local function fn_timing_test_beta()
+	return "beta"
+end
+
+local function fn_timing_test_gamma()
+	return "gamma"
 end

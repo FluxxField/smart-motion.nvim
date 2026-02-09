@@ -19,7 +19,7 @@ Interactive test files for every SmartMotion preset. Open them in Neovim with Sm
 | `words_lines.lua` | `w`, `b`, `e`, `ge`, `j`, `k` |
 | `search.lua` | `s`, `S`, `f`, `F`, `t`, `T`, `;`, `,`, `gs`, native `/` search |
 | `operators.lua` | Composable operators (`d`, `y`, `c`, `p`, `P` + any motion), until (`dt`, `dT`, `yt`, `yT`, `ct`, `cT`), remote (`rdw`, `rdl`, `ryw`, `ryl`), operator-pending (`>w`, `gUw`, etc.) |
-| `treesitter.lua` | `]]`, `[[`, `]c`, `[c`, `]b`, `[b`, `daa`, `caa`, `yaa`, `dfn`, `cfn`, `yfn`, `saa` |
+| `treesitter.lua` | `]]`, `[[`, `]c`, `[c`, `]b`, `[b`, `af`, `if`, `ac`, `ic`, `aa`, `ia`, `fn`, `saa`, `gS`, `R` |
 | `diagnostics.lua` | `]d`, `[d`, `]e`, `[e` (requires LSP) |
 | `misc.lua` | `.` (repeat), `gmd`, `gmy` |
 

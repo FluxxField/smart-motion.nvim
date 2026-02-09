@@ -212,6 +212,13 @@ local action_entries = {
 			description = "Paste the entire line at the target",
 		},
 	},
+	textobject_select = {
+		run = require("smart-motion.actions.textobject_select").run,
+		metadata = {
+			label = "Text Object Select",
+			description = "Sets a charwise visual selection spanning the target range",
+		},
+	},
 	run_motion = run_motion,
 }
 

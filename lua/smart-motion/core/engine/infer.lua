@@ -10,16 +10,57 @@ local EXIT_TYPE = consts.EXIT_TYPE
 
 local M = {}
 
+--- Non-blocking getchar with timeout. Returns the char or nil on timeout.
+--- @param timeout_ms number
+--- @return string|nil
+local function getchar_with_timeout(timeout_ms)
+	local result = nil
+	vim.wait(timeout_ms, function()
+		local c = vim.fn.getchar(1) -- non-blocking peek
+		if c ~= 0 then
+			result = type(c) == "number" and vim.fn.nr2char(c) or c
+			return true
+		end
+		return false
+	end, 10) -- poll every 10ms
+	return result
+end
+
 function M.run(ctx, cfg, motion_state)
 	if not motion_state.motion.infer then
 		return
 	end
 
-	local ok, motion_key = exit.safe(pcall(vim.fn.getchar))
+	local ok, raw_key = exit.safe(pcall(vim.fn.getchar))
 	exit.throw_if(not ok, EXIT_TYPE.EARLY_EXIT)
 
-	motion_key = type(motion_key) == "number" and vim.fn.nr2char(motion_key) or motion_key
-	exit.throw_if(motion_key == "\027", EXIT_TYPE.EARLY_EXIT)
+	local first_char = type(raw_key) == "number" and vim.fn.nr2char(raw_key) or raw_key
+	exit.throw_if(first_char == "\027", EXIT_TYPE.EARLY_EXIT)
+
+	-- Multi-char resolution: check for longer composable motions after reading first char.
+	-- If the current char is both a composable match AND a prefix of longer composable keys,
+	-- wait up to timeoutlen for more input.
+	local motions_reg = require("smart-motion.motions")
+	local motion_key = first_char
+	local target_motion = motions_reg.get_composable_by_key(motion_key)
+
+	while motions_reg.has_composable_with_prefix(motion_key) do
+		local next_char = getchar_with_timeout(vim.o.timeoutlen)
+		if not next_char then break end -- timeout, use current match
+		if next_char == "\027" then break end -- ESC cancels, use current match
+
+		local longer_key = motion_key .. next_char
+		local longer_match = motions_reg.get_composable_by_key(longer_key)
+
+		if longer_match or motions_reg.has_composable_with_prefix(longer_key) then
+			motion_key = longer_key
+			target_motion = longer_match or target_motion
+		else
+			-- Extra char doesn't extend any composable — push it back
+			vim.api.nvim_feedkeys(next_char, "t", false)
+			break
+		end
+	end
 
 	motion_state.motion_key = motion_key
 	motion_state.target_type = consts.TARGET_TYPES_BY_KEY[motion_key]
@@ -27,8 +68,10 @@ function M.run(ctx, cfg, motion_state)
 	-- Motion-based inference: look up a composable motion by motion_key.
 	-- This allows any registered composable motion (w, b, e, j, k, s, f, etc.)
 	-- to automatically work as a target for operators (d, y, c, p).
-	local motions_reg = require("smart-motion.motions")
-	local target_motion = motions_reg.get_by_key(motion_key)
+	-- If multi-char resolution already found a composable, use it directly.
+	if not target_motion then
+		target_motion = motions_reg.get_by_key(motion_key)
+	end
 
 	if target_motion and target_motion.composable then
 		local motion = motion_state.motion

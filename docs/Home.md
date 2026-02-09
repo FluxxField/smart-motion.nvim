@@ -54,8 +54,9 @@ Works with `y` (yank), `c` (change), `p` (paste). Chain any operator with any mo
 ### Treesitter-Aware Editing
 - `]]` / `[[` — jump to functions
 - `]c` / `[c` — jump to classes
-- `daa` — delete argument (with separator awareness)
-- `cfn` — change function name (instant rename)
+- `daf` — delete around function (text object + operator)
+- `cfn` — change function name (instant rename via multi-char infer)
+- `yaa` — yank around argument (with separator awareness)
 - `saa` — swap two arguments
 
 ### Search That Actually Works
@@ -84,7 +85,7 @@ Search, treesitter, and diagnostic motions show labels across **all visible spli
       yank = true,         -- y, yt, yT, ryw, ryl
       change = true,       -- c, ct, cT
       paste = true,        -- p, P
-      treesitter = true,   -- ]], [[, ]c, [c, ]b, [b, daa, caa, yaa, dfn, cfn, yfn, saa, gS, R
+      treesitter = true,   -- ]], [[, ]c, [c, ]b, [b, af, if, ac, ic, aa, ia, fn, saa, gS, R
       diagnostics = true,  -- ]d, [d, ]e, [e
       git = true,          -- ]g, [g
       quickfix = true,     -- ]q, [q, ]l, [l

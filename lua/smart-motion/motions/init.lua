@@ -179,4 +179,29 @@ function motions.map_motion(name, motion_opts, opts)
 	end
 end
 
+--- Check if any composable motion has a trigger_key starting with the given prefix
+--- (but is longer than the prefix itself).
+--- @param prefix string
+--- @return boolean
+function motions.has_composable_with_prefix(prefix)
+	for _, motion in pairs(motions.by_key) do
+		if motion.composable and motion.trigger_key ~= prefix
+			and vim.startswith(motion.trigger_key, prefix) then
+			return true
+		end
+	end
+	return false
+end
+
+--- Get a composable motion by its exact trigger_key.
+--- @param key string
+--- @return SmartMotionMotionEntry|nil
+function motions.get_composable_by_key(key)
+	local motion = motions.by_key[key]
+	if motion and motion.composable then
+		return motion
+	end
+	return nil
+end
+
 return motions
