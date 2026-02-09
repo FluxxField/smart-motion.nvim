@@ -18,41 +18,41 @@ One plugin replaces hop, leap, flash, and mini.jump - then goes further with tre
 
 ---
 
-## ? Features
+## âœ¨ Features
 
-- ?? **Flow State** - chain motions without re-triggering hints. Select a target, then press any motion key within 300ms for instant movement. Hold `w` and watch it flow like native Vim. **No other motion plugin does this.**
-- ?? **Composable operators** - `d`, `y`, `c`, `p` automatically compose with **every** motion via inference. `dw`, `ds`, `yf`, `cj` - 55+ compositions from 16 keys, zero explicit mappings needed.
-- ? **Word, line, and search jumping** with home-row hint labels - forward, backward, start, end
-- ?? **Treesitter-aware motions** - jump to functions (`]]`/`[[`), classes (`]c`/`[c`), scopes/blocks (`]b`/`[b`), delete/change/yank function names (`dfn`, `cfn`, `yfn`), and arguments (`daa`, `caa`, `yaa`)
-- ?? **Remote operations** - `rdw`, `rdl`, `ryw`, `ryl` delete or yank words and lines without moving the cursor
-- ?? **Until motions** - `dt`, `yt`, `ct` operate from cursor to a labeled character
-- ?? **Treesitter incremental select** - `gS` selects node at cursor, `;` expands to parent, `,` shrinks to child
-- ?? **Treesitter search** - `R` searches text, then lets you pick which surrounding syntax node to select (works with operators: `dR`, `yR`, `cR`)
-- ?? **Diagnostics jumping** - navigate all diagnostics (`]d`/`[d`) or errors only (`]e`/`[e`)
-- ?? **Git hunk jumping** - navigate git changed regions (`]g`/`[g`) with gitsigns.nvim integration
-- ?? **Quickfix/location list** - navigate quickfix (`]q`/`[q`) and location list (`]l`/`[l`) entries with labels
-- ?? **Marks integration** - jump to any mark with labels (`g'`), set marks remotely (`gm`)
-- ?? **2-char find** - `f`/`F` for leap-style two-character search with labels
-- ?? **Live search** - `s` for incremental search with labeled results across all visible text
-- ?? **Fuzzy search** - `S` for fuzzy matching (type "fn" to match "function", "filename", etc.)
-- ?? **Till motions** - `t`/`T` for single-character till (jump to just before/after the match), with `;`/`,` to repeat
-- ?? **Native search labels** - `/` shows labels incrementally as you type, `<C-s>` toggles labels on/off
-- ?? **Label conflict avoidance** - labels can't be valid search continuations (no ambiguity)
-- ?? **Multi-window jumping** - search, treesitter, and diagnostic motions show labels across all visible splits. Select a label in another window and jump there instantly.
-- ?? **Operator-pending mode** - use SmartMotion motions with any vim operator (`>w`, `gUw`, `=j`, `gqj`, etc.)
-- ??? **Visual range selection** - `gs` picks two targets, enters visual mode spanning the range
-- ?? **Argument swap** - `saa` picks two treesitter arguments and swaps them
-- ?? **Multi-cursor edit** - `gmd`/`gmy` toggle-select multiple words, then delete or yank them all at once
-- ?? **Repeat** - `.` repeats the last SmartMotion
-- ??? **Motion History** - `g.` opens a full-featured history browser with **pins** (`gp` to bookmark), **frecency ranking**, **j/k navigation with live preview**, **/search filtering**, and **action mode** (`d`/`y`/`c` to delete, yank, or change targets remotely). History persists across sessions.
-- ?? **Direct Pin Jumps** - `g1`-`g9` jump instantly to numbered pins. `g0` jumps to your most recent location. `gp1`-`gp9` set pins at specific slots.
-- ?? **Global Pins** - `gP` creates cross-project bookmarks (`A`-`Z`). `gA`-`gZ` jump to global pins from any project. Great for dotfiles, notes, or common configs.
-- ?? **Fully modular pipeline** - Collector  Extractor  Modifier  Filter  Visualizer  Selection  Action. Every stage is replaceable. Build entirely custom motions from scratch.
-- ?? **13 presets, 55+ inferred compositions, 100+ keybindings** - enable what you want, disable what you don't
+- ğŸŒŠ **Flow State** - chain motions without re-triggering hints. Select a target, then press any motion key within 300ms for instant movement. Hold `w` and watch it flow like native Vim. **No other motion plugin does this.**
+- ğŸ”€ **Composable operators** - `d`, `y`, `c`, `p` automatically compose with **every** motion via inference. `dw`, `ds`, `yf`, `cj` - 55+ compositions from 16 keys, zero explicit mappings needed.
+- âš¡ **Word, line, and search jumping** with home-row hint labels - forward, backward, start, end
+- ğŸŒ³ **Treesitter-aware motions** - jump to functions (`]]`/`[[`), classes (`]c`/`[c`), scopes/blocks (`]b`/`[b`), delete/change/yank function names (`dfn`, `cfn`, `yfn`), and arguments (`daa`, `caa`, `yaa`)
+- ğŸ“¡ **Remote operations** - `rdw`, `rdl`, `ryw`, `ryl` delete or yank words and lines without moving the cursor
+- âœ‚ï¸ **Until motions** - `dt`, `yt`, `ct` operate from cursor to a labeled character
+- ğŸŒ² **Treesitter incremental select** - `gS` selects node at cursor, `;` expands to parent, `,` shrinks to child
+- ğŸ” **Treesitter search** - `R` searches text, then lets you pick which surrounding syntax node to select (works with operators: `dR`, `yR`, `cR`)
+- ğŸ©º **Diagnostics jumping** - navigate all diagnostics (`]d`/`[d`) or errors only (`]e`/`[e`)
+- ğŸ”€ **Git hunk jumping** - navigate git changed regions (`]g`/`[g`) with gitsigns.nvim integration
+- ğŸ“‹ **Quickfix/location list** - navigate quickfix (`]q`/`[q`) and location list (`]l`/`[l`) entries with labels
+- ğŸ”– **Marks integration** - jump to any mark with labels (`g'`), set marks remotely (`gm`)
+- ğŸ” **2-char find** - `f`/`F` for leap-style two-character search with labels
+- ğŸ” **Live search** - `s` for incremental search with labeled results across all visible text
+- ğŸ” **Fuzzy search** - `S` for fuzzy matching (type "fn" to match "function", "filename", etc.)
+- ğŸ¯ **Till motions** - `t`/`T` for single-character till (jump to just before/after the match), with `;`/`,` to repeat
+- ğŸ” **Native search labels** - `/` shows labels incrementally as you type, `<C-s>` toggles labels on/off
+- ğŸ§  **Label conflict avoidance** - labels can't be valid search continuations (no ambiguity)
+- ğŸªŸ **Multi-window jumping** - search, treesitter, and diagnostic motions show labels across all visible splits. Select a label in another window and jump there instantly.
+- âš™ï¸ **Operator-pending mode** - use SmartMotion motions with any vim operator (`>w`, `gUw`, `=j`, `gqj`, etc.)
+- ğŸ‘ï¸ **Visual range selection** - `gs` picks two targets, enters visual mode spanning the range
+- ğŸ”„ **Argument swap** - `saa` picks two treesitter arguments and swaps them
+- âœï¸ **Multi-cursor edit** - `gmd`/`gmy` toggle-select multiple words, then delete or yank them all at once
+- ğŸ” **Repeat** - `.` repeats the last SmartMotion
+- ğŸ•°ï¸ **Motion History** - `g.` opens a full-featured history browser with **pins** (`gp` to bookmark), **frecency ranking**, **j/k navigation with live preview**, **/search filtering**, and **action mode** (`d`/`y`/`c` to delete, yank, or change targets remotely). History persists across sessions.
+- ğŸ“Œ **Direct Pin Jumps** - `g1`-`g9` jump instantly to numbered pins. `g0` jumps to your most recent location. `gp1`-`gp9` set pins at specific slots.
+- ğŸŒ **Global Pins** - `gP` creates cross-project bookmarks (`A`-`Z`). `gA`-`gZ` jump to global pins from any project. Great for dotfiles, notes, or common configs.
+- ğŸ§© **Fully modular pipeline** - Collector â†’ Extractor â†’ Modifier â†’ Filter â†’ Visualizer â†’ Selection â†’ Action. Every stage is replaceable. Build entirely custom motions from scratch.
+- ğŸ“¦ **13 presets, 55+ inferred compositions, 100+ keybindings** - enable what you want, disable what you don't
 
 ---
 
-## ?? Quick Start
+## ğŸš€ Quick Start
 
 Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 
@@ -90,7 +90,7 @@ presets = {
 
 ---
 
-## ?? Flow State
+## ğŸŒŠ Flow State
 
 This is SmartMotion's signature feature. Flow State lets you chain motions without seeing labels on every keystroke.
 
@@ -99,19 +99,19 @@ This is SmartMotion's signature feature. Flow State lets you chain motions witho
 **1. Select a label, then chain:**
 
 ```
-w  [labels appear]  f  cursor jumps to that word
-                           (within 300ms)
-                      j  instant jump to line below (no labels)
-                           (within 300ms)
-                      b  instant jump back a word (no labels)
-                           (within 300ms)
-                      w  instant jump forward (no labels)
+w  [labels appear]  f  cursor jumps to that word
+                           (within 300ms)
+                      j  instant jump to line below (no labels)
+                           (within 300ms)
+                      b  instant jump back a word (no labels)
+                           (within 300ms)
+                      w  instant jump forward (no labels)
 ```
 
 **2. Hold or spam a motion key:**
 
 ```
-w  [labels flash briefly]  w  instant jump  w  instant jump  w  ...
+w  [labels flash briefly]  w  instant jump  w  instant jump  w  ...
 ```
 
 **Easiest way to feel it:** just hold down `w`. Labels appear for a split second, then it moves word-by-word exactly like native Vim. That's Flow State kicking in.
@@ -123,7 +123,7 @@ Other motion plugins force a choice: hints for precision OR native feel for spee
 - **Labels** when you need to aim at a specific target
 - **Instant movement** when you're flowing through code
 
-The 300ms window resets on every motion, so you can chain indefinitely. And you can chain *different* motions - `w`  `j`  `b`  `w` all without hints.
+The 300ms window resets on every motion, so you can chain indefinitely. And you can chain *different* motions - `w` â†’ `j` â†’ `b` â†’ `w` all without hints.
 
 Configure the timeout:
 
@@ -135,16 +135,16 @@ opts = {
 
 ---
 
-## ?? Composable Operators - The Inference System
+## ğŸ”€ Composable Operators - The Inference System
 
 When you press `d`, `y`, `c`, or `p`, SmartMotion reads the next key and **automatically infers the full pipeline** - extractor, filter, visualizer, and metadata - from the target motion. No explicit mapping needed.
 
 ```
-dw    d (delete)  +  w (words extractor, after cursor filter)
-db    d (delete)  +  b (words extractor, before cursor filter)
-ds    d (delete)  +  s (live search extractor, multi-window)
-yf    y (yank)    +  f (2-char search extractor)
-cj    c (change)  +  j (lines extractor, after cursor filter)
+dw    d (delete)  +  w (words extractor, after cursor filter)
+db    d (delete)  +  b (words extractor, before cursor filter)
+ds    d (delete)  +  s (live search extractor, multi-window)
+yf    y (yank)    +  f (2-char search extractor)
+cj    c (change)  +  j (lines extractor, after cursor filter)
 ```
 
 Every composable motion (`w`, `b`, `e`, `j`, `k`, `s`, `S`, `f`, `F`, `t`, `T`) works with every operator (`d`, `y`, `c`, `p`, `P`). That's **55+ compositions** from 16 keys.
@@ -154,9 +154,9 @@ Every composable motion (`w`, `b`, `e`, `j`, `k`, `s`, `S`, `f`, `F`, `t`, `T`) 
 Repeat the motion key to act on the target under cursor:
 
 ```
-dww    delete this word (no labels)
-yww    yank this word
-cww    change this word
+dww    delete this word (no labels)
+yww    yank this word
+cww    change this word
 ```
 
 Labels still appear, but the second tap says "I mean this one."
@@ -177,7 +177,7 @@ presets = {
 }
 ```
 
-Enable a motion preset  every operator can use it. Enable an operator preset  it works with every motion. The growth is multiplicative, not additive.
+Enable a motion preset â†’ every operator can use it. Enable an operator preset â†’ it works with every motion. The growth is multiplicative, not additive.
 
 ### Custom Trigger Keys
 
@@ -196,12 +196,12 @@ If the motion key doesn't match any SmartMotion motion, it falls through to nati
 
 ---
 
-## ?? What You Get
+## ğŸ¯ What You Get
 
 Every preset and its keybindings at a glance. Enable a preset and all its bindings are ready.
 
 <details>
-<summary><b>? Words</b> - <code>w</code> <code>b</code> <code>e</code> <code>ge</code></summary>
+<summary><b>âš¡ Words</b> - <code>w</code> <code>b</code> <code>e</code> <code>ge</code></summary>
 
 | Key  | Mode    | Description                          |
 |------|---------|--------------------------------------|
@@ -213,7 +213,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>?? Lines</b> - <code>j</code> <code>k</code></summary>
+<summary><b>ğŸ“ Lines</b> - <code>j</code> <code>k</code></summary>
 
 | Key | Mode    | Description                  |
 |-----|---------|------------------------------|
@@ -223,7 +223,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>?? Search</b> - <code>s</code> <code>S</code> <code>f</code> <code>F</code> <code>t</code> <code>T</code> <code>;</code> <code>,</code> <code>gs</code> ??</summary>
+<summary><b>ğŸ” Search</b> - <code>s</code> <code>S</code> <code>f</code> <code>F</code> <code>t</code> <code>T</code> <code>;</code> <code>,</code> <code>gs</code> ğŸªŸ</summary>
 
 | Key  | Mode | Description                                          |
 |------|------|------------------------------------------------------|
@@ -242,7 +242,7 @@ Every preset and its keybindings at a glance. Enable a preset and all its bindin
 </details>
 
 <details>
-<summary><b>?? Composable Operators</b> - <code>d</code> <code>y</code> <code>c</code> <code>p</code> <code>P</code> + any motion</summary>
+<summary><b>ğŸ”€ Composable Operators</b> - <code>d</code> <code>y</code> <code>c</code> <code>p</code> <code>P</code> + any motion</summary>
 
 Press an operator, then any motion key - SmartMotion infers the pipeline, shows labels, and performs the action:
 
@@ -251,8 +251,8 @@ Press an operator, then any motion key - SmartMotion infers the pipeline, shows 
 | `dw`  | Jump to word after cursor, delete it |
 | `db`  | Jump to word before cursor, delete it |
 | `dj`  | Jump to line below, delete it |
-| `ds`  | Live search  pick label  delete |
-| `df`  | 2-char find  pick label  delete |
+| `ds`  | Live search â†’ pick label â†’ delete |
+| `df`  | 2-char find â†’ pick label â†’ delete |
 | `dt`  | Delete till character (from cursor to target) |
 | `dd`  | Delete current line |
 
@@ -272,7 +272,7 @@ Repeat the motion key for cursor target: `dww` = delete this word.
 </details>
 
 <details>
-<summary><b>?? Treesitter</b> - <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>]b</code> <code>[b</code> <code>daa</code> <code>caa</code> <code>yaa</code> <code>dfn</code> <code>cfn</code> <code>yfn</code> <code>saa</code> <code>gS</code> <code>R</code> ??</summary>
+<summary><b>ğŸŒ³ Treesitter</b> - <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>]b</code> <code>[b</code> <code>daa</code> <code>caa</code> <code>yaa</code> <code>dfn</code> <code>cfn</code> <code>yfn</code> <code>saa</code> <code>gS</code> <code>R</code> ğŸªŸ</summary>
 
 | Key   | Mode    | Description                                           |
 |-------|---------|-------------------------------------------------------|
@@ -299,7 +299,7 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 </details>
 
 <details>
-<summary><b>?? Diagnostics</b> - <code>]d</code> <code>[d</code> <code>]e</code> <code>[e</code> ??</summary>
+<summary><b>ğŸ©º Diagnostics</b> - <code>]d</code> <code>[d</code> <code>]e</code> <code>[e</code> ğŸªŸ</summary>
 
 | Key  | Mode | Description                         |
 |------|------|-------------------------------------|
@@ -313,7 +313,7 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 </details>
 
 <details>
-<summary><b>?? Git</b> - <code>]g</code> <code>[g</code> ??</summary>
+<summary><b>ğŸ”€ Git</b> - <code>]g</code> <code>[g</code> ğŸªŸ</summary>
 
 | Key  | Mode | Description                              |
 |------|------|------------------------------------------|
@@ -325,7 +325,7 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 </details>
 
 <details>
-<summary><b>?? Quickfix</b> - <code>]q</code> <code>[q</code> <code>]l</code> <code>[l</code> ??</summary>
+<summary><b>ğŸ“‹ Quickfix</b> - <code>]q</code> <code>[q</code> <code>]l</code> <code>[l</code> ğŸªŸ</summary>
 
 | Key  | Mode | Description                              |
 |------|------|------------------------------------------|
@@ -337,7 +337,7 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 </details>
 
 <details>
-<summary><b>?? Marks</b> - <code>g'</code> <code>gm</code> ??</summary>
+<summary><b>ğŸ”– Marks</b> - <code>g'</code> <code>gm</code> ğŸªŸ</summary>
 
 | Key  | Mode | Description                                        |
 |------|------|----------------------------------------------------|
@@ -347,7 +347,7 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 </details>
 
 <details>
-<summary><b>?? Misc</b> - <code>.</code> <code>g.</code> <code>g0</code> <code>g1-g9</code> <code>gp</code> <code>gP</code> <code>gA-gZ</code> <code>gmd</code> <code>gmy</code></summary>
+<summary><b>ğŸ” Misc</b> - <code>.</code> <code>g.</code> <code>g0</code> <code>g1-g9</code> <code>gp</code> <code>gP</code> <code>gA-gZ</code> <code>gmd</code> <code>gmy</code></summary>
 
 | Key   | Mode | Description                                          |
 |-------|------|------------------------------------------------------|
@@ -367,31 +367,31 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, an
 
 ---
 
-## ?? Pins - Quick File Navigation
+## ğŸ“Œ Pins - Quick File Navigation
 
 SmartMotion includes a built-in pinning system for fast file navigation.
 
 ### Local Pins (Per-Project)
 
 ```
-gp         toggle pin at cursor ("Pinned 1/9" or "Unpinned")
-g1 - g9    jump instantly to pin 1-9
-gp3        set current location as pin 3
-g.         open history browser (pins at top)
+gp         toggle pin at cursor ("Pinned 1/9" or "Unpinned")
+g1 - g9    jump instantly to pin 1-9
+gp3        set current location as pin 3
+g.         open history browser (pins at top)
 ```
 
 **Workflow:**
-1. Open your main file, `gp`  "Pinned (1/9)"
-2. Open your test file, `gp`  "Pinned (2/9)"
-3. Open your config, `gp`  "Pinned (3/9)"
+1. Open your main file, `gp` â†’ "Pinned (1/9)"
+2. Open your test file, `gp` â†’ "Pinned (2/9)"
+3. Open your config, `gp` â†’ "Pinned (3/9)"
 4. Now: `g1` = main, `g2` = tests, `g3` = config
 
 ### Global Pins (Cross-Project)
 
 ```
-gP         toggle global pin (prompts A-Z)
-gA - gZ    jump to global pin from ANY project
-gPA        set global pin A directly
+gP         toggle global pin (prompts A-Z)
+gA - gZ    jump to global pin from ANY project
+gPA        set global pin A directly
 ```
 
 26 slots for dotfiles, notes, configs - accessible from anywhere.
@@ -406,7 +406,7 @@ gPA        set global pin A directly
 
 ---
 
-## ?? Multi-Window Jumping
+## ğŸªŸ Multi-Window Jumping
 
 Search, treesitter, diagnostic, git, quickfix, and mark motions show labels across **all visible splits**. Select a label in another window and jump there.
 
@@ -416,7 +416,7 @@ Word/line motions (`w`, `b`, `e`, `ge`, `j`, `k`) stay single-window - direction
 
 ---
 
-## ?? Operator-Pending Mode
+## âš™ï¸ Operator-Pending Mode
 
 SmartMotion motions work with **any vim operator**:
 
@@ -432,18 +432,18 @@ All jump motions are available in operator-pending mode.
 
 ---
 
-## ??? Motion History
+## ğŸ•°ï¸ Motion History
 
 Press `g.` to open the history browser:
 
 ```
  1  *  "authenticate"            auth.lua:42
  2  *  "render"                  app.tsx:15
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
- f  s   "config"          ÛÛÛÛ   config.lua:8     just now
- a  dw  "handle_error"    ÛÛÛ    server.lua:30    5m ago
- s  w   "validate"        ÛÛ     utils.lua:12     2h ago
-ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+ f  s   "config"          â–ˆâ–ˆâ–ˆâ–ˆ   config.lua:8     just now
+ a  dw  "handle_error"    â–ˆâ–ˆâ–ˆ    server.lua:30    5m ago
+ s  w   "validate"        â–ˆâ–ˆ     utils.lua:12     2h ago
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
  j/k navigate  /search  d/y/c action  Enter select  Esc cancel
 ```
 
@@ -457,7 +457,7 @@ History persists across sessions.
 
 ---
 
-## ?? Why SmartMotion?
+## ğŸ§© Why SmartMotion?
 
 ### One Plugin, Compound Benefits
 
@@ -472,7 +472,7 @@ History persists across sessions.
 Every motion flows through:
 
 ```
-Collector  Extractor  Modifier  Filter  Visualizer  Selection  Action
+Collector â†’ Extractor â†’ Modifier â†’ Filter â†’ Visualizer â†’ Selection â†’ Action
 ```
 
 Every stage is a module. Build custom motions by combining them:
@@ -497,7 +497,7 @@ For more, see the [Wiki](https://github.com/FluxxField/smart-motion.nvim/wiki/Bu
 ---
 
 <details>
-<summary><h2>?? Configuration</h2></summary>
+<summary><h2>âš™ï¸ Configuration</h2></summary>
 
 ```lua
 {
@@ -528,7 +528,7 @@ See [Wiki Configuration](https://github.com/FluxxField/smart-motion.nvim/wiki/Co
 
 ---
 
-## ?? Alternatives
+## ğŸ“¦ Alternatives
 
 SmartMotion is inspired by and unifies ideas from:
 
@@ -540,17 +540,17 @@ SmartMotion is inspired by and unifies ideas from:
 
 ---
 
-## ?? License
+## ğŸ“œ License
 
 [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html)
 
-## ?? Author
+## ğŸ‘¤ Author
 
 Built by [FluxxField](https://github.com/FluxxField)
 
 ---
 
-## ?? Documentation
+## ğŸ“– Documentation
 
 Visit the **[Wiki](https://github.com/FluxxField/smart-motion.nvim/wiki)**:
 
