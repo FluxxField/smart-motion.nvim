@@ -653,13 +653,18 @@ function presets.misc(exclude)
 	end
 
 	-- Register g<letter> keymaps for jumping to global pins (A-Z)
+	-- Skip letters used by other SmartMotion keymaps:
+	--   P = toggle global pin (gP), S = treesitter incremental select (gS)
+	local reserved_global_pin_letters = { P = true, S = true }
 	for c = 65, 90 do -- ASCII A-Z
 		local letter = string.char(c)
-		local key = "g" .. letter
-		if not (type(exclude) == "table" and exclude[key] == false) then
-			vim.keymap.set("n", key, function()
-				require("smart-motion.core.history").jump_to_global_pin(letter)
-			end, { desc = "Jump to global pin " .. letter, noremap = true, silent = true })
+		if not reserved_global_pin_letters[letter] then
+			local key = "g" .. letter
+			if not (type(exclude) == "table" and exclude[key] == false) then
+				vim.keymap.set("n", key, function()
+					require("smart-motion.core.history").jump_to_global_pin(letter)
+				end, { desc = "Jump to global pin " .. letter, noremap = true, silent = true })
+			end
 		end
 	end
 
@@ -849,117 +854,138 @@ function presets.treesitter(exclude)
 		"formal_parameters",
 	}
 
-	-- Treesitter editing motions: operate on function names and arguments
+	-- Text objects: registered in x/o modes, compose with any operator via infer fallthrough
 	presets._register({
-		-- Delete/Change/Yank around argument (includes separator)
-		daa = {
+		af = {
 			collector = "treesitter",
 			extractor = "pass_through",
 			modifier = "weight_distance",
 			filter = "filter_visible",
 			visualizer = "hint_start",
-			action = "delete",
+			action = "textobject_select",
 			map = true,
-			modes = { "n" },
+			modes = { "x", "o" },
 			metadata = {
-				label = "Delete Around Argument",
-				description = "Delete an argument including its separator",
+				label = "Around Function",
+				description = "Select around a function",
+				motion_state = {
+					ts_node_types = function_node_types,
+					is_textobject = true,
+				},
+			},
+		},
+		["if"] = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "textobject_select",
+			map = true,
+			modes = { "x", "o" },
+			metadata = {
+				label = "Inside Function",
+				description = "Select inside a function body",
+				motion_state = {
+					ts_node_types = function_node_types,
+					ts_inner_body = true,
+					is_textobject = true,
+				},
+			},
+		},
+		ac = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "textobject_select",
+			map = true,
+			modes = { "x", "o" },
+			metadata = {
+				label = "Around Class",
+				description = "Select around a class/struct",
+				motion_state = {
+					ts_node_types = class_node_types,
+					is_textobject = true,
+				},
+			},
+		},
+		ic = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "textobject_select",
+			map = true,
+			modes = { "x", "o" },
+			metadata = {
+				label = "Inside Class",
+				description = "Select inside a class/struct body",
+				motion_state = {
+					ts_node_types = class_node_types,
+					ts_inner_body = true,
+					is_textobject = true,
+				},
+			},
+		},
+		aa = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "textobject_select",
+			map = true,
+			modes = { "x", "o" },
+			metadata = {
+				label = "Around Argument",
+				description = "Select around an argument (including separator)",
 				motion_state = {
 					ts_node_types = arg_container_types,
 					ts_yield_children = true,
 					ts_around_separator = true,
+					is_textobject = true,
 				},
 			},
 		},
-		caa = {
+		ia = {
 			collector = "treesitter",
 			extractor = "pass_through",
 			modifier = "weight_distance",
 			filter = "filter_visible",
 			visualizer = "hint_start",
-			action = "change",
+			action = "textobject_select",
 			map = true,
-			modes = { "n" },
+			modes = { "x", "o" },
 			metadata = {
-				label = "Change Around Argument",
-				description = "Change an argument (replaces its content)",
+				label = "Inside Argument",
+				description = "Select inside an argument (without separator)",
 				motion_state = {
 					ts_node_types = arg_container_types,
 					ts_yield_children = true,
+					is_textobject = true,
 				},
 			},
 		},
-		yaa = {
+		fn = {
+			composable = true,
 			collector = "treesitter",
 			extractor = "pass_through",
 			modifier = "weight_distance",
 			filter = "filter_visible",
 			visualizer = "hint_start",
-			action = "yank",
+			action = "textobject_select",
 			map = true,
-			modes = { "n" },
+			modes = { "o" },
 			metadata = {
-				label = "Yank Around Argument",
-				description = "Yank an argument",
-				motion_state = {
-					ts_node_types = arg_container_types,
-					ts_yield_children = true,
-				},
-			},
-		},
-
-		-- Delete/Change/Yank function name
-		dfn = {
-			collector = "treesitter",
-			extractor = "pass_through",
-			modifier = "weight_distance",
-			filter = "filter_visible",
-			visualizer = "hint_start",
-			action = "delete",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Delete Function Name",
-				description = "Delete a function's name",
+				label = "Function Name",
+				description = "Select a function name",
 				motion_state = {
 					ts_node_types = function_node_types,
 					ts_child_field = "name",
-				},
-			},
-		},
-		cfn = {
-			collector = "treesitter",
-			extractor = "pass_through",
-			modifier = "weight_distance",
-			filter = "filter_visible",
-			visualizer = "hint_start",
-			action = "change",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Change Function Name",
-				description = "Change a function's name (rename)",
-				motion_state = {
-					ts_node_types = function_node_types,
-					ts_child_field = "name",
-				},
-			},
-		},
-		yfn = {
-			collector = "treesitter",
-			extractor = "pass_through",
-			modifier = "weight_distance",
-			filter = "filter_visible",
-			visualizer = "hint_start",
-			action = "yank",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Yank Function Name",
-				description = "Yank a function's name",
-				motion_state = {
-					ts_node_types = function_node_types,
-					ts_child_field = "name",
+					is_textobject = true,
 				},
 			},
 		},

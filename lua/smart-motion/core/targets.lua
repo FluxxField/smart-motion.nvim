@@ -99,10 +99,14 @@ function M.get_target_under_cursor(ctx, cfg, motion_state)
 			end
 
 			if cursor_col >= match_start and cursor_col < match_end then
+				-- Use cursor position as start (not word start) to mirror native vim
+				-- dw behavior: delete from cursor to end of word, not the full word.
+				-- Full word deletion is covered by native daw/diw.
+				local text_from_cursor = matched_text:sub(cursor_col - match_start + 1)
 				return M.format_target(ctx, cfg, motion_state, {
-					start_pos = { row = cursor_line, col = match_start },
+					start_pos = { row = cursor_line, col = cursor_col },
 					end_pos = { row = cursor_line, col = match_end },
-					text = matched_text,
+					text = text_from_cursor,
 					type = motion_state.target_type,
 				})
 			end

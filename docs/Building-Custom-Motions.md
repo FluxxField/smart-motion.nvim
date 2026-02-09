@@ -262,19 +262,21 @@ The `text_search_2_char` extractor prompts for 2 characters before showing label
 
 ---
 
-## Example: Delete to Function Name
+## Example: Function Name Text Object
+
+This is how the built-in `fn` text object works. It's a good template for building custom treesitter-based text objects:
 
 ```lua
-local merge = require("smart-motion.core.utils").action_utils.merge
-
-require("smart-motion").register_motion("dfn", {
+require("smart-motion").register_motion("fn", {
   collector = "treesitter",
   extractor = "pass_through",
+  modifier = "weight_distance",
   filter = "filter_visible",
   visualizer = "hint_start",
-  action = merge({ "jump", "delete" }),
+  action = "textobject_select",
+  composable = true,
   map = true,
-  modes = { "n" },
+  modes = { "o" },
   metadata = {
     motion_state = {
       ts_node_types = {
@@ -283,12 +285,13 @@ require("smart-motion").register_motion("dfn", {
         "method_definition",
       },
       ts_child_field = "name",  -- only the "name" field of the function
+      is_textobject = true,
     },
   },
 })
 ```
 
-The `ts_child_field` option makes the collector yield only the specified named field (like `name`) from matching nodes.
+The `ts_child_field` option makes the collector yield only the specified named field (like `name`) from matching nodes. The `textobject_select` action sets a charwise visual selection, which the pending operator then applies to. Since `fn` is `composable = true`, it works with the multi-char infer system: `dfn` typed quickly resolves as function name, `df` + pause falls through to find-char.
 
 ---
 

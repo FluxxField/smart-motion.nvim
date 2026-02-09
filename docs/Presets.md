@@ -15,7 +15,7 @@ SmartMotion ships with **13 presets** containing **100+ keybindings**. Each pres
 | `yank` | `y` `yt` `yT` `ryw` `ryl` | Yank operations |
 | `change` | `c` `ct` `cT` | Change operations |
 | `paste` | `p` `P` | Paste operations |
-| `treesitter` | `]]` `[[` `]c` `[c` `]b` `[b` `daa` `caa` `yaa` `dfn` `cfn` `yfn` `saa` `gS` `R` | Syntax-aware motions |
+| `treesitter` | `]]` `[[` `]c` `[c` `]b` `[b` `af` `if` `ac` `ic` `aa` `ia` `fn` `saa` `gS` `R` | Syntax-aware motions |
 | `diagnostics` | `]d` `[d` `]e` `[e` | LSP diagnostic navigation |
 | `git` | `]g` `[g` | Git hunk navigation |
 | `quickfix` | `]q` `[q` `]l` `[l` | Quickfix/location list |
@@ -262,24 +262,31 @@ Press ]] → labels appear on all function definitions → select one → jump t
 Works in operator-pending: >]] indents to labeled function
 ```
 
-### Editing
+### Text Objects
 
 | Key | Modes | What it does |
 |-----|-------|--------------|
-| `daa` | n | **Delete around argument** (includes comma/separator) |
-| `caa` | n | **Change around argument** |
-| `yaa` | n | **Yank around argument** |
-| `dfn` | n | **Delete function name** |
-| `cfn` | n | **Change function name** (instant rename) |
-| `yfn` | n | **Yank function name** |
+| `af` | x, o | **Around function** — select entire function (works with any operator: `daf`, `yaf`, `gqaf`) |
+| `if` | x, o | **Inside function** — select function body only |
+| `ac` | x, o | **Around class/struct** — select entire class |
+| `ic` | x, o | **Inside class/struct** — select class body only |
+| `aa` | x, o | **Around argument** — includes comma/separator |
+| `ia` | x, o | **Inside argument** — argument text only |
+| `fn` | o | **Function name** — select function name (works with operators: `dfn`, `cfn`, `yfn`) |
 | `saa` | n | **Swap arguments** — pick two, swap positions |
 
 ```
 In: calculate(first, second, third)
 Press daa → labels appear on arguments → select "second" → becomes: calculate(first, third)
-
+Press vaf → labels appear on functions → select one → entire function visually selected
+Press daf → labels appear on functions → select one → entire function deleted
 Press cfn → labels appear on function names → select one → name deleted, insert mode
+Press gqaf → labels appear on functions → select one → function formatted
 ```
+
+Text objects compose with **any vim operator** automatically — no explicit mappings needed. `daf`, `yaf`, `cif`, `>af`, `=if`, `gqaf` all work out of the box.
+
+**Multi-char infer (`fn`):** When you type `dfn` quickly, the infer system resolves `fn` as a function name motion. If you type `df` and pause (up to `timeoutlen`), it falls through to find-char. This timeout-based resolution avoids conflicts between `f` (find-char) and `fn` (function name).
 
 ### Selection
 
@@ -386,7 +393,7 @@ Repeat, history, pins, and multi-cursor operations.
 | `gp` | n | **Toggle pin** — bookmark/unbookmark the current cursor position |
 | `gp1`-`gp9` | n | **Set pin at slot** — set current location as pin N |
 | `gP` | n | **Toggle global pin** — cross-project bookmark (prompts A-Z) |
-| `gA`-`gZ` | n | **Jump to global pin** — jump to cross-project pin |
+| `gA`-`gZ` | n | **Jump to global pin** — jump to cross-project pin (`gP`/`gS` reserved) |
 | `gPA`-`gPZ` | n | **Set global pin** — set current location as global pin |
 | `gmd` | n | **Multi-cursor delete** — toggle-select multiple words, delete all |
 | `gmy` | n | **Multi-cursor yank** — toggle-select multiple words, yank all |
@@ -465,6 +472,8 @@ gPA → directly sets global pin A at cursor (no prompt)
 ```
 
 Global pins are stored separately from project pins and persist across all Neovim sessions. Use them for frequently-accessed files like your dotfiles, notes, or commonly-edited configs.
+
+**Note:** `gP` (toggle global pin) and `gS` (treesitter incremental select) are reserved — use `gPA`-`gPZ` to set/access pins at those slots, or use the history browser.
 
 ### Multi-Cursor (`gmd`/`gmy`)
 

@@ -34,6 +34,34 @@ local function yield_node(node, bufnr, extra_metadata)
 	})
 end
 
+--- Yields the inner body of a node (e.g. function body without braces).
+--- Falls back to yield_node if no body field exists.
+--- @param node TSNode
+--- @param bufnr integer
+local function yield_inner_body(node, bufnr)
+	local body = node:field("body")
+	if body and #body > 0 then
+		local body_node = body[1]
+		local sr, sc, er, ec = body_node:range()
+		-- Trim brace delimiters if present
+		local first = body_node:child(0)
+		local last = body_node:child(body_node:child_count() - 1)
+		if first and last and first:type() == "{" and last:type() == "}" then
+			_, _, sr, sc = first:range() -- end of "{"
+			er, ec = last:range()        -- start of "}"
+		end
+		coroutine.yield({
+			text = table.concat(vim.api.nvim_buf_get_text(bufnr, sr, sc, er, ec, {}), "\n"),
+			start_pos = { row = sr, col = sc },
+			end_pos = { row = er, col = ec },
+			type = "treesitter",
+			metadata = { node_type = node:type(), inner = true },
+		})
+	else
+		yield_node(node, bufnr) -- fallback: no body field
+	end
+end
+
 --- Gets all named children of a node.
 --- @param node TSNode
 --- @return TSNode[]
@@ -162,7 +190,11 @@ function M.run()
 			walk_tree(root, motion_state.ts_node_types, nodes)
 
 			for _, node in ipairs(nodes) do
-				yield_node(node, bufnr)
+				if motion_state.ts_inner_body then
+					yield_inner_body(node, bufnr)
+				else
+					yield_node(node, bufnr)
+				end
 			end
 
 			return

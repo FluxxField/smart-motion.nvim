@@ -28,6 +28,17 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 		return
 	end
 
+	-- Repeat motion key = act on target under cursor (e.g., dww deletes cursor word)
+	-- Must check BEFORE flow state evaluation — otherwise quick typing triggers
+	-- "jump early" which selects the first target instead of the cursor target.
+	if motion_state.allow_quick_action and motion_state.motion_key and char == motion_state.motion_key then
+		local under_cursor = targets.get_target_under_cursor(ctx, cfg, motion_state)
+		if under_cursor then
+			motion_state.selected_jump_target = under_cursor
+			return
+		end
+	end
+
 	if flow_state.evaluate_flow_at_selection() and motion_state.selection_mode ~= consts.SELECTION_MODE.SECOND then
 		log.debug("Selection is jumping early")
 		return
@@ -59,15 +70,6 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 		end
 
 		log.debug("No matching hint found for input: " .. char)
-
-		-- Repeat motion key = act on target under cursor (e.g., dww deletes cursor word)
-		if motion_state.allow_quick_action and motion_state.motion_key and char == motion_state.motion_key then
-			local under_cursor = targets.get_target_under_cursor(ctx, cfg, motion_state)
-			if under_cursor then
-				motion_state.selected_jump_target = under_cursor
-				return
-			end
-		end
 
 		-- Invalid hint - cancel the operation instead of feeding the key
 		-- (feeding the key could trigger unintended actions like undo)

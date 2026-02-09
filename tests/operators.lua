@@ -129,11 +129,24 @@ local paste_target_three = "one more spot →  ← for pasting"
 -- 2. Press p, pick a label on one of the paste_target lines
 -- 3. The yanked line appears after the target
 
--- ── Section 6: Composable d/y/c with treesitter ──────────────
+-- ── Section 6: Composable d/y/c with treesitter + text objects ──
 
+-- COMPOSABLE WITH TREESITTER JUMPS:
 -- Try: d then ]] — delete to a function boundary
 -- Try: y then [[ — yank to previous function
 -- Try: c then w — change to a word target
+--
+-- COMPOSABLE WITH TEXT OBJECTS (via infer fallthrough):
+-- Try: daf — delete around function (d reads "a", falls through, vim op-pending, af fires)
+-- Try: cif — change inside function body
+-- Try: yaa — yank around argument
+-- Try: dfn (quick) — delete function name (multi-char infer resolves "fn")
+-- Try: cfn (quick) — change function name
+--
+-- REPEAT MOTION KEY (dww):
+-- Try: dw — labels appear, press w again → deletes from cursor to end of word under cursor
+-- Try: yw — labels appear, press w again → yanks from cursor to end of word
+-- Try: cw — labels appear, press w again → changes from cursor to end of word
 
 local function format_item(item)
 	return string.format("%-20s qty:%-4d $%.2f", item.name, item.quantity, item.price)
