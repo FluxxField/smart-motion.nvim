@@ -16,6 +16,8 @@ One plugin replaces hop, leap, flash, and mini.jump - then goes further with tre
 
 ![SmartMotion in action](assets/smart-motion-showcase.gif)
 
+[Features](#-features) · [Quick Start](#-quick-start) · [Flow State](#-flow-state) · [Composable Operators](#-composable-operators---the-inference-system) · [What You Get](#-what-you-get) · [Pins](#-pins---quick-file-navigation) · [Multi-Window](#-multi-window-jumping) · [Operator-Pending](#️-operator-pending-mode) · [Motion History](#️-motion-history) · [Why SmartMotion?](#-why-smartmotion) · [Configuration](#️-configuration)
+
 ---
 
 ## ✨ Features
