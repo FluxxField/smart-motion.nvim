@@ -8,7 +8,7 @@
 /____/_/ /_/ /_/\__,_/_/   \__/__/  /_/\____/\__/_/\____/_/ /_(_)__/ /_/|___/_/_/ /_/ /_/
 ```
 
-A motion framework for Neovim. Enable a motion, enable an operator — they compose automatically.
+A motion framework for Neovim. Enable a motion, enable an operator. They compose automatically.
 
 ![SmartMotion in action](assets/smart-motion-showcase.gif)
 
@@ -48,9 +48,9 @@ presets = {
 
 ## What Happens When You Use It
 
-**Press `w`.** Labels appear on every word ahead of your cursor. Press a label — you're there. No counting, no guessing. You looked at the word, you pressed `w`, you pressed the label.
+**Press `w`.** Labels appear on every word ahead of your cursor. Press a label and you're there. No counting, no guessing. You looked at the word, you pressed `w`, you pressed the label.
 
-**Press `dw`.** Same labels appear. Press one — that word is deleted. Press `w` again instead (`dww`) — the word under your cursor is deleted. `yw`, `cw`, `pw` all work the same way.
+**Press `dw`.** Same labels appear. Press one and that word is deleted. Press `w` again instead (`dww`) and the word under your cursor is deleted. `yw`, `cw`, `pw` all work the same way.
 
 **That's the entire mental model.** Motion key shows targets. Label picks one. Operator + motion shows targets and acts on your pick.
 
@@ -58,9 +58,9 @@ presets = {
 
 ## Why This Is Different
 
-### Composable operators — zero explicit mappings
+### Composable operators with zero explicit mappings
 
-Enable `words` and `delete` as presets. Now `dw`, `db`, `de`, `dge` all work. Enable `search` — now `ds`, `dS`, `df`, `dt` work too. Enable `lines` — `dj`, `dk`. Every motion preset **multiplies** with every operator preset:
+Enable `words` and `delete` as presets. Now `dw`, `db`, `de`, `dge` all work. Enable `search` and `ds`, `dS`, `df`, `dt` work too. Enable `lines` and you get `dj`, `dk`. Every motion preset **multiplies** with every operator preset:
 
 ```
 11 composable motions  ×  5 operators  =  55+ compositions
@@ -69,9 +69,9 @@ Enable `words` and `delete` as presets. Now `dw`, `db`, `de`, `dge` all work. En
 
 Unknown keys fall through to native Vim. `d$`, `d0`, `dG` work exactly as expected.
 
-### Flow State — chain motions without labels
+### Flow State chains motions without labels
 
-Select a target, then press any motion key within 300ms — instant movement, no labels. Chain different motions: `w` → `j` → `b` → `w`, all without hints.
+Select a target, then press any motion key within 300ms for instant movement with no labels. Chain different motions: `w` → `j` → `b` → `w`, all without hints.
 
 **Hold `w`.** Labels flash once, then it moves word-by-word like native Vim. That's Flow State.
 
@@ -84,12 +84,12 @@ w  [labels]  f  → jump        (within 300ms)
 
 ### Text objects that work with any operator
 
-`af`, `if`, `ac`, `ic`, `aa`, `ia` are real text objects in operator-pending and visual mode. They work with everything — not just `d`/`y`/`c`:
+`af`, `if`, `ac`, `ic`, `aa`, `ia` are real text objects in operator-pending and visual mode. They work with everything, not just `d`/`y`/`c`:
 
 ```
-daf   — delete a function       gqaf  — format a function
-yaa   — yank an argument        =if   — indent a function body
-cic   — change inside a class   >ac   — indent a class
+daf   delete a function       gqaf  format a function
+yaa   yank an argument        =if   indent a function body
+cic   change inside a class   >ac   indent a class
 ```
 
 ### It's a framework, not just a plugin
@@ -115,7 +115,7 @@ Collector → Extractor → Modifier → Filter → Visualizer → Selection →
 ## All Presets
 
 <details>
-<summary><b>Words</b> — <code>w</code> <code>b</code> <code>e</code> <code>ge</code></summary>
+<summary><b>Words</b>: <code>w</code> <code>b</code> <code>e</code> <code>ge</code></summary>
 
 | Key  | Mode    | Description                          |
 |------|---------|--------------------------------------|
@@ -129,7 +129,7 @@ Works with any operator in operator-pending mode: `>w`, `gUw`, `=w`
 </details>
 
 <details>
-<summary><b>Lines</b> — <code>j</code> <code>k</code></summary>
+<summary><b>Lines</b>: <code>j</code> <code>k</code></summary>
 
 | Key | Mode    | Description                  |
 |-----|---------|------------------------------|
@@ -141,30 +141,30 @@ Works with any operator: `=j`, `gqj`, `>j`
 </details>
 
 <details>
-<summary><b>Search</b> — <code>s</code> <code>S</code> <code>f</code> <code>F</code> <code>t</code> <code>T</code> <code>;</code> <code>,</code> <code>gs</code></summary>
+<summary><b>Search</b>: <code>s</code> <code>S</code> <code>f</code> <code>F</code> <code>t</code> <code>T</code> <code>;</code> <code>,</code> <code>gs</code></summary>
 
 | Key  | Mode | Description                                          |
 |------|------|------------------------------------------------------|
 | `s`  | n, o | Live search with labels across all visible text      |
-| `S`  | n, o | Fuzzy search — type partial patterns to match words  |
+| `S`  | n, o | Fuzzy search: type partial patterns to match words   |
 | `f`  | n, o | 2-char find forward (inclusive, line-constrained)    |
 | `F`  | n, o | 2-char find backward (inclusive, line-constrained)   |
 | `t`  | n, o | 2-char till forward (exclusive, line-constrained)    |
 | `T`  | n, o | 2-char till backward (exclusive, line-constrained)   |
 | `;`  | n, v | Repeat last f/F/t/T (same direction)                 |
 | `,`  | n, v | Repeat last f/F/t/T (reversed direction)             |
-| `gs` | n    | Visual select — pick two targets, enter visual mode  |
+| `gs` | n    | Visual select: pick two targets, enter visual mode   |
 
 Multi-window: `s` and `S` show labels across all visible splits. Label conflict avoidance ensures labels can't be valid search continuations.
 
-`f`/`F`/`t`/`T` can be made multi-line or multi-window — see [Customizing Motions](#customizing-motions).
+`f`/`F`/`t`/`T` can be made multi-line or multi-window. See [Customizing Motions](#customizing-motions).
 
 </details>
 
 <details>
-<summary><b>Operators</b> — <code>d</code> <code>y</code> <code>c</code> <code>p</code> <code>P</code> + any motion</summary>
+<summary><b>Operators</b>: <code>d</code> <code>y</code> <code>c</code> <code>p</code> <code>P</code> + any motion</summary>
 
-Press an operator, then any motion key — labels appear, pick a target, action runs:
+Press an operator, then any motion key. Labels appear, pick a target, action runs:
 
 | Combo | What it does |
 |-------|-------------|
@@ -190,7 +190,7 @@ Repeat the motion key for the target under cursor: `dww` = delete this word, `yw
 </details>
 
 <details>
-<summary><b>Treesitter</b> — <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>]b</code> <code>[b</code> + text objects + <code>saa</code> <code>gS</code> <code>R</code></summary>
+<summary><b>Treesitter</b>: <code>]]</code> <code>[[</code> <code>]c</code> <code>[c</code> <code>]b</code> <code>[b</code> + text objects + <code>saa</code> <code>gS</code> <code>R</code></summary>
 
 **Navigation** (multi-window):
 
@@ -203,7 +203,7 @@ Repeat the motion key for the target under cursor: `dww` = delete this word, `yw
 | `]b`  | n, o    | Jump to next block/scope             |
 | `[b`  | n, o    | Jump to previous block/scope         |
 
-**Text objects** (work with ANY operator — `daf`, `gqaf`, `=if`, `>ac`):
+**Text objects** (work with ANY operator: `daf`, `gqaf`, `=if`, `>ac`):
 
 | Key   | Mode    | Description                          |
 |-------|---------|--------------------------------------|
@@ -228,7 +228,7 @@ Works across Lua, Python, JavaScript, TypeScript, Rust, Go, C, C++, Java, C#, Ru
 </details>
 
 <details>
-<summary><b>Diagnostics</b> — <code>]d</code> <code>[d</code> <code>]e</code> <code>[e</code></summary>
+<summary><b>Diagnostics</b>: <code>]d</code> <code>[d</code> <code>]e</code> <code>[e</code></summary>
 
 | Key  | Mode | Description                         |
 |------|------|-------------------------------------|
@@ -242,7 +242,7 @@ Multi-window. Works with operators: `d]d`, `y]e`
 </details>
 
 <details>
-<summary><b>Git</b> — <code>]g</code> <code>[g</code></summary>
+<summary><b>Git</b>: <code>]g</code> <code>[g</code></summary>
 
 | Key  | Mode | Description                              |
 |------|------|------------------------------------------|
@@ -254,7 +254,7 @@ Works best with [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim). Mul
 </details>
 
 <details>
-<summary><b>Quickfix</b> — <code>]q</code> <code>[q</code> <code>]l</code> <code>[l</code></summary>
+<summary><b>Quickfix</b>: <code>]q</code> <code>[q</code> <code>]l</code> <code>[l</code></summary>
 
 | Key  | Mode | Description                              |
 |------|------|------------------------------------------|
@@ -266,7 +266,7 @@ Works best with [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim). Mul
 </details>
 
 <details>
-<summary><b>Marks</b> — <code>g'</code> <code>gm</code></summary>
+<summary><b>Marks</b>: <code>g'</code> <code>gm</code></summary>
 
 | Key  | Mode | Description                                        |
 |------|------|----------------------------------------------------|
@@ -276,7 +276,7 @@ Works best with [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim). Mul
 </details>
 
 <details>
-<summary><b>Misc</b> — repeat, history, pins, global pins, multi-cursor</summary>
+<summary><b>Misc</b>: repeat, history, pins, global pins, multi-cursor</summary>
 
 | Key          | Mode | Description                                          |
 |--------------|------|------------------------------------------------------|
@@ -288,8 +288,8 @@ Works best with [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim). Mul
 | `gp1`-`gp9` | n    | Set pin at specific slot                             |
 | `gP`         | n    | Toggle global pin (cross-project, prompts A-Z)       |
 | `gA`-`gZ`   | n    | Jump to global pin (works from any project)          |
-| `gmd`        | n    | Multi-cursor delete — toggle-select, Enter to delete |
-| `gmy`        | n    | Multi-cursor yank — toggle-select, Enter to yank     |
+| `gmd`        | n    | Multi-cursor delete: toggle-select, Enter to delete  |
+| `gmy`        | n    | Multi-cursor yank: toggle-select, Enter to yank      |
 
 **Pins workflow:** `gp` at main file → `gp` at test file → `gp` at config → now `g1` = main, `g2` = tests, `g3` = config.
 
@@ -343,7 +343,7 @@ presets = {
 }
 ```
 
-You can override any motion property — `extractor`, `filter`, `visualizer`, `action`, `modes`, etc.
+You can override any motion property: `extractor`, `filter`, `visualizer`, `action`, `modes`, etc.
 
 ---
 
@@ -394,11 +394,11 @@ One plugin, one config. Your pins know about your history. Your text objects wor
 
 ### When to choose something else
 
-**[leap.nvim](https://github.com/ggandor/leap.nvim)** — The 2-character search UX is beautifully refined. If that's your primary motion pattern, leap's polish is hard to beat.
+**[leap.nvim](https://github.com/ggandor/leap.nvim)**: The 2-character search UX is beautifully refined. If that's your primary motion pattern, leap's polish is hard to beat.
 
-**[flash.nvim](https://github.com/folke/flash.nvim)** — The most feature-complete alternative. Excellent treesitter integration, large community. If you're happy with flash, it's a great plugin.
+**[flash.nvim](https://github.com/folke/flash.nvim)**: The most feature-complete alternative. Excellent treesitter integration, large community. If you're happy with flash, it's a great plugin.
 
-**[hop.nvim](https://github.com/phaazon/hop.nvim)** — Simpler and battle-tested. If you just need word/line jumping with hints, hop does its job with less surface area.
+**[hop.nvim](https://github.com/phaazon/hop.nvim)**: Simpler and battle-tested. If you just need word/line jumping with hints, hop does its job with less surface area.
 
 SmartMotion wouldn't exist without these plugins. See [Why SmartMotion](https://github.com/FluxxField/smart-motion.nvim/wiki/Why-SmartMotion) for the full story.
 
@@ -408,8 +408,8 @@ SmartMotion wouldn't exist without these plugins. See [Why SmartMotion](https://
 
 ```lua
 {
-  keys = "fjdksleirughtynm",        -- label characters (home row first)
-  flow_state_timeout_ms = 300,       -- chaining window (0 to disable)
+  keys = "fjdksleirughtynm",        -- label characters, home row first
+  flow_state_timeout_ms = 300,       -- chaining window, 0 to disable
   disable_dim_background = false,    -- dim non-target text
   auto_select_target = false,        -- auto-jump on single target
   native_search = true,              -- labels during / search
@@ -424,12 +424,12 @@ See [Configuration](https://github.com/FluxxField/smart-motion.nvim/wiki/Configu
 
 ## Documentation
 
-- [Presets Guide](https://github.com/FluxxField/smart-motion.nvim/wiki/Presets) — every preset explained in detail
-- [Advanced Features](https://github.com/FluxxField/smart-motion.nvim/wiki/Advanced-Features) — flow state, operator-pending, multi-window, history browser
-- [Building Custom Motions](https://github.com/FluxxField/smart-motion.nvim/wiki/Building-Custom-Motions) — create your own with the pipeline API
-- [Pipeline Architecture](https://github.com/FluxxField/smart-motion.nvim/wiki/Pipeline-Architecture) — how the framework works internally
-- [API Reference](https://github.com/FluxxField/smart-motion.nvim/wiki/API-Reference) — full module and motion_state reference
-- [Configuration](https://github.com/FluxxField/smart-motion.nvim/wiki/Configuration) — all settings
+- [Presets Guide](https://github.com/FluxxField/smart-motion.nvim/wiki/Presets): every preset explained in detail
+- [Advanced Features](https://github.com/FluxxField/smart-motion.nvim/wiki/Advanced-Features): flow state, operator-pending, multi-window, history browser
+- [Building Custom Motions](https://github.com/FluxxField/smart-motion.nvim/wiki/Building-Custom-Motions): create your own with the pipeline API
+- [Pipeline Architecture](https://github.com/FluxxField/smart-motion.nvim/wiki/Pipeline-Architecture): how the framework works internally
+- [API Reference](https://github.com/FluxxField/smart-motion.nvim/wiki/API-Reference): full module and motion_state reference
+- [Configuration](https://github.com/FluxxField/smart-motion.nvim/wiki/Configuration): all settings
 
 ---
 
