@@ -1,5 +1,7 @@
 # Building Custom Motions
 
+> **Want to tweak an existing motion instead of building from scratch?** Start with the [Recipes](Recipes.md) guide for practical examples like making `f` single-char, words bidirectional, or search line-constrained.
+
 This is where SmartMotion becomes yours.
 
 Every built-in motion uses the same system you're about to learn. There's no magic, no internal APIs. Just a pipeline you can configure however you want.
@@ -601,6 +603,10 @@ Now `ghw`, `ghj`, `ghs` etc. all work automatically.
 ---
 
 ## Next Steps
+
+→ **[Recipes](Recipes.md)**: Practical examples for customizing built-in motions
+
+→ **[Advanced Recipes](Advanced-Recipes.md)**: Treesitter motions, text objects, composable operators
 
 → **[Pipeline Architecture](Pipeline-Architecture.md)**: Deep dive into each pipeline stage
 

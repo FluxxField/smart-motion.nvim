@@ -15,7 +15,7 @@ Let's start with `w` (jump to the next word) and transform it, one piece at a ti
 ### Starting point: forward word jump
 
 ```lua
-require("smart-motion").motions.register("gw", {
+require("smart-motion").register_motion("gw", {
     collector = "lines",
     extractor = "words",
     filter = "filter_words_after_cursor",
@@ -34,7 +34,7 @@ This collects visible lines, extracts word boundaries, filters to only those aft
 ### Step 1: Swap the filter -- you just built `b`
 
 ```lua
-require("smart-motion").motions.register("gb", {
+require("smart-motion").register_motion("gb", {
     collector = "lines",
     extractor = "words",
     filter = "filter_words_before_cursor",  -- <- changed
@@ -53,7 +53,7 @@ One filter change. Everything else is identical. Forward became backward.
 ### Step 2: Swap the filter again -- bidirectional
 
 ```lua
-require("smart-motion").motions.register("gw", {
+require("smart-motion").register_motion("gw", {
     collector = "lines",
     extractor = "words",
     filter = "filter_words_around_cursor",  -- <- changed
@@ -72,7 +72,7 @@ Now labels appear on words both above and below the cursor.
 ### Step 3: Swap the extractor -- you just built `j`
 
 ```lua
-require("smart-motion").motions.register("gj", {
+require("smart-motion").register_motion("gj", {
     collector = "lines",
     extractor = "lines",                     -- <- changed
     filter = "filter_lines_after_cursor",    -- <- changed
@@ -91,7 +91,7 @@ Swap `words` for `lines` in the extractor, match the filter to line-based, and y
 ### Step 4: Swap the action -- now it deletes
 
 ```lua
-require("smart-motion").motions.register("gd", {
+require("smart-motion").register_motion("gd", {
     collector = "lines",
     extractor = "words",
     filter = "filter_words_after_cursor",
@@ -110,7 +110,7 @@ Same targets, same labels. But instead of jumping, it deletes from cursor to the
 ### Step 5: Swap the extractor to live search -- search-and-destroy
 
 ```lua
-require("smart-motion").motions.register("gx", {
+require("smart-motion").register_motion("gx", {
     collector = "lines",
     extractor = "live_search",               -- <- changed
     filter = "filter_visible",               -- <- changed
@@ -129,7 +129,7 @@ Type characters to narrow down matches, then pick a label to delete from cursor 
 ### Step 6: Add multi-window -- cross-window search-and-destroy
 
 ```lua
-require("smart-motion").motions.register("gx", {
+require("smart-motion").register_motion("gx", {
     collector = "lines",
     extractor = "live_search",
     filter = "filter_visible",
@@ -183,7 +183,7 @@ This keeps the default `w` config but overrides its filter to be bidirectional. 
 Use `register_motion` after setup for completely custom motions:
 
 ```lua
-require("smart-motion").motions.register("gw", {
+require("smart-motion").register_motion("gw", {
     collector = "lines",
     extractor = "words",
     filter = "filter_words_around_cursor",
@@ -401,19 +401,23 @@ presets = {
     words = {
         w = {
             metadata = {
-                word_pattern = [[\v(\u\l+|\l+|\u+|\d+)]],
+                motion_state = {
+                    word_pattern = [[\v(\u\l+|\l+|\u+|\d+)]],
+                },
             },
         },
         b = {
             metadata = {
-                word_pattern = [[\v(\u\l+|\l+|\u+|\d+)]],
+                motion_state = {
+                    word_pattern = [[\v(\u\l+|\l+|\u+|\d+)]],
+                },
             },
         },
     },
 }
 ```
 
-**What changed:** The `word_pattern` metadata tells the `words` extractor to use a custom regex. This pattern splits `camelCaseWord` into `camel`, `Case`, and `Word` as separate targets.
+**What changed:** The `motion_state.word_pattern` metadata tells the `words` extractor to use a custom regex. This pattern splits `camelCaseWord` into `camel`, `Case`, and `Word` as separate targets.
 
 ### Bidirectional words
 
@@ -578,7 +582,7 @@ Swap the action from `jump` to `jump_centered`:
 
 ```lua
 -- Example: a custom motion that centers after jumping
-require("smart-motion").motions.register("gw", {
+require("smart-motion").register_motion("gw", {
     collector = "lines",
     extractor = "words",
     filter = "filter_words_after_cursor",

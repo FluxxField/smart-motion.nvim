@@ -2,6 +2,8 @@
 
 SmartMotion ships with **13 presets** containing **140+ keybindings**. Each preset is a logical group of related motions. Enable what you need, disable what you don't.
 
+> **Every preset can be customized.** Want to make `f` single-char? Words bidirectional? Search line-constrained? See the [Recipes](Recipes.md) guide for practical examples.
+
 ---
 
 ## Quick Reference

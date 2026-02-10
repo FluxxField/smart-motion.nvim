@@ -152,6 +152,8 @@ require("smart-motion").map_motion("w")
 
 See **[Presets Guide](Presets.md)** for complete preset documentation.
 
+For practical examples of what you can customize (multiline f, single-char find, camelCase words, and more), see the **[Recipes](Recipes.md)** guide.
+
 ---
 
 ## Highlights
