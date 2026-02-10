@@ -162,6 +162,10 @@ The possibilities are endless because **you control every stage**.
 - **[Presets Guide](Presets.md)**: All 13 presets and 140+ keybindings
 - **[Advanced Features](Advanced-Features.md)**: Flow state, multi-window, operator-pending mode
 
+### Customizing
+- **[Recipes](Recipes.md)**: Practical examples for customizing built-in motions
+- **[Advanced Recipes](Advanced-Recipes.md)**: Treesitter motions, text objects, composable operators
+
 ### Building Your Own
 - **[Build Your Own Motions](Building-Custom-Motions.md)**: Create custom motions in minutes
 - **[Pipeline Architecture](Pipeline-Architecture.md)**: Deep dive into collectors, extractors, filters, and more
