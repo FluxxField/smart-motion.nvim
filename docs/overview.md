@@ -10,9 +10,10 @@
 - **[Home](Home.md)**: Overview and introduction
 - **[Why SmartMotion?](Why-SmartMotion.md)**: Philosophy and comparison with alternatives
 - **[Quick Start](Quick-Start.md)**: Install and configure in 60 seconds
+- **[Migration Guide](Migration.md)**: Coming from flash, leap, hop, or mini.jump
 
 ### Using SmartMotion
-- **[Presets](Presets.md)**: All 13 presets and 59+ keybindings explained
+- **[Presets](Presets.md)**: All 13 presets and 140+ keybindings
 - **[Advanced Features](Advanced-Features.md)**: Flow state, multi-window, operator-pending mode
 
 ### Building Your Own

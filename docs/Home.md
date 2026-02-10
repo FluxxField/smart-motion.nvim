@@ -1,6 +1,6 @@
 # SmartMotion.nvim
 
-> **The last motion plugin you'll ever need, and the first motion *framework* for Neovim.**
+> A motion framework for Neovim. Enable a motion, enable an operator. They compose automatically.
 
 ---
 
@@ -12,7 +12,7 @@ Other motion plugins give you a fixed set of features. SmartMotion gives you a *
 Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action
 ```
 
-This isn't just a plugin. It's a **framework**. The 59+ built-in keybindings? They're all built on the same system you can use to create your own.
+This isn't just a plugin. It's a **framework**. The 140+ built-in keybindings? They're all built on the same system you can use to create your own.
 
 ---
 
@@ -90,13 +90,13 @@ Search, treesitter, and diagnostic motions show labels across **all visible spli
       git = true,          -- ]g, [g
       quickfix = true,     -- ]q, [q, ]l, [l
       marks = true,        -- g', gm
-      misc = true,         -- . (repeat), gmd, gmy
+      misc = true,         -- . g. g1-g9 gp gP gA-gZ gmd gmy (repeat, history, pins, multi-cursor)
     },
   },
 }
 ```
 
-That's it. You now have 59+ motions that work together seamlessly.
+That's it. You now have 140+ motions that work together seamlessly.
 
 ---
 
@@ -156,9 +156,10 @@ The possibilities are endless because **you control every stage**.
 ### Getting Started
 - **[Quick Start](Quick-Start.md)**: Install and configure in 60 seconds
 - **[Why SmartMotion?](Why-SmartMotion.md)**: Philosophy and comparison with alternatives
+- **[Migration Guide](Migration.md)**: Coming from flash, leap, hop, or mini.jump
 
 ### Using SmartMotion
-- **[Presets Guide](Presets.md)**: All 13 presets and 59+ keybindings explained
+- **[Presets Guide](Presets.md)**: All 13 presets and 140+ keybindings
 - **[Advanced Features](Advanced-Features.md)**: Flow state, multi-window, operator-pending mode
 
 ### Building Your Own

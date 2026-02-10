@@ -311,6 +311,8 @@ SmartMotion shines when you want **power and extensibility**: composable operato
 
 → **[Quick Start](Quick-Start.md)**: Get running in 60 seconds
 
-→ **[Presets Guide](Presets.md)**: See all 100+ built-in keybindings
+→ **[Migration Guide](Migration.md)**: Switching from flash, leap, hop, or mini.jump
+
+→ **[Presets Guide](Presets.md)**: See all 140+ built-in keybindings
 
 → **[Build Your Own](Building-Custom-Motions.md)**: Create your first custom motion

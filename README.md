@@ -29,7 +29,7 @@ A motion framework for Neovim. Enable a motion, enable an operator. They compose
       change = true,       -- c + any motion
       treesitter = true,   -- ]], [[, af, if, ac, ic, aa, ia, fn, saa, gS, R
       diagnostics = true,  -- ]d, [d, ]e, [e
-      misc = true,         -- . g. g0 g1-g9 gp (repeat, history, pins)
+      misc = true,         -- . g. g1-g9 gp gP gA-gZ gmd gmy (repeat, history, pins, multi-cursor)
     },
   },
 }
@@ -425,6 +425,7 @@ See [Configuration](https://github.com/FluxxField/smart-motion.nvim/wiki/Configu
 ## Documentation
 
 - [Presets Guide](https://github.com/FluxxField/smart-motion.nvim/wiki/Presets): every preset explained in detail
+- [Migration Guide](https://github.com/FluxxField/smart-motion.nvim/wiki/Migration): coming from flash, leap, hop, or mini.jump
 - [Advanced Features](https://github.com/FluxxField/smart-motion.nvim/wiki/Advanced-Features): flow state, operator-pending, multi-window, history browser
 - [Building Custom Motions](https://github.com/FluxxField/smart-motion.nvim/wiki/Building-Custom-Motions): create your own with the pipeline API
 - [Pipeline Architecture](https://github.com/FluxxField/smart-motion.nvim/wiki/Pipeline-Architecture): how the framework works internally

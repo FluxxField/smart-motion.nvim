@@ -1,6 +1,6 @@
 # Presets Guide
 
-SmartMotion ships with **13 presets** containing **100+ keybindings**. Each preset is a logical group of related motions. Enable what you need, disable what you don't.
+SmartMotion ships with **13 presets** containing **140+ keybindings**. Each preset is a logical group of related motions. Enable what you need, disable what you don't.
 
 ---
 

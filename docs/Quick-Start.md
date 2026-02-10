@@ -86,7 +86,7 @@ With cursor in a function call, press `daa` → labels appear on arguments → s
 
 ## What You Just Got
 
-With all presets enabled, you have **59+ keybindings**:
+With all presets enabled, you have **140+ keybindings**:
 
 | Preset | Keys |
 |--------|------|
@@ -102,7 +102,7 @@ With all presets enabled, you have **59+ keybindings**:
 | **git** | `]g` `[g` |
 | **quickfix** | `]q` `[q` `]l` `[l` |
 | **marks** | `g'` `gm` |
-| **misc** | `.` `g.` `gp` `gmd` `gmy` |
+| **misc** | `.` `g.` `g0` `g1`-`g9` `gp` `gp1`-`gp9` `gP` `gA`-`gZ` `gmd` `gmy` |
 
 → See **[Presets Guide](Presets.md)** for detailed explanations of each.
 
