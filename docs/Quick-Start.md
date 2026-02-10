@@ -86,7 +86,7 @@ With cursor in a function call, press `daa` → labels appear on arguments → s
 
 ## What You Just Got
 
-With all presets enabled, you have **59+ keybindings**:
+With all presets enabled, you have **140+ keybindings**:
 
 | Preset | Keys |
 |--------|------|
@@ -102,7 +102,7 @@ With all presets enabled, you have **59+ keybindings**:
 | **git** | `]g` `[g` |
 | **quickfix** | `]q` `[q` `]l` `[l` |
 | **marks** | `g'` `gm` |
-| **misc** | `.` `g.` `gp` `gmd` `gmy` |
+| **misc** | `.` `g.` `g0` `g1`-`g9` `gp` `gp1`-`gp9` `gP` `gA`-`gZ` `gmd` `gmy` |
 
 → See **[Presets Guide](Presets.md)** for detailed explanations of each.
 
@@ -189,13 +189,13 @@ opts = {
 You're ready to use SmartMotion. Here's where to go next:
 
 ### Learn the Keybindings
-→ **[Presets Guide](Presets.md)** — Every preset explained with examples
+→ **[Presets Guide](Presets.md)**: Every preset explained with examples
 
 ### Understand the Power
-→ **[Advanced Features](Advanced-Features.md)** — Flow state, multi-window, operator-pending mode
+→ **[Advanced Features](Advanced-Features.md)**: Flow state, multi-window, operator-pending mode
 
 ### Build Your Own
-→ **[Build Your Own Motions](Building-Custom-Motions.md)** — Create custom motions in minutes
+→ **[Build Your Own Motions](Building-Custom-Motions.md)**: Create custom motions in minutes
 
 ### Configure Everything
-→ **[Configuration](Configuration.md)** — All options explained
+→ **[Configuration](Configuration.md)**: All options explained

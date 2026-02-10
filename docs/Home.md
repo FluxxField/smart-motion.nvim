@@ -1,6 +1,6 @@
 # SmartMotion.nvim
 
-> **The last motion plugin you'll ever need — and the first motion *framework* for Neovim.**
+> A motion framework for Neovim. Enable a motion, enable an operator. They compose automatically.
 
 ---
 
@@ -12,13 +12,13 @@ Other motion plugins give you a fixed set of features. SmartMotion gives you a *
 Collector → Extractor → Modifier → Filter → Visualizer → Selection → Action
 ```
 
-This isn't just a plugin. It's a **framework**. The 59+ built-in keybindings? They're all built on the same system you can use to create your own.
+This isn't just a plugin. It's a **framework**. The 140+ built-in keybindings? They're all built on the same system you can use to create your own.
 
 ---
 
 ## One Plugin to Replace Them All
 
-SmartMotion unifies the best ideas from hop, leap, flash, and mini.jump — then goes further:
+SmartMotion unifies the best ideas from hop, leap, flash, and mini.jump, then goes further:
 
 | Feature | hop | leap | flash | SmartMotion |
 |---------|-----|------|-------|-------------|
@@ -37,7 +37,7 @@ SmartMotion unifies the best ideas from hop, leap, flash, and mini.jump — then
 | **Extensible pipeline** | | | | ✓ |
 | **Build your own motions** | | | | ✓ |
 
-The difference isn't just features — it's **architecture**. SmartMotion is designed from the ground up to be extended.
+The difference isn't just features, it's **architecture**. SmartMotion is designed from the ground up to be extended.
 
 ---
 
@@ -52,17 +52,17 @@ Press `d` → press `w` → labels appear → select target → text deleted fro
 Works with `y` (yank), `c` (change), `p` (paste). Chain any operator with any motion.
 
 ### Treesitter-Aware Editing
-- `]]` / `[[` — jump to functions
-- `]c` / `[c` — jump to classes
-- `daf` — delete around function (text object + operator)
-- `cfn` — change function name (instant rename via multi-char infer)
-- `yaa` — yank around argument (with separator awareness)
-- `saa` — swap two arguments
+- `]]` / `[[` - jump to functions
+- `]c` / `[c` - jump to classes
+- `daf` - delete around function (text object + operator)
+- `cfn` - change function name (instant rename via multi-char infer)
+- `yaa` - yank around argument (with separator awareness)
+- `saa` - swap two arguments
 
 ### Search That Actually Works
-- `s` — live search with labels as you type
-- `S` — fuzzy search (type "fn" to match "function")
-- `/` — native search with label overlay
+- `s` - live search with labels as you type
+- `S` - fuzzy search (type "fn" to match "function")
+- `/` - native search with label overlay
 - Label conflict avoidance means labels never interfere with your search
 
 ### Multi-Window
@@ -90,13 +90,13 @@ Search, treesitter, and diagnostic motions show labels across **all visible spli
       git = true,          -- ]g, [g
       quickfix = true,     -- ]q, [q, ]l, [l
       marks = true,        -- g', gm
-      misc = true,         -- . (repeat), gmd, gmy
+      misc = true,         -- . g. g1-g9 gp gP gA-gZ gmd gmy (repeat, history, pins, multi-cursor)
     },
   },
 }
 ```
 
-That's it. You now have 59+ motions that work together seamlessly.
+That's it. You now have 140+ motions that work together seamlessly.
 
 ---
 
@@ -154,21 +154,22 @@ The possibilities are endless because **you control every stage**.
 ## Documentation
 
 ### Getting Started
-- **[Quick Start](Quick-Start.md)** — Install and configure in 60 seconds
-- **[Why SmartMotion?](Why-SmartMotion.md)** — Philosophy and comparison with alternatives
+- **[Quick Start](Quick-Start.md)**: Install and configure in 60 seconds
+- **[Why SmartMotion?](Why-SmartMotion.md)**: Philosophy and comparison with alternatives
+- **[Migration Guide](Migration.md)**: Coming from flash, leap, hop, or mini.jump
 
 ### Using SmartMotion
-- **[Presets Guide](Presets.md)** — All 13 presets and 59+ keybindings explained
-- **[Advanced Features](Advanced-Features.md)** — Flow state, multi-window, operator-pending mode
+- **[Presets Guide](Presets.md)**: All 13 presets and 140+ keybindings
+- **[Advanced Features](Advanced-Features.md)**: Flow state, multi-window, operator-pending mode
 
 ### Building Your Own
-- **[Build Your Own Motions](Building-Custom-Motions.md)** — Create custom motions in minutes
-- **[Pipeline Architecture](Pipeline-Architecture.md)** — Deep dive into collectors, extractors, filters, and more
+- **[Build Your Own Motions](Building-Custom-Motions.md)**: Create custom motions in minutes
+- **[Pipeline Architecture](Pipeline-Architecture.md)**: Deep dive into collectors, extractors, filters, and more
 
 ### Reference
-- **[Configuration](Configuration.md)** — All options explained
-- **[API Reference](API-Reference.md)** — Complete module and motion_state reference
-- **[Debugging](Debugging.md)** — Tips for troubleshooting
+- **[Configuration](Configuration.md)**: All options explained
+- **[API Reference](API-Reference.md)**: Complete module and motion_state reference
+- **[Debugging](Debugging.md)**: Tips for troubleshooting
 
 ---
 
@@ -176,11 +177,11 @@ The possibilities are endless because **you control every stage**.
 
 SmartMotion is built on three principles:
 
-1. **Composability** — Every piece should work with every other piece. Operators compose with motions. Actions compose with each other. Modules compose into pipelines.
+1. **Composability.** Every piece should work with every other piece. Operators compose with motions. Actions compose with each other. Modules compose into pipelines.
 
-2. **Extensibility** — The architecture that powers built-in motions is the same architecture available to you. No hidden magic.
+2. **Extensibility.** The architecture that powers built-in motions is the same architecture available to you. No hidden magic.
 
-3. **Native Feel** — Motions should feel like Vim, not fight against it. Operator-pending mode works. Repeat with `.` works. Flow state makes chaining feel instant.
+3. **Native Feel.** Motions should feel like Vim, not fight against it. Operator-pending mode works. Repeat with `.` works. Flow state makes chaining feel instant.
 
 ---
 

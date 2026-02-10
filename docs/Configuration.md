@@ -29,7 +29,7 @@ Complete guide to configuring SmartMotion.
   -- Enable/disable preset groups
   presets = {},
 
-  -- Flow state timeout (ms) - how long to stay in "flow" between motions
+  -- Flow state timeout (ms): how long to stay in "flow" between motions
   flow_state_timeout_ms = 300,
 
   -- Disable dimming of non-target text
@@ -44,7 +44,7 @@ Complete guide to configuring SmartMotion.
   -- Show labels during native / search (toggle with <C-s>)
   native_search = true,
 
-  -- How count prefix interacts with motions (j/k): "target" or "native"
+  -- How count prefix interacts with motions (j/k), "target" or "native"
   count_behavior = "target",
 }
 ```
@@ -100,12 +100,12 @@ presets = {
   yank = true,         -- y, yt, yT, ryw, ryl
   change = true,       -- c, ct, cT
   paste = true,        -- p, P
-  treesitter = true,   -- ]], [[, ]c, [c, ]b, [b, daa, caa, yaa, dfn, cfn, yfn, saa, gS, R
+  treesitter = true,   -- ]], [[, ]c, [c, ]b, [b, af, if, ac, ic, aa, ia, fn, saa, gS, R
   diagnostics = true,  -- ]d, [d, ]e, [e
   git = true,          -- ]g, [g
   quickfix = true,     -- ]q, [q, ]l, [l
   marks = true,        -- g', gm
-  misc = true,         -- . (repeat), gmd, gmy
+  misc = true,         -- . g. g0 g1-g9 gp gP gA-gZ gmd gmy (repeat, history, pins, global pins)
 }
 ```
 
@@ -216,7 +216,7 @@ flow_state_timeout_ms = 300  -- default
 **How it works:**
 1. Trigger a motion, select a target
 2. Within timeout, press another motion key
-3. Labels appear instantly — you're in flow
+3. Labels appear instantly, you're in flow
 
 **Adjust timing:**
 ```lua
@@ -270,7 +270,7 @@ Control what happens when a count precedes a motion like `j` or `k`:
 count_behavior = "target"  -- default
 ```
 
-**`"target"` (default):** The count selects the Nth target directly — no labels shown, instant jump. `5j` jumps to the 5th line target below the cursor. If the count exceeds available targets, it clamps to the last one.
+**`"target"` (default):** The count selects the Nth target directly: no labels shown, instant jump. `5j` jumps to the 5th line target below the cursor. If the count exceeds available targets, it clamps to the last one.
 
 **`"native"`:** The count bypasses SmartMotion entirely and feeds the native vim motion. `5j` moves 5 lines down, exactly like vanilla vim.
 
@@ -307,7 +307,7 @@ history_max_size = 50  -- keep more history
 history_max_size = 0   -- effectively disables persistence
 ```
 
-Controls how many entries are stored for both `.` (repeat) and `g.` (history browser). History persists across Neovim sessions — stored per-project in `~/.local/share/nvim/smart-motion/history/`. Entries older than 30 days or pointing to deleted files are automatically pruned.
+Controls how many entries are stored for both `.` (repeat) and `g.` (history browser). History persists across Neovim sessions, stored per-project in `~/.local/share/nvim/smart-motion/history/`. Entries older than 30 days or pointing to deleted files are automatically pruned.
 
 See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)** for full details.
 
@@ -412,8 +412,8 @@ For more control, use a config function:
 
 ## Next Steps
 
-→ **[Presets Guide](Presets.md)** — All presets explained
+→ **[Presets Guide](Presets.md)**: All presets explained
 
-→ **[Building Custom Motions](Building-Custom-Motions.md)** — Create your own
+→ **[Building Custom Motions](Building-Custom-Motions.md)**: Create your own
 
-→ **[Advanced Features](Advanced-Features.md)** — Flow state, multi-window, more
+→ **[Advanced Features](Advanced-Features.md)**: Flow state, multi-window, more

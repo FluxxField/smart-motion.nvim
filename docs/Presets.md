@@ -1,6 +1,6 @@
 # Presets Guide
 
-SmartMotion ships with **13 presets** containing **100+ keybindings**. Each preset is a logical group of related motions. Enable what you need, disable what you don't.
+SmartMotion ships with **13 presets** containing **140+ keybindings**. Each preset is a logical group of related motions. Enable what you need, disable what you don't.
 
 ---
 
@@ -42,8 +42,8 @@ Press w → labels appear on all words ahead → press 'f' → cursor jumps to t
 
 **Works with operators:**
 ```
->w    — indent from cursor to labeled word
-gUw   — uppercase from cursor to labeled word
+>w     indent from cursor to labeled word
+gUw    uppercase from cursor to labeled word
 ```
 
 ---
@@ -64,14 +64,14 @@ Press j → labels appear on lines below → press 'a' → cursor jumps to that 
 
 **Works with operators:**
 ```
-=j    — auto-indent from cursor to labeled line
-gqj   — format from cursor to labeled line
+=j     auto-indent from cursor to labeled line
+gqj    format from cursor to labeled line
 ```
 
 **Count prefix support:**
 ```
-5j    — jumps to the 5th line target below (no labels shown)
-3k    — jumps to the 3rd line target above
+5j     jumps to the 5th line target below (no labels shown)
+3k     jumps to the 3rd line target above
 ```
 
 When a count precedes `j` or `k`, SmartMotion skips the label step and auto-selects the Nth target. This can be changed to native vim behavior via `count_behavior = "native"` in config. See **[Configuration](Configuration.md#count-behavior)**.
@@ -84,15 +84,15 @@ Powerful search with multiple modes.
 
 | Key | Modes | Multi-window | What it does |
 |-----|-------|--------------|--------------|
-| `s` | n, o | Yes | **Live search** — labels update as you type |
-| `S` | n, o | Yes | **Fuzzy search** — type "fn" to match "function" |
+| `s` | n, o | Yes | **Live search**: labels update as you type |
+| `S` | n, o | Yes | **Fuzzy search**: type "fn" to match "function" |
 | `f` | n, o | Yes | **2-char find** forward (like leap) |
 | `F` | n, o | Yes | **2-char find** backward |
 | `t` | n, o | Yes | **Till** character forward (cursor lands before match) |
 | `T` | n, o | Yes | **Till** character backward (cursor lands after match) |
 | `;` | n, v | Yes | **Repeat** last f/F/t/T (same direction) |
 | `,` | n, v | Yes | **Repeat** last f/F/t/T (reversed direction) |
-| `gs` | n | Yes | **Visual select** — pick two targets, enter visual mode |
+| `gs` | n | Yes | **Visual select**: pick two targets, enter visual mode |
 
 ### Live Search (`s`)
 
@@ -134,7 +134,7 @@ Great for selecting arbitrary ranges without counting.
 
 ### Label Conflict Avoidance
 
-When searching, labels are chosen to avoid ambiguity. If you're searching for "fu" and there's a match followed by "n", the label won't be "n" — because that could be continuing your search.
+When searching, labels are chosen to avoid ambiguity. If you're searching for "fu" and there's a match followed by "n", the label won't be "n", because that could be continuing your search.
 
 ---
 
@@ -144,11 +144,11 @@ Delete operations with visual feedback.
 
 | Key | Modes | What it does |
 |-----|-------|--------------|
-| `d` | n | **Composable delete** — press `d` then any composable motion (jumps to target, deletes) |
+| `d` | n | **Composable delete**: press `d` then any composable motion (jumps to target, deletes) |
 | `dt` | n | Delete from cursor **until** character (forward) |
 | `dT` | n | Delete from cursor **until** character (backward) |
-| `rdw` | n | **Remote delete word** — delete a word without moving cursor |
-| `rdl` | n | **Remote delete line** — delete a line without moving cursor |
+| `rdw` | n | **Remote delete word**: delete a word without moving cursor |
+| `rdl` | n | **Remote delete line**: delete a line without moving cursor |
 
 ### Composable Delete (`d`)
 
@@ -165,9 +165,9 @@ Works with ANY composable SmartMotion motion (`w`, `b`, `e`, `j`, `k`, `s`, `S`,
 When labels appear, pressing the motion key **again** acts on the target under your cursor:
 
 ```
-dww   — delete the word under the cursor (repeat 'w')
-djj   — delete to the current line target (repeat 'j')
-d]]]] — delete to the function at cursor (repeat ']]')
+dww    delete the word under the cursor (repeat 'w')
+djj    delete to the current line target (repeat 'j')
+d]]]]  delete to the function at cursor (repeat ']]')
 ```
 
 This gives you the best of both worlds: `dw` shows labels so you can pick any target, but `dww` is a fast shortcut for the common case of acting right where you are. The motion key is excluded from the label pool so there's never ambiguity.
@@ -197,11 +197,11 @@ Yank (copy) operations.
 
 | Key | Modes | What it does |
 |-----|-------|--------------|
-| `y` | n | **Composable yank** — press `y` then any composable motion (jumps to target, yanks) |
+| `y` | n | **Composable yank**: press `y` then any composable motion (jumps to target, yanks) |
 | `yt` | n | Yank from cursor **until** character (forward) |
 | `yT` | n | Yank from cursor **until** character (backward) |
-| `ryw` | n | **Remote yank word** — yank a word without moving cursor |
-| `ryl` | n | **Remote yank line** — yank a line without moving cursor |
+| `ryw` | n | **Remote yank word**: yank a word without moving cursor |
+| `ryl` | n | **Remote yank line**: yank a line without moving cursor |
 
 Same patterns as delete, but yanks to register instead. Cursor jumps to the target.
 
@@ -215,7 +215,7 @@ Change (delete + insert) operations.
 
 | Key | Modes | What it does |
 |-----|-------|--------------|
-| `c` | n | **Composable change** — press `c` then any composable motion (jumps to target, deletes, enters insert) |
+| `c` | n | **Composable change**: press `c` then any composable motion (jumps to target, deletes, enters insert) |
 | `ct` | n | Change from cursor **until** character (forward) |
 | `cT` | n | Change from cursor **until** character (backward) |
 
@@ -233,8 +233,8 @@ Paste at target location.
 
 | Key | Modes | What it does |
 |-----|-------|--------------|
-| `p` | n | **Paste after** — press `p` then a motion, jump to target, paste after it |
-| `P` | n | **Paste before** — press `P` then a motion, jump to target, paste before it |
+| `p` | n | **Paste after**: press `p` then a motion, jump to target, paste after it |
+| `P` | n | **Paste before**: press `P` then a motion, jump to target, paste before it |
 
 ```
 Yank some text → press pw → select a word target → cursor jumps there, yanked text pastes after
@@ -266,14 +266,14 @@ Works in operator-pending: >]] indents to labeled function
 
 | Key | Modes | What it does |
 |-----|-------|--------------|
-| `af` | x, o | **Around function** — select entire function (works with any operator: `daf`, `yaf`, `gqaf`) |
-| `if` | x, o | **Inside function** — select function body only |
-| `ac` | x, o | **Around class/struct** — select entire class |
-| `ic` | x, o | **Inside class/struct** — select class body only |
-| `aa` | x, o | **Around argument** — includes comma/separator |
-| `ia` | x, o | **Inside argument** — argument text only |
-| `fn` | o | **Function name** — select function name (works with operators: `dfn`, `cfn`, `yfn`) |
-| `saa` | n | **Swap arguments** — pick two, swap positions |
+| `af` | x, o | **Around function**: select entire function (works with any operator: `daf`, `yaf`, `gqaf`) |
+| `if` | x, o | **Inside function**: select function body only |
+| `ac` | x, o | **Around class/struct**: select entire class |
+| `ic` | x, o | **Inside class/struct**: select class body only |
+| `aa` | x, o | **Around argument**: includes comma/separator |
+| `ia` | x, o | **Inside argument**: argument text only |
+| `fn` | o | **Function name**: select function name (works with operators: `dfn`, `cfn`, `yfn`) |
+| `saa` | n | **Swap arguments**: pick two, swap positions |
 
 ```
 In: calculate(first, second, third)
@@ -284,7 +284,7 @@ Press cfn → labels appear on function names → select one → name deleted, i
 Press gqaf → labels appear on functions → select one → function formatted
 ```
 
-Text objects compose with **any vim operator** automatically — no explicit mappings needed. `daf`, `yaf`, `cif`, `>af`, `=if`, `gqaf` all work out of the box.
+Text objects compose with **any vim operator** automatically. No explicit mappings needed. `daf`, `yaf`, `cif`, `>af`, `=if`, `gqaf` all work out of the box.
 
 **Multi-char infer (`fn`):** When you type `dfn` quickly, the infer system resolves `fn` as a function name motion. If you type `df` and pause (up to `timeoutlen`), it falls through to find-char. This timeout-based resolution avoids conflicts between `f` (find-char) and `fn` (function name).
 
@@ -292,8 +292,8 @@ Text objects compose with **any vim operator** automatically — no explicit map
 
 | Key | Modes | What it does |
 |-----|-------|--------------|
-| `gS` | n, x | **Incremental select** — `;` expands to parent, `,` shrinks to child |
-| `R` | n, x, o | **Treesitter search** — search text, pick match, pick ancestor scope |
+| `gS` | n, x | **Incremental select**: `;` expands to parent, `,` shrinks to child |
+| `R` | n, x, o | **Treesitter search**: search text, pick match, pick ancestor scope |
 
 ```
 Press gS → smallest node at cursor selected → press ; → expands to parent node → etc.
@@ -387,16 +387,16 @@ Repeat, history, pins, and multi-cursor operations.
 | Key | Modes | What it does |
 |-----|-------|--------------|
 | `.` | n | **Repeat** last SmartMotion |
-| `g.` | n | **History browser** — browse pins and past targets with frecency ranking and action mode |
-| `g0` | n | **Jump to most recent** — instant jump to your last location |
-| `g1`-`g9` | n | **Direct pin jump** — jump to pin N without opening browser |
-| `gp` | n | **Toggle pin** — bookmark/unbookmark the current cursor position |
-| `gp1`-`gp9` | n | **Set pin at slot** — set current location as pin N |
-| `gP` | n | **Toggle global pin** — cross-project bookmark (prompts A-Z) |
-| `gA`-`gZ` | n | **Jump to global pin** — jump to cross-project pin (`gP`/`gS` reserved) |
-| `gPA`-`gPZ` | n | **Set global pin** — set current location as global pin |
-| `gmd` | n | **Multi-cursor delete** — toggle-select multiple words, delete all |
-| `gmy` | n | **Multi-cursor yank** — toggle-select multiple words, yank all |
+| `g.` | n | **History browser**: browse pins and past targets with frecency ranking and action mode |
+| `g0` | n | **Jump to most recent**: instant jump to your last location |
+| `g1`-`g9` | n | **Direct pin jump**: jump to pin N without opening browser |
+| `gp` | n | **Toggle pin**: bookmark/unbookmark the current cursor position |
+| `gp1`-`gp9` | n | **Set pin at slot**: set current location as pin N |
+| `gP` | n | **Toggle global pin**: cross-project bookmark (prompts A-Z) |
+| `gA`-`gZ` | n | **Jump to global pin**: jump to cross-project pin (`gP`/`gS` reserved) |
+| `gPA`-`gPZ` | n | **Set global pin**: set current location as global pin |
+| `gmd` | n | **Multi-cursor delete**: toggle-select multiple words, delete all |
+| `gmy` | n | **Multi-cursor yank**: toggle-select multiple words, yank all |
 
 ### History Browser (`g.`)
 
@@ -420,7 +420,7 @@ The browser shows:
 
 **Search:** Press `/` to filter entries by target text, filename, or motion key. The list updates live as you type.
 
-**Action mode:** Press `d`, `y`, or `c` — the title changes to `[D]`/`[Y]`/`[C]`, then press a label to delete, yank, or change that target without navigating there.
+**Action mode:** Press `d`, `y`, or `c`. The title changes to `[D]`/`[Y]`/`[C]`, then press a label to delete, yank, or change that target without navigating there.
 
 History persists across Neovim sessions. Visit counts accumulate over time, pushing frequently-visited locations to the top. See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)** for full details.
 
@@ -433,7 +433,7 @@ g1 → instantly jumps to location A
 g2 → instantly jumps to location B
 ```
 
-Jump directly to numbered pins without opening the browser — pure muscle memory.
+Jump directly to numbered pins without opening the browser. Pure muscle memory.
 
 ### Jump to Most Recent (`g0`)
 
@@ -447,7 +447,7 @@ Quick "go back" without opening the history browser.
 ### Pins (`gp`)
 
 ```
-Press gp → "Pinned (1/9)" — current location bookmarked
+Press gp → "Pinned (1/9)", current location bookmarked
 Press gp again at same spot → "Unpinned"
 ```
 
@@ -456,7 +456,7 @@ Up to 9 pins. Pins persist across sessions and appear at the top of the history 
 ### Pin Slot Assignment (`gp1`-`gp9`)
 
 ```
-gp3 → "Pin 3 set (3/9)" — current location becomes pin 3
+gp3 → "Pin 3 set (3/9)", current location becomes pin 3
 ```
 
 Set current location at a specific pin slot, replacing any existing pin there. Useful for organizing your pins in a consistent order.
@@ -473,7 +473,7 @@ gPA → directly sets global pin A at cursor (no prompt)
 
 Global pins are stored separately from project pins and persist across all Neovim sessions. Use them for frequently-accessed files like your dotfiles, notes, or commonly-edited configs.
 
-**Note:** `gP` (toggle global pin) and `gS` (treesitter incremental select) are reserved — use `gPA`-`gPZ` to set/access pins at those slots, or use the history browser.
+**Note:** `gP` (toggle global pin) and `gS` (treesitter incremental select) are reserved. Use `gPA`-`gPZ` to set/access pins at those slots, or use the history browser.
 
 ### Multi-Cursor (`gmd`/`gmy`)
 
@@ -577,8 +577,8 @@ Motions marked with **Multi-window: Yes** show labels across all visible (non-fl
 
 ## Next Steps
 
-→ **[Advanced Features](Advanced-Features.md)** — Flow state, operator-pending details, more
+→ **[Advanced Features](Advanced-Features.md)**: Flow state, operator-pending details, more
 
-→ **[Build Your Own Motions](Building-Custom-Motions.md)** — Create custom motions
+→ **[Build Your Own Motions](Building-Custom-Motions.md)**: Create custom motions
 
-→ **[Configuration](Configuration.md)** — All settings explained
+→ **[Configuration](Configuration.md)**: All settings explained

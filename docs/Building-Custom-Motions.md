@@ -2,7 +2,7 @@
 
 This is where SmartMotion becomes yours.
 
-Every built-in motion uses the same system you're about to learn. There's no magic, no internal APIs — just a pipeline you can configure however you want.
+Every built-in motion uses the same system you're about to learn. There's no magic, no internal APIs. Just a pipeline you can configure however you want.
 
 ---
 
@@ -28,11 +28,11 @@ Let's break it down:
 
 | Field | What it does |
 |-------|--------------|
-| `collector` | Where to look — `"lines"` means all buffer lines |
-| `extractor` | What to find — `"words"` finds word boundaries |
-| `filter` | Which to show — `"filter_words_after_cursor"` keeps only words ahead |
-| `visualizer` | How to display — `"hint_start"` puts labels at word start |
-| `action` | What to do — `"jump_centered"` moves cursor and centers screen |
+| `collector` | Where to look: `"lines"` means all buffer lines |
+| `extractor` | What to find: `"words"` finds word boundaries |
+| `filter` | Which to show: `"filter_words_after_cursor"` keeps only words ahead |
+| `visualizer` | How to display: `"hint_start"` puts labels at word start |
+| `action` | What to do: `"jump_centered"` moves cursor and centers screen |
 | `map` | Whether to create a keymap |
 | `modes` | Which vim modes this works in |
 
@@ -130,10 +130,10 @@ Each stage is optional (except collector, extractor, visualizer, action). Each s
 | `restore` | Restore cursor to original position |
 
 **Action naming pattern:**
-- `delete`/`yank`/`change`/`paste` — operate on target text without moving cursor
-- `*_jump` — jump to target first, then operate (used by composable operators like `dw`)
-- `remote_*` — jump, operate, restore cursor (cursor stays in place, for `rdw`/`ryw`)
-- `*_line` — line-wise variants (used by double-tap: `dd`, `yy`, `cc`)
+- `delete`/`yank`/`change`/`paste`: operate on target text without moving cursor
+- `*_jump`: jump to target first, then operate (used by composable operators like `dw`)
+- `remote_*`: jump, operate, restore cursor (cursor stays in place, for `rdw`/`ryw`)
+- `*_line`: line-wise variants (used by double-tap: `dd`, `yy`, `cc`)
 
 ---
 
@@ -240,7 +240,7 @@ require("smart-motion").register_motion("<leader>s", {
 })
 ```
 
-The `live_search` extractor handles user input automatically — labels update as you type.
+The `live_search` extractor handles user input automatically. Labels update as you type.
 
 ---
 
@@ -489,7 +489,7 @@ action = "notify_target"
 
 ## Infer Mode (Advanced)
 
-The `infer` flag enables composable operators. Press an operator key, then a motion key — SmartMotion automatically looks up the motion, inherits its entire pipeline, and runs it with the operator's action.
+The `infer` flag enables composable operators. Press an operator key, then a motion key. SmartMotion automatically looks up the motion, inherits its entire pipeline, and runs it with the operator's action.
 
 ### How It Works
 
@@ -515,7 +515,7 @@ When `infer = true`:
 3. The infer system looks up a **composable motion** registered with that key
 4. If found, the operator's pipeline is overridden with the motion's extractor, filter, visualizer, collector, and metadata
 5. The pipeline runs, labels appear, user picks a target
-6. The action executes — for `d`/`y`/`c`/`p`, this is **jump to target + action** (e.g., `delete_jump`)
+6. The action executes. For `d`/`y`/`c`/`p`, this is **jump to target + action** (e.g., `delete_jump`)
 
 If the motion key doesn't match any composable motion, it falls through to native vim (`d$`, `d0`, `dG` all work as expected).
 
@@ -536,7 +536,7 @@ require("smart-motion").register_motion("w", {
 })
 ```
 
-Now `dw`, `yw`, `cw`, `pw` all work — each inherits `words` extractor + `filter_words_after_cursor` + `hint_start` visualizer from the `w` motion. The 11 built-in composable motions (`w`, `b`, `e`, `j`, `k`, `s`, `S`, `f`, `F`, `t`, `T`) × 5 operators = **55+ compositions** from zero explicit mappings.
+Now `dw`, `yw`, `cw`, `pw` all work, each inheriting `words` extractor + `filter_words_after_cursor` + `hint_start` visualizer from the `w` motion. The 11 built-in composable motions (`w`, `b`, `e`, `j`, `k`, `s`, `S`, `f`, `F`, `t`, `T`) × 5 operators = **55+ compositions** from zero explicit mappings.
 
 ### Action Key Decoupling
 
@@ -588,22 +588,22 @@ Now `ghw`, `ghj`, `ghs` etc. all work automatically.
 
 ## Tips
 
-1. **Start simple** — Get a basic motion working, then add complexity.
+1. **Start simple.** Get a basic motion working, then add complexity.
 
-2. **Use existing modules** — Browse the built-in collectors, extractors, etc. before writing custom ones.
+2. **Use existing modules.** Browse the built-in collectors, extractors, etc. before writing custom ones.
 
-3. **Test in operator-pending** — Add `"o"` to modes if you want your motion to work with native operators.
+3. **Test in operator-pending.** Add `"o"` to modes if you want your motion to work with native operators.
 
-4. **Check multi-window** — Set `multi_window = true` if your motion makes sense across splits.
+4. **Check multi-window.** Set `multi_window = true` if your motion makes sense across splits.
 
-5. **Debug with logging** — Enable `vim.g.smart_motion_log_level = "debug"` to see what's happening.
+5. **Debug with logging.** Enable `vim.g.smart_motion_log_level = "debug"` to see what's happening.
 
 ---
 
 ## Next Steps
 
-→ **[Pipeline Architecture](Pipeline-Architecture.md)** — Deep dive into each pipeline stage
+→ **[Pipeline Architecture](Pipeline-Architecture.md)**: Deep dive into each pipeline stage
 
-→ **[API Reference](API-Reference.md)** — Complete module and motion_state reference
+→ **[API Reference](API-Reference.md)**: Complete module and motion_state reference
 
-→ **[Debugging](Debugging.md)** — Troubleshooting tips
+→ **[Debugging](Debugging.md)**: Troubleshooting tips

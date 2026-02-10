@@ -13,11 +13,11 @@ vim.g.smart_motion_log_level = "debug"
 ```
 
 **Levels:**
-- `"off"` — No logging (default)
-- `"error"` — Errors only
-- `"warn"` — Warnings and errors
-- `"info"` — Info, warnings, errors
-- `"debug"` — Everything
+- `"off"`: No logging (default)
+- `"error"`: Errors only
+- `"warn"`: Warnings and errors
+- `"info"`: Info, warnings, errors
+- `"debug"`: Everything
 
 View logs in `:messages`.
 
@@ -49,10 +49,10 @@ end
 ```
 
 Key fields to check:
-- `motion_state.targets` — All collected targets
-- `motion_state.selected_jump_target` — User's selection
-- `motion_state.search_text` — Current search input
-- `motion_state.multi_window` — Multi-window enabled?
+- `motion_state.targets`: All collected targets
+- `motion_state.selected_jump_target`: User's selection
+- `motion_state.search_text`: Current search input
+- `motion_state.multi_window`: Multi-window enabled?
 
 ---
 
@@ -341,8 +341,8 @@ nvim -u test_config.lua somefile.lua
 
 ## Next Steps
 
-→ **[Configuration](Configuration.md)** — All options
+→ **[Configuration](Configuration.md)**: All options
 
-→ **[API Reference](API-Reference.md)** — Complete reference
+→ **[API Reference](API-Reference.md)**: Complete reference
 
-→ **[Building Custom Motions](Building-Custom-Motions.md)** — Create your own
+→ **[Building Custom Motions](Building-Custom-Motions.md)**: Create your own
