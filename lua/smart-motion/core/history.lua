@@ -173,7 +173,10 @@ function M.jump_to_pin(n)
 	end
 
 	-- Save to jumplist
-	vim.cmd("normal! m'")
+	local config = require("smart-motion.config")
+	if not config.validated or config.validated.save_to_jumplist then
+		vim.cmd("normal! m'")
+	end
 
 	-- Open file if needed
 	local current_file = vim.api.nvim_buf_get_name(0)
@@ -215,7 +218,10 @@ function M.jump_to_recent()
 	end
 
 	-- Save to jumplist
-	vim.cmd("normal! m'")
+	local config = require("smart-motion.config")
+	if not config.validated or config.validated.save_to_jumplist then
+		vim.cmd("normal! m'")
+	end
 
 	-- Open file if needed
 	local current_file = vim.api.nvim_buf_get_name(0)
@@ -447,7 +453,10 @@ function M.jump_to_global_pin(letter)
 	end
 
 	-- Save to jumplist
-	vim.cmd("normal! m'")
+	local config = require("smart-motion.config")
+	if not config.validated or config.validated.save_to_jumplist then
+		vim.cmd("normal! m'")
+	end
 
 	-- Open file if needed
 	local current_file = vim.api.nvim_buf_get_name(0)
@@ -940,6 +949,10 @@ end
 function M.setup(cfg)
 	if cfg.history_max_size and type(cfg.history_max_size) == "number" then
 		M.max_size = cfg.history_max_size
+	end
+
+	if cfg.max_pins and type(cfg.max_pins) == "number" and cfg.max_pins >= 1 then
+		M.max_pins = cfg.max_pins
 	end
 
 	M._load()

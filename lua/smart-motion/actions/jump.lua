@@ -53,7 +53,9 @@ function M.run(ctx, cfg, motion_state)
 	end
 
 	-- Save current position to jumplist before moving
-	vim.cmd("normal! m'")
+	if cfg.save_to_jumplist then
+		vim.cmd("normal! m'")
+	end
 
 	local current_winid = vim.api.nvim_get_current_win()
 	if winid and winid ~= current_winid then

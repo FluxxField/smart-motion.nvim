@@ -416,6 +416,8 @@ SmartMotion wouldn't exist without these plugins. See [Why SmartMotion](https://
   count_behavior = "target",         -- "target" or "native" for j/k counts
   history_max_size = 20,             -- persistent history entries
   open_folds_on_jump = true,         -- open folds at target position
+  save_to_jumplist = true,           -- save position to jumplist before jumping
+  max_pins = 9,                      -- maximum pin slots
 }
 ```
 

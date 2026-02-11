@@ -22,6 +22,8 @@
 ---@field native_search? boolean
 ---@field count_behavior? "target" | "native"
 ---@field open_folds_on_jump? boolean
+---@field save_to_jumplist? boolean
+---@field max_pins? integer
 
 ---@class SmartMotionPresets
 ---@field words? true | SmartMotionPresetKey.Words[]

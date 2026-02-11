@@ -91,7 +91,10 @@ function M._navigate(entry)
 	local bufnr = target.metadata and target.metadata.bufnr
 	local filepath = entry.filepath
 
-	vim.cmd("normal! m'")
+	local config = require("smart-motion.config")
+	if not config.validated or config.validated.save_to_jumplist then
+		vim.cmd("normal! m'")
+	end
 
 	if bufnr and vim.api.nvim_buf_is_valid(bufnr) then
 		local winid = M._find_win_for_buf(bufnr)

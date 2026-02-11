@@ -49,6 +49,12 @@ Complete guide to configuring SmartMotion.
 
   -- Open folds at target position after jumping
   open_folds_on_jump = true,
+
+  -- Save position to jumplist before jumping
+  save_to_jumplist = true,
+
+  -- Maximum number of pin slots
+  max_pins = 9,
 }
 ```
 
@@ -317,6 +323,34 @@ Disable this if you prefer folds to stay closed and want to open them manually.
 
 ---
 
+## Jumplist
+
+Control whether SmartMotion saves the current position to the jumplist before jumping:
+
+```lua
+save_to_jumplist = true   -- save to jumplist (default)
+save_to_jumplist = false  -- don't save to jumplist
+```
+
+When enabled, `m'` is set before every jump so `<C-o>` takes you back. This applies to all jump actions including pipeline jumps, history navigation, and pin jumps.
+
+Disable this if you don't want SmartMotion populating your jumplist, especially for frequent short hops.
+
+---
+
+## Pins
+
+Configure the maximum number of pin slots:
+
+```lua
+max_pins = 9   -- default (labels 1-9)
+max_pins = 20  -- more pin slots
+```
+
+Controls how many positions can be pinned via `gp`. Pin labels in the history browser use number keys (1-9 by default), so values above 9 will use letter labels for the extra slots.
+
+---
+
 ## History
 
 Configure motion history size:
@@ -388,6 +422,12 @@ See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)**
 
     -- Keep folds closed when jumping
     open_folds_on_jump = false,
+
+    -- Don't pollute jumplist with SmartMotion jumps
+    save_to_jumplist = false,
+
+    -- More pin slots
+    max_pins = 20,
   },
 }
 ```

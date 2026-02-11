@@ -3,6 +3,7 @@ local consts = require("smart-motion.consts")
 
 local FLOW_STATE_TIMEOUT_MS = consts.FLOW_STATE_TIMEOUT_MS
 local HISTORY_MAX_SIZE = consts.HISTORY_MAX_SIZE
+local PINS_MAX_SIZE = consts.PINS_MAX_SIZE
 
 local M = {}
 
@@ -30,6 +31,8 @@ M.defaults = {
 	native_search = true,
 	count_behavior = "target",
 	open_folds_on_jump = true,
+	save_to_jumplist = true,
+	max_pins = PINS_MAX_SIZE,
 }
 
 ---@type SmartMotionConfig
@@ -163,6 +166,20 @@ function M.validate(user_config)
 	--
 	if config.open_folds_on_jump == nil or type(config.open_folds_on_jump) ~= "boolean" then
 		config.open_folds_on_jump = true
+	end
+
+	--
+	-- Validate save_to_jumplist
+	--
+	if config.save_to_jumplist == nil or type(config.save_to_jumplist) ~= "boolean" then
+		config.save_to_jumplist = true
+	end
+
+	--
+	-- Validate max_pins
+	--
+	if config.max_pins == nil or type(config.max_pins) ~= "number" or config.max_pins < 1 then
+		config.max_pins = PINS_MAX_SIZE
 	end
 
 	M.validated = config

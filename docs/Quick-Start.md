@@ -182,6 +182,9 @@ opts = {
 
   -- Open folds at target position after jumping
   open_folds_on_jump = true,
+
+  -- Save position to jumplist before jumping
+  save_to_jumplist = true,
 }
 ```
 
