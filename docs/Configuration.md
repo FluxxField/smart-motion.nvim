@@ -55,6 +55,18 @@ Complete guide to configuring SmartMotion.
 
   -- Maximum number of pin slots
   max_pins = 9,
+
+  -- Search timeout: auto-proceed to label selection after typing (ms)
+  search_timeout_ms = 500,
+
+  -- Search idle timeout: exit search if no input typed (ms)
+  search_idle_timeout_ms = 2000,
+
+  -- Yank highlight flash duration (ms)
+  yank_highlight_duration = 150,
+
+  -- Prune history entries older than this many days
+  history_max_age_days = 30,
 }
 ```
 
@@ -351,6 +363,42 @@ Controls how many positions can be pinned via `gp`. Pin labels in the history br
 
 ---
 
+## Search Timeouts
+
+Tune how long search modes wait before auto-proceeding or exiting:
+
+```lua
+search_timeout_ms = 500       -- default: auto-proceed to labels after typing
+search_idle_timeout_ms = 2000 -- default: exit search if nothing typed
+```
+
+**`search_timeout_ms`**: After you type in a search motion (`s`, `S`, `R`), this is how long SmartMotion waits before automatically proceeding to label selection. Lower values feel snappier; higher values give more time to refine your search.
+
+**`search_idle_timeout_ms`**: If you trigger a search motion but don't type anything, SmartMotion exits after this timeout. Set higher if you need more thinking time.
+
+```lua
+search_timeout_ms = 300       -- fast typist, proceed quickly
+search_timeout_ms = 800       -- slower, more time to type
+
+search_idle_timeout_ms = 5000 -- very patient idle timeout
+```
+
+---
+
+## Yank Highlight
+
+Control how long the yank flash is shown after yanking with SmartMotion operators:
+
+```lua
+yank_highlight_duration = 150  -- default (ms)
+yank_highlight_duration = 300  -- longer flash
+yank_highlight_duration = 0    -- disable yank highlight
+```
+
+This is the SmartMotion equivalent of Neovim's `vim.hl.on_yank()` duration. Applies to `y` operator actions and treesitter search yanks.
+
+---
+
 ## History
 
 Configure motion history size:
@@ -361,7 +409,17 @@ history_max_size = 50  -- keep more history
 history_max_size = 0   -- effectively disables persistence
 ```
 
-Controls how many entries are stored for both `.` (repeat) and `g.` (history browser). History persists across Neovim sessions, stored per-project in `~/.local/share/nvim/smart-motion/history/`. Entries older than 30 days or pointing to deleted files are automatically pruned.
+Controls how many entries are stored for both `.` (repeat) and `g.` (history browser). History persists across Neovim sessions, stored per-project in `~/.local/share/nvim/smart-motion/history/`. Entries pointing to deleted files are automatically pruned.
+
+Configure how long history entries are retained:
+
+```lua
+history_max_age_days = 30  -- default
+history_max_age_days = 90  -- keep entries longer
+history_max_age_days = 7   -- aggressive pruning
+```
+
+Entries older than this are discarded when history is loaded at startup and during disk merges.
 
 See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)** for full details.
 
@@ -428,6 +486,15 @@ See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)**
 
     -- More pin slots
     max_pins = 20,
+
+    -- Faster search auto-proceed
+    search_timeout_ms = 300,
+
+    -- Longer yank flash
+    yank_highlight_duration = 300,
+
+    -- Keep history for 90 days
+    history_max_age_days = 90,
   },
 }
 ```

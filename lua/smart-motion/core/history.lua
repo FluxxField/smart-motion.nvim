@@ -3,7 +3,15 @@ local log = require("smart-motion.core.log")
 
 local HISTORY_MAX_SIZE = consts.HISTORY_MAX_SIZE
 local HISTORY_VERSION = 2
-local HISTORY_MAX_AGE_SECS = 30 * 24 * 3600 -- 30 days
+local HISTORY_MAX_AGE_DAYS_DEFAULT = 30
+
+--- Returns the max age in seconds, reading from config if available.
+---@return number
+local function get_max_age_secs()
+	local config = require("smart-motion.config")
+	local days = config.validated and config.validated.history_max_age_days or HISTORY_MAX_AGE_DAYS_DEFAULT
+	return days * 24 * 3600
+end
 local GLOBAL_PINS_MAX = 26 -- A-Z
 
 local M = {
@@ -726,7 +734,7 @@ function M._merge_with_disk()
 			local key = M._entry_key(entry)
 			if not seen[key] then
 				local ts = entry.metadata and entry.metadata.time_stamp or 0
-				if (now - ts) <= HISTORY_MAX_AGE_SECS then
+				if (now - ts) <= get_max_age_secs() then
 					seen[key] = true
 					table.insert(merged, entry)
 				end
@@ -887,9 +895,9 @@ function M._load()
 	for _, raw in ipairs(data.entries) do
 		local entry = M._deserialize_entry(raw)
 		if entry then
-			-- Expiry: skip entries older than 30 days
+			-- Expiry: skip entries older than history_max_age_days
 			local ts = entry.metadata and entry.metadata.time_stamp or 0
-			if (now - ts) > HISTORY_MAX_AGE_SECS then
+			if (now - ts) > get_max_age_secs() then
 				goto continue_entry
 			end
 

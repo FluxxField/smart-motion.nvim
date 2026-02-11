@@ -215,8 +215,9 @@ function M.run(mode, operator)
 	motion_state.search_text = ""
 	motion_state.is_searching_mode = true
 
-	-- Input loop with auto-timeout (same 500ms as live search)
-	local CONTINUE_TIMEOUT_MS = 500
+	-- Input loop with auto-timeout (uses search_timeout_ms config)
+	local config = require("smart-motion.config")
+	local continue_timeout_ms = config.validated and config.validated.search_timeout_ms or 500
 	local last_input_time = nil
 
 	-- Helper: redraw screen then display the search prompt in the message area.
@@ -241,7 +242,7 @@ function M.run(mode, operator)
 			and #motion_state.jump_targets > 0
 		then
 			local elapsed = vim.fn.reltimefloat(vim.fn.reltime(last_input_time)) * 1000
-			if elapsed > CONTINUE_TIMEOUT_MS then
+			if elapsed > continue_timeout_ms then
 				break
 			end
 		end
@@ -406,9 +407,10 @@ function M.run(mode, operator)
 					vim.api.nvim_buf_add_highlight(bufnr, ns, "IncSearch", row, col_start, col_end)
 				end
 			end
+			local yank_duration = config.validated and config.validated.yank_highlight_duration or 150
 			vim.defer_fn(function()
 				vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-			end, 150)
+			end, yank_duration)
 		elseif pending_operator == "d" then
 			vim.api.nvim_buf_set_text(bufnr, sr, sc, er, ec, { "" })
 		elseif pending_operator == "c" then

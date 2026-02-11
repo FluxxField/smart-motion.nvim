@@ -33,6 +33,10 @@ M.defaults = {
 	open_folds_on_jump = true,
 	save_to_jumplist = true,
 	max_pins = PINS_MAX_SIZE,
+	search_timeout_ms = 500,
+	search_idle_timeout_ms = 2000,
+	yank_highlight_duration = 150,
+	history_max_age_days = 30,
 }
 
 ---@type SmartMotionConfig
@@ -180,6 +184,34 @@ function M.validate(user_config)
 	--
 	if config.max_pins == nil or type(config.max_pins) ~= "number" or config.max_pins < 1 then
 		config.max_pins = PINS_MAX_SIZE
+	end
+
+	--
+	-- Validate search_timeout_ms
+	--
+	if config.search_timeout_ms == nil or type(config.search_timeout_ms) ~= "number" or config.search_timeout_ms < 0 then
+		config.search_timeout_ms = 500
+	end
+
+	--
+	-- Validate search_idle_timeout_ms
+	--
+	if config.search_idle_timeout_ms == nil or type(config.search_idle_timeout_ms) ~= "number" or config.search_idle_timeout_ms < 0 then
+		config.search_idle_timeout_ms = 2000
+	end
+
+	--
+	-- Validate yank_highlight_duration
+	--
+	if config.yank_highlight_duration == nil or type(config.yank_highlight_duration) ~= "number" or config.yank_highlight_duration < 0 then
+		config.yank_highlight_duration = 150
+	end
+
+	--
+	-- Validate history_max_age_days
+	--
+	if config.history_max_age_days == nil or type(config.history_max_age_days) ~= "number" or config.history_max_age_days < 1 then
+		config.history_max_age_days = 30
 	end
 
 	M.validated = config
