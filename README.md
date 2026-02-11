@@ -416,6 +416,12 @@ SmartMotion wouldn't exist without these plugins. See [Why SmartMotion](https://
   count_behavior = "target",         -- "target" or "native" for j/k counts
   history_max_size = 20,             -- persistent history entries
   open_folds_on_jump = true,         -- open folds at target position
+  save_to_jumplist = true,           -- save position to jumplist before jumping
+  max_pins = 9,                      -- maximum pin slots
+  search_timeout_ms = 500,           -- auto-proceed after typing in search
+  search_idle_timeout_ms = 2000,     -- exit search with no input
+  yank_highlight_duration = 150,     -- yank flash duration (ms)
+  history_max_age_days = 30,         -- prune history entries older than this
 }
 ```
 

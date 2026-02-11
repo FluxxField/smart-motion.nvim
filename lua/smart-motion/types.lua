@@ -22,6 +22,12 @@
 ---@field native_search? boolean
 ---@field count_behavior? "target" | "native"
 ---@field open_folds_on_jump? boolean
+---@field save_to_jumplist? boolean
+---@field max_pins? integer
+---@field search_timeout_ms? number
+---@field search_idle_timeout_ms? number
+---@field yank_highlight_duration? number
+---@field history_max_age_days? number
 
 ---@class SmartMotionPresets
 ---@field words? true | SmartMotionPresetKey.Words[]

@@ -130,11 +130,13 @@ function M.set_register(bufnr, start_row, start_col, end_row, end_col, text, reg
 		end
 
 		-- Clear after timeout
+		local config = require("smart-motion.config")
+		local duration = config.validated and config.validated.yank_highlight_duration or 150
 		vim.defer_fn(function()
 			if vim.api.nvim_buf_is_valid(bufnr) then
 				vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
 			end
-		end, 150)
+		end, duration)
 	end
 end
 

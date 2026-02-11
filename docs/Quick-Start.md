@@ -182,6 +182,15 @@ opts = {
 
   -- Open folds at target position after jumping
   open_folds_on_jump = true,
+
+  -- Save position to jumplist before jumping
+  save_to_jumplist = true,
+
+  -- Search auto-proceed timeout (ms)
+  search_timeout_ms = 500,
+
+  -- Yank highlight flash duration (ms)
+  yank_highlight_duration = 150,
 }
 ```
 

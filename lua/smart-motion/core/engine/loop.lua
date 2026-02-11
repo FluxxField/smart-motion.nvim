@@ -4,9 +4,6 @@ local pipeline = require("smart-motion.core.engine.pipeline")
 local module_loader = require("smart-motion.utils.module_loader")
 local log = require("smart-motion.core.log")
 
--- TODO: Move to config
-local EARLY_EXIT_TIMEOUT = 2000
-local CONTINUE_TIMEOUT = 500
 local EXIT_TYPE = consts.EXIT_TYPE
 
 local M = {}
@@ -48,9 +45,9 @@ function M.run(ctx, cfg, motion_state)
 				local timeout
 
 				if type(motion_state.search_text) == "string" and motion_state.search_text ~= "" then
-					timeout = motion_state.timeout_after_input and CONTINUE_TIMEOUT or nil
+					timeout = motion_state.timeout_after_input and cfg.search_timeout_ms or nil
 				else
-					timeout = EARLY_EXIT_TIMEOUT
+					timeout = cfg.search_idle_timeout_ms
 				end
 
 				local elapsed_time = vim.fn.reltimefloat(vim.fn.reltime(start_time)) * 1000
