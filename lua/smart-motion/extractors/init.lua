@@ -38,6 +38,18 @@ extractors.register_many({
 			},
 		}),
 	},
+	text_search_1_char_until = {
+		run = utils.module_wrapper(text_search.run, {
+			before_input_loop = text_search.before_input_loop,
+		}),
+		metadata = vim.tbl_deep_extend("force", text_search.metadata, {
+			motion_state = {
+				num_of_char = 1,
+				should_show_prefix = false,
+				exclude_target = true,
+			},
+		}),
+	},
 	text_search_2_char_until = {
 		keys = { "t" },
 		run = utils.module_wrapper(text_search.run, {
