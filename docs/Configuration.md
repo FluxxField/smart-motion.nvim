@@ -46,6 +46,9 @@ Complete guide to configuring SmartMotion.
 
   -- How count prefix interacts with motions (j/k), "target" or "native"
   count_behavior = "target",
+
+  -- Open folds at target position after jumping
+  open_folds_on_jump = true,
 }
 ```
 
@@ -299,6 +302,21 @@ disable_dim_background = true   -- dimming disabled
 
 ---
 
+## Fold Handling
+
+Control whether folds are opened when jumping to a target:
+
+```lua
+open_folds_on_jump = true   -- open folds at target (default)
+open_folds_on_jump = false  -- keep folds closed
+```
+
+When enabled, SmartMotion runs `zv` after every jump to reveal the target line. This applies to all jump actions including pipeline jumps, history navigation, and pin jumps.
+
+Disable this if you prefer folds to stay closed and want to open them manually.
+
+---
+
 ## History
 
 Configure motion history size:
@@ -367,6 +385,9 @@ See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)**
 
     -- Disable native search labels
     native_search = false,
+
+    -- Keep folds closed when jumping
+    open_folds_on_jump = false,
   },
 }
 ```

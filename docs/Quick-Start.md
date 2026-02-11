@@ -179,6 +179,9 @@ opts = {
 
   -- Dim non-target text
   disable_dim_background = false,
+
+  -- Open folds at target position after jumping
+  open_folds_on_jump = true,
 }
 ```
 

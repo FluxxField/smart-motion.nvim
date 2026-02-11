@@ -115,7 +115,10 @@ function M._navigate(entry)
 	end
 	local col = math.max(target.start_pos.col, 0)
 	pcall(vim.api.nvim_win_set_cursor, 0, { row, col })
-	vim.cmd("normal! zv")
+	local config = require("smart-motion.config")
+	if not config.validated or config.validated.open_folds_on_jump then
+		vim.cmd("normal! zv")
+	end
 end
 
 --- Executes a remote action on a history entry's target.
