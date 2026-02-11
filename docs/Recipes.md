@@ -209,7 +209,7 @@ Extractors determine *what kind of targets* appear.
 
 | Name | What it finds |
 |------|---------------|
-| `words` | Word boundaries (respects `word_pattern` metadata) |
+| `words` | Word boundaries matching native vim `w` — keyword sequences and punctuation sequences (respects `word_pattern` metadata) |
 | `lines` | Line starts (non-blank lines) |
 | `text_search_1_char` | Matches after typing 1 character |
 | `text_search_2_char` | Matches after typing 2 characters (inclusive) |
@@ -417,7 +417,7 @@ presets = {
 }
 ```
 
-**What changed:** The `motion_state.word_pattern` metadata tells the `words` extractor to use a custom regex. This pattern splits `camelCaseWord` into `camel`, `Case`, and `Word` as separate targets.
+**What changed:** The `motion_state.word_pattern` metadata tells the `words` extractor to use a custom regex instead of the default (`\k\+\|\%(\k\@!\S\)\+` — keyword sequences or punctuation sequences). This pattern splits `camelCaseWord` into `camel`, `Case`, and `Word` as separate targets.
 
 ### Bidirectional words
 

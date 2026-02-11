@@ -142,7 +142,7 @@ require("smart-motion").register_motion("<leader>t", {
 })
 ```
 
-**How it works:** The `words` extractor uses the custom `word_pattern` regex instead of the default word boundary pattern. It matches only TODO-style comment tags. The `lines` collector feeds all visible buffer lines, and `multi_window = true` searches across every open split.
+**How it works:** The `words` extractor uses the custom `word_pattern` regex instead of the default (`\k\+\|\%(\k\@!\S\)\+` — keyword sequences or punctuation sequences). It matches only TODO-style comment tags. The `lines` collector feeds all visible buffer lines, and `multi_window = true` searches across every open split.
 
 ### Jump to Only Errors
 

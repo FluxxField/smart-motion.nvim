@@ -303,7 +303,7 @@ The `motion_state` table is mutable state passed through all pipeline stages.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `word_pattern` | string | Custom word regex |
+| `word_pattern` | string | Custom word regex (default: `\k\+\|\%(\k\@!\S\)\+` — keyword sequences or punctuation sequences, matching native vim `w`) |
 
 ---
 
