@@ -21,6 +21,7 @@
 ---@field disable_dim_background boolean
 ---@field native_search? boolean
 ---@field count_behavior? "target" | "native"
+---@field open_folds_on_jump? boolean
 
 ---@class SmartMotionPresets
 ---@field words? true | SmartMotionPresetKey.Words[]

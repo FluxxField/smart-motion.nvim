@@ -29,6 +29,7 @@ M.defaults = {
 	auto_select_target = false,
 	native_search = true,
 	count_behavior = "target",
+	open_folds_on_jump = true,
 }
 
 ---@type SmartMotionConfig
@@ -155,6 +156,13 @@ function M.validate(user_config)
 	--
 	if config.count_behavior ~= "target" and config.count_behavior ~= "native" then
 		config.count_behavior = "target"
+	end
+
+	--
+	-- Validate open_folds_on_jump
+	--
+	if config.open_folds_on_jump == nil or type(config.open_folds_on_jump) ~= "boolean" then
+		config.open_folds_on_jump = true
 	end
 
 	M.validated = config

@@ -87,7 +87,7 @@ function M.run(ctx, cfg, motion_state)
 	end
 
 	-- Open any folds at the target position
-	if not is_op_pending then
+	if not is_op_pending and cfg.open_folds_on_jump then
 		vim.cmd("normal! zv")
 	end
 

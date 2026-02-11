@@ -415,6 +415,7 @@ SmartMotion wouldn't exist without these plugins. See [Why SmartMotion](https://
   native_search = true,              -- labels during / search
   count_behavior = "target",         -- "target" or "native" for j/k counts
   history_max_size = 20,             -- persistent history entries
+  open_folds_on_jump = true,         -- open folds at target position
 }
 ```
 

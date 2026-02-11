@@ -193,7 +193,10 @@ function M.jump_to_pin(n)
 		row = line_count
 	end
 	vim.api.nvim_win_set_cursor(0, { row, col })
-	vim.cmd("normal! zv") -- Open folds
+	local config = require("smart-motion.config")
+	if not config.validated or config.validated.open_folds_on_jump then
+		vim.cmd("normal! zv") -- Open folds
+	end
 end
 
 --- Jumps to the most recent history entry.
@@ -232,7 +235,10 @@ function M.jump_to_recent()
 		row = line_count
 	end
 	vim.api.nvim_win_set_cursor(0, { row, col })
-	vim.cmd("normal! zv") -- Open folds
+	local config = require("smart-motion.config")
+	if not config.validated or config.validated.open_folds_on_jump then
+		vim.cmd("normal! zv") -- Open folds
+	end
 end
 
 --- Sets the current cursor location as pin at slot n (1-based).
@@ -461,7 +467,10 @@ function M.jump_to_global_pin(letter)
 		row = line_count
 	end
 	vim.api.nvim_win_set_cursor(0, { row, col })
-	vim.cmd("normal! zv")
+	local config = require("smart-motion.config")
+	if not config.validated or config.validated.open_folds_on_jump then
+		vim.cmd("normal! zv")
+	end
 end
 
 --- Saves global pins to disk.
