@@ -16,7 +16,12 @@ function M.run(ctx, cfg, motion_state, exit_type)
 
 	if exit_type == EXIT_TYPE.CONTINUE_TO_SELECTION then
 		motion_state.is_searching_mode = false
-		modules.visualizer.run(ctx, cfg, motion_state)
+		-- Only render labels if they weren't already assigned during the search loop.
+		-- Re-rendering here would use the full (unfiltered) key pool, which produces
+		-- different label assignments than the conflict-filtered labels the user already saw.
+		if vim.tbl_isempty(motion_state.assigned_hint_labels) then
+			modules.visualizer.run(ctx, cfg, motion_state)
+		end
 		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 	end
 
