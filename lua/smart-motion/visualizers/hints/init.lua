@@ -115,15 +115,44 @@ function M.run(ctx, cfg, motion_state)
 		end)
 	end
 
-	-- Filter out conflicting labels when in search mode
+	-- Apply per-motion label customization (label_keys / exclude_label_keys)
 	local effective_cfg = cfg
-	if motion_state.is_searching_mode and motion_state.search_text and #motion_state.search_text > 0 then
-		local filtered_keys = label_conflict.filter_conflicting_labels(cfg.keys, targets, ctx.bufnr)
-		if #filtered_keys < #cfg.keys then
-			-- Create a shallow copy of cfg with filtered keys
+	if motion_state.label_keys then
+		local custom_keys = {}
+		for char in motion_state.label_keys:gmatch(".") do
+			table.insert(custom_keys, char)
+		end
+		if #custom_keys > 0 then
 			effective_cfg = vim.tbl_extend("force", {}, cfg)
+			effective_cfg.keys = custom_keys
+			recalculate_label_counts(motion_state, #custom_keys)
+		end
+	end
+	if motion_state.exclude_label_keys then
+		local exclude_set = {}
+		for char in motion_state.exclude_label_keys:gmatch(".") do
+			exclude_set[char:lower()] = true
+		end
+		local filtered_keys = vim.tbl_filter(function(key)
+			return not exclude_set[key:lower()]
+		end, effective_cfg.keys)
+		if #filtered_keys < #effective_cfg.keys then
+			if effective_cfg == cfg then
+				effective_cfg = vim.tbl_extend("force", {}, cfg)
+			end
 			effective_cfg.keys = filtered_keys
-			-- Recalculate label counts based on new key pool
+			recalculate_label_counts(motion_state, #filtered_keys)
+		end
+	end
+
+	-- Filter out conflicting labels when in search mode
+	if motion_state.is_searching_mode and motion_state.search_text and #motion_state.search_text > 0 then
+		local filtered_keys = label_conflict.filter_conflicting_labels(effective_cfg.keys, targets, ctx.bufnr)
+		if #filtered_keys < #effective_cfg.keys then
+			if effective_cfg == cfg then
+				effective_cfg = vim.tbl_extend("force", {}, cfg)
+			end
+			effective_cfg.keys = filtered_keys
 			recalculate_label_counts(motion_state, #filtered_keys)
 		end
 	end
