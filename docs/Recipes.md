@@ -611,6 +611,35 @@ presets = {
 
 **What changed:** The `first_target` filter keeps only the single closest target, so the action executes immediately without showing labels. This turns a labeled motion into an instant one.
 
+### Customize label keys for a motion
+
+Replace the entire label pool for a specific motion:
+
+```lua
+presets = {
+    words = {
+        w = { keys = "fdsarewq" },
+    },
+}
+```
+
+**What changed:** Only the characters `f`, `d`, `s`, `a`, `r`, `e`, `w`, `q` will be used as labels when pressing `w`. All other label characters are ignored for this motion.
+
+### Exclude keys from labels
+
+Remove specific characters from labels to avoid accidental presses:
+
+```lua
+presets = {
+    lines = {
+        j = { exclude_keys = "jk" },
+        k = { exclude_keys = "jk" },
+    },
+}
+```
+
+**What changed:** The `j` and `k` characters are removed from the label pool for line motions. This prevents accidental selection when you intended to press `j`/`k` again but were slightly too slow. The exclusion is case-insensitive and composes with all other label filters.
+
 ---
 
 ## Next Steps

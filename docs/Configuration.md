@@ -171,6 +171,31 @@ Map manually later:
 require("smart-motion").map_motion("w")
 ```
 
+### Per-Motion Label Customization
+
+Control which characters are used as labels for specific motions:
+
+```lua
+presets = {
+  lines = {
+    -- exclude j and k from labels so they don't interfere with line motions
+    j = { exclude_keys = "jk" },
+    k = { exclude_keys = "jk" },
+  },
+  words = {
+    -- use only these characters as labels for w
+    w = { keys = "fdsarewq" },
+  },
+}
+```
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `keys` | string | Replace the label pool entirely — only these characters will be used |
+| `exclude_keys` | string | Remove specific characters from the default label pool (case-insensitive) |
+
+Both options compose with existing label filters (motion key exclusion, search conflict avoidance). If both are set, `keys` defines the base pool and `exclude_keys` filters from it.
+
 See **[Presets Guide](Presets.md)** for complete preset documentation.
 
 For practical examples of what you can customize (multiline f, single-char find, camelCase words, and more), see the **[Recipes](Recipes.md)** guide.
