@@ -280,6 +280,15 @@ The `motion_state` table is mutable state passed through all pipeline stages.
 | `ts_inner_body` | boolean | Yield inner body (trims `{`/`}` delimiters) |
 | `is_textobject` | boolean | Bypass op-pending jump override for text objects |
 
+### Label Customization Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `label_keys` | string | Replace label pool with these characters |
+| `exclude_label_keys` | string | Remove these characters from label pool (case-insensitive) |
+
+Set via preset overrides as `keys` / `exclude_keys` (automatically routed to these motion_state fields).
+
 ### Multi-Window Fields
 
 | Field | Type | Description |

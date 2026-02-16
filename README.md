@@ -342,6 +342,8 @@ Here's a taste of what you can change with a single override:
 | Delete without moving cursor        | action        | `action = "remote_delete"`                   |
 | Make any motion cross-window        | metadata      | `multi_window = true`                        |
 | Auto-jump to closest target         | filter        | `filter = "first_target"`                    |
+| Customize labels for a motion       | keys          | `keys = "fdsarewq"`                          |
+| Exclude keys from labels            | exclude_keys  | `exclude_keys = "jk"`                        |
 
 See the [Recipes](https://github.com/FluxxField/smart-motion.nvim/wiki/Recipes) guide for 20+ practical examples, or [Advanced Recipes](https://github.com/FluxxField/smart-motion.nvim/wiki/Advanced-Recipes) for treesitter motions, custom text objects, and composable operators.
 
