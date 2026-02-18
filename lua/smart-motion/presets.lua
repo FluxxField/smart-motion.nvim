@@ -80,6 +80,9 @@ function presets.lines(exclude)
 			metadata = {
 				label = "Jump to Line after cursor",
 				description = "Jumps to the start of the line after the cursor",
+				motion_state = {
+					skip_jumplist = true,
+				},
 			},
 		},
 		k = {
@@ -95,6 +98,9 @@ function presets.lines(exclude)
 			metadata = {
 				label = "Jump to Line before cursor",
 				description = "Jumps to the start of the line before the cursor",
+				motion_state = {
+					skip_jumplist = true,
+				},
 			},
 		},
 	}, exclude)
