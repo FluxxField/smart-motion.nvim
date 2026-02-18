@@ -371,6 +371,8 @@ save_to_jumplist = false  -- don't save to jumplist
 
 When enabled, `m'` is set before every jump so `<C-o>` takes you back. This applies to all jump actions including pipeline jumps, history navigation, and pin jumps.
 
+> **Note:** `j`/`k` line motions never save to the jumplist, matching native vim behavior where simple line movements don't appear in `<C-o>`/`<C-i>` history. This applies to both standalone `j`/`k` and composed forms like `dj`/`dk`.
+
 Disable this if you don't want SmartMotion populating your jumplist, especially for frequent short hops.
 
 ---

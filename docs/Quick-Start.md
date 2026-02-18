@@ -183,7 +183,7 @@ opts = {
   -- Open folds at target position after jumping
   open_folds_on_jump = true,
 
-  -- Save position to jumplist before jumping
+  -- Save position to jumplist before jumping (j/k excluded to match native vim)
   save_to_jumplist = true,
 
   -- Search auto-proceed timeout (ms)
