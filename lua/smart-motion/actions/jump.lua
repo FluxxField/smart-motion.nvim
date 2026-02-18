@@ -53,7 +53,8 @@ function M.run(ctx, cfg, motion_state)
 	end
 
 	-- Save current position to jumplist before moving
-	if cfg.save_to_jumplist then
+	-- Skip for motions like j/k that shouldn't pollute the jumplist (matching native vim)
+	if cfg.save_to_jumplist and not motion_state.skip_jumplist then
 		vim.cmd("normal! m'")
 	end
 
