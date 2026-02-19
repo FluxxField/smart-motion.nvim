@@ -31,10 +31,19 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 	-- Repeat motion key = act on target under cursor (e.g., dww deletes cursor word)
 	-- Must check BEFORE flow state evaluation — otherwise quick typing triggers
 	-- "jump early" which selects the first target instead of the cursor target.
-	if motion_state.allow_quick_action and motion_state.motion_key and char == motion_state.motion_key then
-		local under_cursor = targets.get_target_under_cursor(ctx, cfg, motion_state)
-		if under_cursor then
-			motion_state.selected_jump_target = under_cursor
+	if motion_state.motion_key and char == motion_state.motion_key then
+		if motion_state.allow_quick_action then
+			local under_cursor = targets.get_target_under_cursor(ctx, cfg, motion_state)
+			if under_cursor then
+				motion_state.selected_jump_target = under_cursor
+				return
+			end
+		elseif motion_state.exclude_label_keys
+			and motion_state.exclude_label_keys:lower():find(char:lower(), 1, true)
+		then
+			-- The motion key was excluded from the label pool via exclude_label_keys.
+			-- Pressing it selects the nearest target (targets[1]) instead of cancelling.
+			-- e.g. j = { exclude_keys = "jk" }: pressing j again always goes down one line.
 			return
 		end
 	end

@@ -19,6 +19,10 @@ function M.run(trigger_key)
 	-- Shallow copy so infer mutations don't leak to the registry entry
 	motion_state.motion = vim.tbl_extend("force", {}, motion)
 
+	-- Set motion_key to the trigger key for direct motions.
+	-- For operator motions (infer=true), infer.run will override this with the composed key.
+	motion_state.motion_key = trigger_key
+
 	local modules = module_loader.get_modules(ctx, cfg, motion_state)
 
 	-- The modules might have motion_state they would like to set
