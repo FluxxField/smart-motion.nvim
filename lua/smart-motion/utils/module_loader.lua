@@ -10,7 +10,6 @@ function M.get_modules(ctx, cfg, motion_state, keys)
 	local registries = require("smart-motion.core.registries"):get()
 	local motion = motion_state.motion
 	local action_key = motion.action_key
-	local motion_key = motion_state.motion_key
 	local modules = {}
 
 	local default_keys = { "collector", "extractor", "modifier", "filter", "visualizer", "action" }
