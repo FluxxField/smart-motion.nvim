@@ -44,6 +44,8 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 			-- The motion key was excluded from the label pool via exclude_label_keys.
 			-- Pressing it selects the nearest target (targets[1]) instead of cancelling.
 			-- e.g. j = { exclude_keys = "jk" }: pressing j again always goes down one line.
+			-- Refresh the timestamp so chained presses (jjjj) keep the flow window alive.
+			flow_state.refresh_timestamp()
 			return
 		end
 	end
