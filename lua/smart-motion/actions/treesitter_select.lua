@@ -101,16 +101,17 @@ end
 
 --- Cleans up state and exits incremental selection.
 local function cleanup()
+	local bufnr = M._bufnr
 	M._active = false
 	M._node_stack = {}
 	M._current_index = 0
 	M._bufnr = nil
 	M._initial_mode = nil
 	-- Clear any temporary keymaps
-	pcall(vim.keymap.del, "x", ";", { buffer = M._bufnr })
-	pcall(vim.keymap.del, "x", ",", { buffer = M._bufnr })
-	pcall(vim.keymap.del, "x", "<CR>", { buffer = M._bufnr })
-	pcall(vim.keymap.del, "x", "<Esc>", { buffer = M._bufnr })
+	pcall(vim.keymap.del, "x", ";", { buffer = bufnr })
+	pcall(vim.keymap.del, "x", ",", { buffer = bufnr })
+	pcall(vim.keymap.del, "x", "<CR>", { buffer = bufnr })
+	pcall(vim.keymap.del, "x", "<Esc>", { buffer = bufnr })
 	vim.api.nvim_echo({ { "", "" } }, false, {})
 end
 
@@ -167,7 +168,6 @@ function M.cancel()
 	if not M._active then
 		return
 	end
-	local bufnr = M._bufnr
 	cleanup()
 	-- Exit visual mode
 	vim.cmd("normal! v")
