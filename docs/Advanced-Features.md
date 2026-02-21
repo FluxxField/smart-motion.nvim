@@ -146,6 +146,27 @@ In operator-pending mode:
 - **No centering**: `jump_centered` becomes plain `jump`
 - **Multi-window disabled**: operators expect same-buffer movement
 - **Till motions work**: `dt)` deletes to just before `)`, as expected
+- **`w` is exclusive**: `dw` stops before the first character of the target word, matching native vim. `b`, `e`, and `ge` also match their native equivalents.
+
+### Per-Mode motion_state Overrides
+
+Motions can specify different `motion_state` values for specific modes by using string keys in the `modes` table:
+
+```lua
+modes = { "n", "v", o = { exclude_target = true } }
+```
+
+Array entries (`"n"`, `"v"`) register the motion normally. String-keyed entries (like `o = { ... }`) register the motion for that mode **and** apply the given fields as a `motion_state` override when that mode is active. This is how the built-in `w` preset achieves native-matching `dw` behavior without affecting normal or visual mode.
+
+You can use any `motion_state` field as an override. Common use cases:
+
+```lua
+-- w-style: exclusive in op-pending (don't eat the target's first char)
+modes = { "n", "v", o = { exclude_target = true } }
+
+-- disable multi-window in a specific mode
+modes = { "n", v = { multi_window = false } }
+```
 
 ---
 

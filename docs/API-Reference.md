@@ -46,9 +46,21 @@ require("smart-motion").register_motion(name, config)
 | `action` | string/function | Yes | Action module name or merged action |
 | `pipeline_wrapper` | string | No | Pipeline wrapper name |
 | `map` | boolean | No | Whether to create keymap (default: true) |
-| `modes` | string[] | No | Vim modes (default: {"n"}) |
+| `modes` | string[]/table | No | Vim modes (default: {"n"}). String-keyed entries add per-mode `motion_state` overrides (see below). |
 | `infer` | boolean | No | Enable operator inference (reads a second key and infers pipeline from composable motion) |
 | `metadata` | table | No | Additional metadata |
+
+**Per-mode `motion_state` overrides:**
+
+String keys in the `modes` table add per-mode `motion_state` overrides. The motion is registered for that mode normally, but the given fields are merged into `motion_state` only when that mode is active:
+
+```lua
+-- exclusive in op-pending (dw stops before the target word's first char)
+modes = { "n", "v", o = { exclude_target = true } }
+
+-- disable multi-window in visual mode only
+modes = { "n", v = { multi_window = false } }
+```
 
 **Example:**
 
@@ -60,7 +72,8 @@ require("smart-motion").register_motion("gw", {
   visualizer = "hint_start",
   action = "jump_centered",
   map = true,
-  modes = { "n", "v", "o" },
+  -- exclusive in op-pending to match native dw behavior
+  modes = { "n", "v", o = { exclude_target = true } },
   metadata = {
     label = "Jump to word",
     description = "Jump to a word after cursor",
