@@ -46,7 +46,10 @@ Press w → labels appear on all words ahead → press 'f' → cursor jumps to t
 ```
 >w     indent from cursor to labeled word
 gUw    uppercase from cursor to labeled word
+dw     delete from cursor to (but not including) labeled word — matches native vim
 ```
+
+> **Native vim behavior:** In operator-pending mode, `w` is an **exclusive** motion — the first character of the target word is not included in the operation. This matches what you'd expect from `dw`, `yw`, `cw`, etc. in stock neovim.
 
 ---
 

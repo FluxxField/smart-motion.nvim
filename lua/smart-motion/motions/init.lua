@@ -65,12 +65,31 @@ function motions.register_motion(name, motion, opts)
 	motions.by_name[name] = motion
 	motions.by_key[motion.trigger_key] = motion
 
+	-- Parse modes table: array entries are plain modes, string-keyed entries are
+	-- modes with per-mode motion_state overrides (e.g. o = { exclude_target = true })
+	local modes_input = motion.modes or { "n" }
+	local flat_modes = {}
+	local per_mode_motion_state = {}
+
+	for _, mode in ipairs(modes_input) do
+		table.insert(flat_modes, mode)
+	end
+	for k, v in pairs(modes_input) do
+		if type(k) == "string" then
+			table.insert(flat_modes, k)
+			per_mode_motion_state[k] = v
+		end
+	end
+
+	if next(per_mode_motion_state) then
+		motion.per_mode_motion_state = per_mode_motion_state
+	end
+
 	if motion.map then
 		local infer = motion.infer or false
-		local modes = motion.modes or { "n" }
 		local desc = motion.metadata.label
 
-		for _, mode in ipairs(modes) do
+		for _, mode in ipairs(flat_modes) do
 			local handler = function()
 				if motion.count_passthrough and vim.v.count > 0 then
 					local count = vim.v.count

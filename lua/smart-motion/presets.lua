@@ -14,7 +14,9 @@ function presets.words(exclude)
 			visualizer = "hint_start",
 			action = "jump_centered",
 			map = true,
-			modes = { "n", "v", "o" },
+			-- In op-pending mode, w is an exclusive motion (dw stops before the target word start),
+			-- matching native vim behavior where dw does not eat the first char of the next word.
+			modes = { "n", "v", o = { exclude_target = true } },
 			metadata = {
 				label = "Jump to Start of Word after cursor",
 				description = "Jumps to the start of a visible word target using labels after the cursor",
