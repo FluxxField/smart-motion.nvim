@@ -11,6 +11,7 @@
 ---@field visualizers { register: fun(name: string, mod: SmartMotionVisualizerModuleEntry), register_many: fun(tbl: table<string, SmartMotionVisualizerModule>, opts?: { override?: boolean }) }
 ---@field actions { register: fun(name: string, mod: SmartMotionActionModuleEntry), register_many: fun(tbl: table<string, SmartMotionActionModule>, opts?: { override?: boolean }) }
 ---@field pipeline_wrappers { register: fun(name: string, mod: SmartMotionPipelineWrapperModuleEntry), register_many: fun(tbl: table<string, SmartMotionPipelineWrapperModule>, opts?: { override?: boolean }) }
+---@field selection_handlers { register: fun(name: string, mod: SmartMotionSelectionHandlerEntry), register_many: fun(tbl: table<string, SmartMotionSelectionHandlerEntry>, opts?: { override?: boolean }) }
 ---@field consts table  -- optional: you could also type consts more specifically later
 
 ---@class SmartMotionConfig
@@ -28,6 +29,7 @@
 ---@field search_idle_timeout_ms? number
 ---@field yank_highlight_duration? number
 ---@field history_max_age_days? number
+---@field selection_keys? false | table<string, string>
 
 ---@class SmartMotionPresets
 ---@field words? true | SmartMotionPresetKey.Words[]
@@ -46,9 +48,9 @@
 ---@alias SmartMotionPresetKey.Words "w" | "b" | "e" | "ge"
 ---@alias SmartMotionPresetKey.Lines "j" | "k"
 ---@alias SmartMotionPresetKey.Search "s" | "S" | "f" | "F" | "t" | "T" | "gs"
----@alias SmartMotionPresetKey.Delete "d" | "dt" | "dT" | "df" | "dF" | "rdw" | "rdl"
----@alias SmartMotionPresetKey.Yank "y" | "yt" | "yT" | "yf" | "yF" | "ryw" | "ryl"
----@alias SmartMotionPresetKey.Change "c" | "ct" | "cT" | "cf" | "cF"
+---@alias SmartMotionPresetKey.Delete "d" | "rdw" | "rdl"
+---@alias SmartMotionPresetKey.Yank "y" | "ryw" | "ryl"
+---@alias SmartMotionPresetKey.Change "c"
 ---@alias SmartMotionPresetKey.Treesitter "]]" | "[[" | "]c" | "[c" | "]b" | "[b" | "daa" | "caa" | "yaa" | "dfn" | "cfn" | "yfn" | "saa" | "gS" | "R"
 ---@alias SmartMotionPresetKey.Misc "." | "gmd" | "gmy" | "gQf" | "gQd" | "gQe" | "gQg" | "gTf" | "gTd" | "gTe" | "gTg"
 ---@alias SmartMotionPresetKey.Diagnostics "]d" | "[d" | "]e" | "[e"
@@ -187,6 +189,12 @@
   action: SmartMotionActionModule
 ): boolean?>
 
+---@alias SmartMotionSelectionHandlerEntry SmartMotionModuleEntry<fun(
+  ctx: SmartMotionContext,
+  cfg: SmartMotionConfig,
+  state: SmartMotionMotionState
+): boolean | "rerun">
+
 ---@class SmartMotionMotionEntry
 ---@field trigger_key? string
 ---@field action_key? string
@@ -209,6 +217,7 @@
   | "visualizers"
   | "actions"
   | "pipeline_wrappers"
+  | "selection_handlers"
   | "motions"
 
 ---@generic T
@@ -230,6 +239,7 @@
 ---@field visualizers SmartMotionRegistry<SmartMotionVisualizerModuleEntry>
 ---@field actions SmartMotionRegistry<SmartMotionActionModuleEntry>
 ---@field pipeline_wrappers SmartMotionRegistry<SmartMotionPipelineWrapperModuleEntry>
+---@field selection_handlers SmartMotionRegistry<SmartMotionSelectionHandlerEntry>
 ---@field motions SmartMotionMotionRegistry
 
 ---@class SmartMotionRegistryManager

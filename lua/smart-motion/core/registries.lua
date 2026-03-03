@@ -8,6 +8,7 @@ local log = require("smart-motion.core.log")
 --- @field visualizers boolean
 --- @field actions boolean
 --- @field pipeline_wrappers boolean
+--- @field selection_handlers boolean
 --- @field motions boolean
 
 --- @type RegistryConstructors
@@ -19,6 +20,7 @@ local default_registry_constructors = {
 	visualizers = true,
 	actions = true,
 	pipeline_wrappers = true,
+	selection_handlers = true,
 	motions = true,
 }
 
