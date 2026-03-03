@@ -24,6 +24,10 @@
 --   gUw → uppercase to word target
 --   =j  → auto-indent to line target
 --   gqj → format to line target
+--
+-- SELECT FIRST TARGET:
+--   Press <CR> during label selection to pick the first target.
+--   Example: dw<CR> deletes to the first word target (similar to dww but explicit)
 
 -- ── Section 1: Words to delete ────────────────────────────────
 

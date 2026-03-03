@@ -23,6 +23,11 @@
 -- MULTI-WINDOW:
 --   :vsplit tests/words_lines.lua
 --   Press s or f — labels should appear in BOTH windows
+--
+-- SELECT FIRST TARGET:
+--   During any label selection, press <CR> to select the first target.
+--   Example: fa<CR> jumps to the first "a" match (same as vanilla f behavior)
+--   Works with: s, S, f, F, t, T, and all operator compositions
 
 -- ── Section 1: Repeated patterns for search ───────────────────
 
