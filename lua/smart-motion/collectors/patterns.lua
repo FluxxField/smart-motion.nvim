@@ -31,9 +31,15 @@ function M.run()
 					local search_start = 0
 
 					while search_start < #line do
-						local ok, match, match_start, match_end = pcall(vim.fn.matchstrpos, line, pattern, search_start)
+						local ok, match_data = pcall(vim.fn.matchstrpos, line, pattern, search_start)
 
-						if not ok or match == "" or match_start == -1 then
+						if not ok or match_data[2] == -1 then
+							break
+						end
+
+						local match, match_start, match_end = match_data[1], match_data[2], match_data[3]
+
+						if match == "" then
 							break
 						end
 
