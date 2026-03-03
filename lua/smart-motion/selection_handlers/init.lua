@@ -3,6 +3,7 @@ local highlight = require("smart-motion.core.highlight")
 local consts = require("smart-motion.consts")
 
 local HINT_POSITION = consts.HINT_POSITION
+local DIRECTION = consts.DIRECTION
 
 ---@type SmartMotionRegistry<SmartMotionSelectionHandlerEntry>
 local selection_handlers = require("smart-motion.core.registry")("selection_handlers")
@@ -76,6 +77,47 @@ local handler_entries = {
 		metadata = {
 			label = "Toggle Hint Position",
 			description = "Toggles hint labels between start and end of targets",
+		},
+	},
+
+	toggle_direction = {
+		run = function(ctx, cfg, motion_state)
+			if motion_state.direction == DIRECTION.AFTER_CURSOR then
+				motion_state.direction = DIRECTION.BEFORE_CURSOR
+			else
+				motion_state.direction = DIRECTION.AFTER_CURSOR
+			end
+			log.debug("Toggled direction to " .. motion_state.direction)
+			return "rerun"
+		end,
+		metadata = {
+			label = "Toggle Direction",
+			description = "Flips search direction (forward/backward) and re-runs pipeline",
+		},
+	},
+
+	toggle_multi_window = {
+		run = function(ctx, cfg, motion_state)
+			motion_state.multi_window = not motion_state.multi_window
+			log.debug("Toggled multi_window to " .. tostring(motion_state.multi_window))
+			return "rerun"
+		end,
+		metadata = {
+			label = "Toggle Multi-Window",
+			description = "Toggles between single and multi-window target collection",
+		},
+	},
+
+	expand_search_scope = {
+		run = function(ctx, cfg, motion_state)
+			local max = vim.api.nvim_buf_line_count(ctx.bufnr)
+			motion_state.max_lines = math.min(motion_state.max_lines * 2, max)
+			log.debug("Expanded search scope to " .. motion_state.max_lines .. " lines")
+			return "rerun"
+		end,
+		metadata = {
+			label = "Expand Search Scope",
+			description = "Doubles the search scope (max_lines) and re-runs pipeline",
 		},
 	},
 }
