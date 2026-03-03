@@ -37,6 +37,9 @@ M.defaults = {
 	search_idle_timeout_ms = 2000,
 	yank_highlight_duration = 150,
 	history_max_age_days = 30,
+	selection_keys = {
+		["<CR>"] = "select_first",
+	},
 }
 
 ---@type SmartMotionConfig
@@ -212,6 +215,25 @@ function M.validate(user_config)
 	--
 	if config.history_max_age_days == nil or type(config.history_max_age_days) ~= "number" or config.history_max_age_days < 1 then
 		config.history_max_age_days = 30
+	end
+
+	--
+	-- Validate selection_keys
+	--
+	if config.selection_keys ~= false then
+		if config.selection_keys ~= nil and type(config.selection_keys) ~= "table" then
+			config.selection_keys = M.defaults.selection_keys
+		end
+
+		if type(config.selection_keys) == "table" then
+			local normalized = {}
+			for key, action in pairs(config.selection_keys) do
+				if type(key) == "string" and type(action) == "string" then
+					normalized[vim.fn.keytrans(key)] = action
+				end
+			end
+			config.selection_keys = normalized
+		end
 	end
 
 	M.validated = config
