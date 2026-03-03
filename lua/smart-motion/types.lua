@@ -28,6 +28,7 @@
 ---@field search_idle_timeout_ms? number
 ---@field yank_highlight_duration? number
 ---@field history_max_age_days? number
+---@field selection_keys? false | table<string, string>
 
 ---@class SmartMotionPresets
 ---@field words? true | SmartMotionPresetKey.Words[]
