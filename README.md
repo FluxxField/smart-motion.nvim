@@ -92,6 +92,18 @@ yaa   yank an argument        =if   indent a function body
 cic   change inside a class   >ac   indent a class
 ```
 
+### Modify the search mid-selection
+
+Other motion plugins lock you in once labels appear. SmartMotion lets you change the search context without cancelling:
+
+```
+w  [labels appear]  <M-d>  → labels flip to backward words
+s  [search, labels] <M-w>  → labels expand to all visible windows
+j  [line labels]    <M-e>  → scope doubles, more labels appear
+```
+
+Toggle direction, toggle multi-window, expand scope, flip hint positions — all while labels are on screen. Pipeline-modifying handlers re-run the entire motion pipeline and regenerate labels in place. Fully configurable via `selection_keys`, and you can register your own handlers.
+
 ### It's a framework, not just a plugin
 
 Every built-in motion uses the same public API:
