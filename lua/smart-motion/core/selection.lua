@@ -29,14 +29,12 @@ function M._rerun_pipeline(ctx, cfg, motion_state)
 
 	-- If pipeline threw an exit event (e.g., no targets), cancel gracefully
 	if exit_type then
-		log.debug("Pipeline re-run exited with: " .. tostring(exit_type))
 		motion_state.selected_jump_target = nil
 		return
 	end
 
 	local targets_list = motion_state.jump_targets or {}
 	if #targets_list == 0 then
-		log.debug("Pipeline re-run produced no targets")
 		motion_state.selected_jump_target = nil
 		return
 	end
@@ -76,7 +74,6 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 			local handler = registries.selection_handlers.get_by_name(handler_name)
 			if handler then
 				local result = handler.run(ctx, cfg, motion_state)
-				log.debug("Selection handler '" .. handler_name .. "' triggered via " .. key_name)
 
 				if result == "rerun" then
 					return M._rerun_pipeline(ctx, cfg, motion_state)

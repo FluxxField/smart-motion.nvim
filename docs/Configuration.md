@@ -489,7 +489,8 @@ selection_keys = {
 | `toggle_multi_window` | `<M-w>` | re-runs | Toggles single/multi-window target collection |
 | `expand_search_scope` | `<M-e>` | re-runs | Doubles the search scope (max_lines) |
 
-Add others as needed:
+> **Tip:** `toggle_hint_position` and `select_last` are available but not mapped by default.
+> `toggle_hint_position` flips hint labels between the start and end of each target — useful when a label obscures the text you're trying to read. Add them to your config if you want them:
 
 ```lua
 selection_keys = {

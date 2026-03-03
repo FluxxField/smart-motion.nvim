@@ -229,15 +229,18 @@ function M.validate(user_config)
 		end
 
 		if type(config.selection_keys) == "table" then
-			local normalized = {}
+			local validated = {}
 			for key, action in pairs(config.selection_keys) do
 				if type(key) == "string" and type(action) == "string" then
-					normalized[vim.fn.keytrans(key)] = action
+					-- Store keys as-is — they are already in notation form (e.g. "<M-d>").
+					-- Do NOT keytrans() them: keytrans escapes "<" to "<lt>", breaking
+					-- the lookup against keytrans(getcharstr()) which returns "<M-d>".
+					validated[key] = action
 				else
 					log.warn("selection_keys: skipping invalid entry (key=" .. tostring(key) .. ", action=" .. tostring(action) .. ")")
 				end
 			end
-			config.selection_keys = normalized
+			config.selection_keys = validated
 		end
 	end
 
