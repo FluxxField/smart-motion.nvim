@@ -70,11 +70,7 @@ Complete guide to configuring SmartMotion.
 
   -- Key-action map for label selection (press key to trigger action)
   selection_keys = {
-    ["<CR>"]  = "select_first",        -- Enter selects the first target
-    ["<M-h>"] = "toggle_hint_position", -- Flip hints between start/end of targets
-    ["<M-d>"] = "toggle_direction",    -- Flip search direction
-    ["<M-w>"] = "toggle_multi_window", -- Toggle single/multi-window
-    ["<M-e>"] = "expand_search_scope", -- Double the search scope
+    ["<CR>"] = "select_first",       -- Enter selects the first target
   },
 }
 ```
@@ -463,15 +459,11 @@ See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)**
 
 ## Selection Keys
 
-Configure special keys that trigger actions during label selection:
+Configure special keys that trigger actions during label selection. Only `<CR>` → `select_first` is enabled by default:
 
 ```lua
 selection_keys = {
-    ["<CR>"]  = "select_first",
-    ["<M-h>"] = "toggle_hint_position",
-    ["<M-d>"] = "toggle_direction",
-    ["<M-w>"] = "toggle_multi_window",
-    ["<M-e>"] = "expand_search_scope",
+    ["<CR>"] = "select_first",
 }
 ```
 
@@ -482,25 +474,25 @@ selection_keys = {
 
 ### Built-in Handlers
 
-| Handler Name | Default Key | Return | Description |
+| Handler Name | Suggested Key | Return | Description |
 |---|---|---|---|
 | `select_first` | `<CR>` | exits | Selects the first (closest) target |
-| `select_last` | (none) | exits | Selects the last (furthest) target |
+| `select_last` | `<S-CR>` | exits | Selects the last (furthest) target |
 | `toggle_hint_position` | `<M-h>` | stays | Toggles hint labels between start/end of targets |
 | `toggle_direction` | `<M-d>` | re-runs | Flips search direction (forward/backward) |
 | `toggle_multi_window` | `<M-w>` | re-runs | Toggles single/multi-window target collection |
 | `expand_search_scope` | `<M-e>` | re-runs | Doubles the search scope (max_lines) |
 
-> **Tip:** `select_last` is available but not mapped by default. Add it to your config if you want it:
+Enable the ones you want by adding them to your config. Remap to any key you prefer:
 
 ```lua
 selection_keys = {
-    ["<CR>"]  = "select_first",
+    ["<CR>"]   = "select_first",
     ["<S-CR>"] = "select_last",
-    ["<M-h>"] = "toggle_hint_position",
-    ["<M-d>"] = "toggle_direction",
-    ["<M-w>"] = "toggle_multi_window",
-    ["<M-e>"] = "expand_search_scope",
+    ["<M-h>"]  = "toggle_hint_position",
+    ["<M-d>"]  = "toggle_direction",
+    ["<M-w>"]  = "toggle_multi_window",
+    ["<M-e>"]  = "expand_search_scope",
 }
 ```
 

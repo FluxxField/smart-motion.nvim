@@ -167,19 +167,15 @@ All coexist. Selection handlers are checked after the motion-key-repeat check, s
 
 ### Configuration
 
-Enabled by default with five mappings. The `selection_keys` config maps keys to registered handlers:
+Only `<CR>` → `select_first` is enabled by default. Enable the others by adding them to `selection_keys`:
 
 ```lua
 -- Default
 selection_keys = {
-    ["<CR>"]  = "select_first",
-    ["<M-h>"] = "toggle_hint_position",
-    ["<M-d>"] = "toggle_direction",
-    ["<M-w>"] = "toggle_multi_window",
-    ["<M-e>"] = "expand_search_scope",
+    ["<CR>"] = "select_first",
 }
 
--- Full example (with optional extras)
+-- Enable all handlers
 selection_keys = {
     ["<CR>"]   = "select_first",
     ["<S-CR>"] = "select_last",

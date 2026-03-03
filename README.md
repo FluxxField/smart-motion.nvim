@@ -437,13 +437,26 @@ SmartMotion wouldn't exist without these plugins. See [Why SmartMotion](https://
   yank_highlight_duration = 150,     -- yank flash duration (ms)
   history_max_age_days = 30,         -- prune history entries older than this
   selection_keys = {                  -- key-action map during label selection
-    ["<CR>"]  = "select_first",      -- Enter picks the first target
-    ["<M-d>"] = "toggle_direction",  -- Flip search direction
-    ["<M-w>"] = "toggle_multi_window", -- Toggle single/multi-window
-    ["<M-e>"] = "expand_search_scope", -- Double the search scope
+    ["<CR>"] = "select_first",       -- Enter picks the first target
   },
 }
 ```
+
+### Selection Keys
+
+During label selection, special keys can trigger actions instead of picking a label. Only `<CR>` → `select_first` is enabled by default. Enable the others to modify the search mid-selection:
+
+```lua
+selection_keys = {
+    ["<CR>"]   = "select_first",         -- Enter picks the first target
+    ["<M-h>"]  = "toggle_hint_position", -- Flip hints between start/end of targets
+    ["<M-d>"]  = "toggle_direction",     -- Flip search direction (forward/backward)
+    ["<M-w>"]  = "toggle_multi_window",  -- Toggle single/multi-window
+    ["<M-e>"]  = "expand_search_scope",  -- Double the search scope
+}
+```
+
+Disable all selection keys with `selection_keys = false`. Remap to different keys by changing the key string. See [Configuration: Selection Keys](https://github.com/FluxxField/smart-motion.nvim/wiki/Configuration#selection-keys) for custom handlers.
 
 See [Configuration](https://github.com/FluxxField/smart-motion.nvim/wiki/Configuration) for the full reference.
 
