@@ -39,10 +39,6 @@ M.defaults = {
 	history_max_age_days = 30,
 	selection_keys = {
 		["<CR>"] = "select_first",
-		["<M-h>"] = "toggle_hint_position",
-		["<M-d>"] = "toggle_direction",
-		["<M-w>"] = "toggle_multi_window",
-		["<M-e>"] = "expand_search_scope",
 	},
 }
 
