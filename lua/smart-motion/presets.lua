@@ -241,32 +241,6 @@ function presets.delete(exclude)
 				},
 			},
 		},
-		dt = {
-			collector = "lines",
-			extractor = "text_search_2_char_until",
-			filter = "filter_words_on_cursor_line_after_cursor",
-			visualizer = "hint_start",
-			action = "delete",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Delete Until Searched Text After Cursor",
-				description = "Deletes until the searched for text after the cursor",
-			},
-		},
-		dT = {
-			collector = "lines",
-			extractor = "text_search_2_char_until",
-			filter = "filter_words_on_cursor_line_before_cursor",
-			visualizer = "hint_start",
-			action = "delete",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Delete Until Searched Text Before Cursor",
-				description = "Deletes until the searched for text before the cursor",
-			},
-		},
 		rdw = {
 			collector = "lines",
 			extractor = "words",
@@ -317,32 +291,6 @@ function presets.yank(exclude)
 				},
 			},
 		},
-		yt = {
-			collector = "lines",
-			extractor = "text_search_2_char_until",
-			filter = "filter_words_on_cursor_line_after_cursor",
-			visualizer = "hint_start",
-			action = "yank_until",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Yank Until Searched Text After Cursor",
-				description = "Yank until the searched for text after the cursor",
-			},
-		},
-		yT = {
-			collector = "lines",
-			extractor = "text_search_2_char_until",
-			filter = "filter_words_on_cursor_line_before_cursor",
-			visualizer = "hint_start",
-			action = "yank_until",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Yank Until Searched Text Before Cursor",
-				description = "Yank until the searched for text before the cursor",
-			},
-		},
 		ryw = {
 			collector = "lines",
 			extractor = "words",
@@ -391,32 +339,6 @@ function presets.change(exclude)
 				motion_state = {
 					allow_quick_action = true,
 				},
-			},
-		},
-		ct = {
-			collector = "lines",
-			extractor = "text_search_2_char_until",
-			filter = "filter_words_on_cursor_line_after_cursor",
-			visualizer = "hint_start",
-			action = "change_until",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Change Until Searched Text After Cursor",
-				description = "Change until the searched for text after the cursor",
-			},
-		},
-		cT = {
-			collector = "lines",
-			extractor = "text_search_2_char_until",
-			filter = "filter_words_on_cursor_line_before_cursor",
-			visualizer = "hint_start",
-			action = "change_until",
-			map = true,
-			modes = { "n" },
-			metadata = {
-				label = "Change Until Searched Text Before Cursor",
-				description = "Change until the searched for text",
 			},
 		},
 	}, exclude)
