@@ -14,6 +14,9 @@ function M.run()
 		exit.throw_if(not vim.api.nvim_buf_is_valid(ctx.bufnr), EXIT_TYPE.EARLY_EXIT)
 
 		local patterns = motion_state.patterns
+		if not patterns or #patterns == 0 then
+			log.debug("Patterns collector: no patterns configured")
+		end
 		exit.throw_if(not patterns or #patterns == 0, EXIT_TYPE.EARLY_EXIT)
 
 		local total_lines = vim.api.nvim_buf_line_count(ctx.bufnr)
@@ -27,7 +30,13 @@ function M.run()
 			local line = vim.api.nvim_buf_get_lines(ctx.bufnr, line_number, line_number + 1, false)[1]
 
 			if line and #line > 0 then
+				local matched_this_line = false
+
 				for pattern_index, pattern in ipairs(patterns) do
+					if matched_this_line and motion_state.patterns_whole_line then
+						break
+					end
+
 					local search_start = 0
 
 					while search_start < #line do
@@ -44,6 +53,7 @@ function M.run()
 						end
 
 						if motion_state.patterns_whole_line then
+							matched_this_line = true
 							coroutine.yield({
 								text = line,
 								line_number = line_number,
