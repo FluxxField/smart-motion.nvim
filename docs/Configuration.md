@@ -489,11 +489,31 @@ selection_keys = false
 ```lua
 selection_keys = {
     ["<CR>"] = "select_first",
-    -- future actions can be added here
+    -- map any key to any registered selection handler
 }
 ```
 
-The `selection_keys` map supports future actions beyond `"select_first"`. Keys are normalized via Vim's key notation, so `<CR>`, `<Tab>`, `<M-h>` all work.
+**Register custom handlers:**
+
+Selection handlers are registered modules, just like collectors, extractors, and actions. You can register your own:
+
+```lua
+require("smart-motion").selection_handlers.register("my_handler", {
+    run = function(ctx, cfg, motion_state)
+        -- Do something with the selection state
+        -- Return true to accept and stop selection, false to continue
+        return true
+    end,
+})
+
+-- Then reference it in config:
+selection_keys = {
+    ["<CR>"] = "select_first",
+    ["<Tab>"] = "my_handler",
+}
+```
+
+Keys are normalized via Vim's key notation, so `<CR>`, `<Tab>`, `<M-h>` all work.
 
 ---
 

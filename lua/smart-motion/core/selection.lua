@@ -50,13 +50,18 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 		end
 	end
 
-	-- Selection action keys (e.g., <CR> = select first target)
+	-- Selection action keys (e.g., <CR> = select_first)
+	-- Handlers are registered in the selection_handlers registry.
 	if cfg.selection_keys then
 		local key_name = vim.fn.keytrans(char)
-		local action = cfg.selection_keys[key_name]
-		if action == "select_first" then
-			log.debug("Selection action: select_first via " .. key_name)
-			return
+		local handler_name = cfg.selection_keys[key_name]
+		if handler_name then
+			local registries = require("smart-motion.core.registries"):get()
+			local handler = registries.selection_handlers.get_by_name(handler_name)
+			if handler and handler.run(ctx, cfg, motion_state) then
+				log.debug("Selection handler '" .. handler_name .. "' triggered via " .. key_name)
+				return
+			end
 		end
 	end
 

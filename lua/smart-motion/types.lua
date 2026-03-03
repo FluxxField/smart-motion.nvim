@@ -11,6 +11,7 @@
 ---@field visualizers { register: fun(name: string, mod: SmartMotionVisualizerModuleEntry), register_many: fun(tbl: table<string, SmartMotionVisualizerModule>, opts?: { override?: boolean }) }
 ---@field actions { register: fun(name: string, mod: SmartMotionActionModuleEntry), register_many: fun(tbl: table<string, SmartMotionActionModule>, opts?: { override?: boolean }) }
 ---@field pipeline_wrappers { register: fun(name: string, mod: SmartMotionPipelineWrapperModuleEntry), register_many: fun(tbl: table<string, SmartMotionPipelineWrapperModule>, opts?: { override?: boolean }) }
+---@field selection_handlers { register: fun(name: string, mod: SmartMotionSelectionHandlerEntry), register_many: fun(tbl: table<string, SmartMotionSelectionHandlerEntry>, opts?: { override?: boolean }) }
 ---@field consts table  -- optional: you could also type consts more specifically later
 
 ---@class SmartMotionConfig
@@ -188,6 +189,12 @@
   action: SmartMotionActionModule
 ): boolean?>
 
+---@alias SmartMotionSelectionHandlerEntry SmartMotionModuleEntry<fun(
+  ctx: SmartMotionContext,
+  cfg: SmartMotionConfig,
+  state: SmartMotionMotionState
+): boolean>
+
 ---@class SmartMotionMotionEntry
 ---@field trigger_key? string
 ---@field action_key? string
@@ -210,6 +217,7 @@
   | "visualizers"
   | "actions"
   | "pipeline_wrappers"
+  | "selection_handlers"
   | "motions"
 
 ---@generic T
@@ -231,6 +239,7 @@
 ---@field visualizers SmartMotionRegistry<SmartMotionVisualizerModuleEntry>
 ---@field actions SmartMotionRegistry<SmartMotionActionModuleEntry>
 ---@field pipeline_wrappers SmartMotionRegistry<SmartMotionPipelineWrapperModuleEntry>
+---@field selection_handlers SmartMotionRegistry<SmartMotionSelectionHandlerEntry>
 ---@field motions SmartMotionMotionRegistry
 
 ---@class SmartMotionRegistryManager
