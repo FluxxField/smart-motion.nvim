@@ -24,6 +24,10 @@
 --   gUw → uppercase to word target
 --   =j  → auto-indent to line target
 --   gqj → format to line target
+--
+-- SELECT FIRST TARGET:
+--   Press <CR> during label selection to pick the first target.
+--   Example: dw<CR> deletes to the first word target (similar to dww but explicit)
 
 -- ── Section 1: Words to delete ────────────────────────────────
 
@@ -203,3 +207,13 @@ local mixed_case = "SoMe MiXeD cAsE tExT"
 
 -- Try: position cursor on "local poorly_indented", press =j, pick a line below
 -- Try: position cursor on "local lowercase_words", press gUw, pick a word target
+
+-- ============================================================================
+-- PIPELINE-MODIFYING HANDLERS IN OPERATOR CONTEXT
+-- ============================================================================
+--
+-- 1. `dw` → `<M-d>` → select backward word → backward word should be deleted
+-- 2. `yw` → `<M-d>` → select backward word → backward word should be yanked
+-- 3. `cw` → `<M-d>` → select backward word → backward word deleted, enter insert mode
+-- 4. `dw` → `<M-e>` → select distant word → word should be deleted
+-- 5. `dw` → `<M-w>` → should be no-op (multi-window disabled in op-pending)

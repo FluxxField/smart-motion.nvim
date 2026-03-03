@@ -21,6 +21,7 @@ function M.setup(user_config)
 		filters = require("smart-motion.filters"),
 		visualizers = require("smart-motion.visualizers"),
 		actions = require("smart-motion.actions"),
+		selection_handlers = require("smart-motion.selection_handlers"),
 		motions = require("smart-motion.motions"),
 	})
 
@@ -119,6 +120,13 @@ function M.setup(user_config)
 		register_many = registries.actions.register_many,
 		get_by_key = registries.actions.get_by_key,
 		get_by_name = registries.actions.get_by_name,
+	}
+
+	M.selection_handlers = {
+		register = registries.selection_handlers.register,
+		register_many = registries.selection_handlers.register_many,
+		get_by_key = registries.selection_handlers.get_by_key,
+		get_by_name = registries.selection_handlers.get_by_name,
 	}
 end
 
