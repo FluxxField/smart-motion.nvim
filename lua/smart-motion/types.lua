@@ -193,7 +193,7 @@
   ctx: SmartMotionContext,
   cfg: SmartMotionConfig,
   state: SmartMotionMotionState
-): boolean>
+): boolean | "rerun">
 
 ---@class SmartMotionMotionEntry
 ---@field trigger_key? string
