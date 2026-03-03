@@ -67,6 +67,11 @@ Complete guide to configuring SmartMotion.
 
   -- Prune history entries older than this many days
   history_max_age_days = 30,
+
+  -- Key-action map for label selection (press key to trigger action)
+  selection_keys = {
+    ["<CR>"] = "select_first",  -- Enter selects the first target
+  },
 }
 ```
 
@@ -452,6 +457,46 @@ See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)**
 
 ---
 
+## Selection Keys
+
+Configure special keys that trigger actions during label selection:
+
+```lua
+selection_keys = {
+    ["<CR>"] = "select_first",  -- default
+}
+```
+
+**How it works:**
+1. A motion triggers and labels appear
+2. Instead of pressing a label, press `<CR>` (Enter)
+3. The first target is selected automatically
+
+This is especially useful for search motions where you often want the first match:
+
+```
+fa<CR>    jump to the first "a" (same as vanilla f)
+sa<CR>    jump to the first "a" match
+dw<CR>    delete to the first word target
+```
+
+**Disable entirely:**
+```lua
+selection_keys = false
+```
+
+**Custom keys:**
+```lua
+selection_keys = {
+    ["<CR>"] = "select_first",
+    -- future actions can be added here
+}
+```
+
+The `selection_keys` map supports future actions beyond `"select_first"`. Keys are normalized via Vim's key notation, so `<CR>`, `<Tab>`, `<M-h>` all work.
+
+---
+
 ## Complete Example
 
 ```lua
@@ -522,6 +567,9 @@ See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)**
 
     -- Keep history for 90 days
     history_max_age_days = 90,
+
+    -- Disable select-first-target (prefer explicit label selection)
+    -- selection_keys = false,
   },
 }
 ```

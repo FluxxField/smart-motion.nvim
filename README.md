@@ -424,6 +424,9 @@ SmartMotion wouldn't exist without these plugins. See [Why SmartMotion](https://
   search_idle_timeout_ms = 2000,     -- exit search with no input
   yank_highlight_duration = 150,     -- yank flash duration (ms)
   history_max_age_days = 30,         -- prune history entries older than this
+  selection_keys = {                 -- key-action map during label selection
+    ["<CR>"] = "select_first",      -- Enter picks the first target
+  },
 }
 ```
 

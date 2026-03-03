@@ -84,6 +84,65 @@ ds + ... = delete via search    df + .. = delete via 2-char find
 
 ---
 
+## Select First Target
+
+Press `<CR>` (Enter) during label selection to instantly select the first target. This bridges the gap between SmartMotion's label-based selection and vanilla Vim behavior.
+
+### The Problem
+
+Search motions like `f`, `t`, and `s` always require reading and pressing a label, even when you want the closest match. Unlike `dww` (repeat the motion key) or flow state (`jj`), there's no quick shortcut for "just give me the first one."
+
+### The Solution
+
+During **any** label selection, press `<CR>` to select the first target:
+
+```
+fa<CR>    jump to the first "a" (vanilla f behavior)
+ta<CR>    jump to just before the first "a" (vanilla t behavior)
+sa<CR>    jump to the first "a" search match
+dw<CR>    delete to the first word target
+yw<CR>    yank to the first word target
+```
+
+### How It Works
+
+1. Trigger any motion — labels appear
+2. Press `<CR>` instead of a label key
+3. The first target (closest to cursor) is selected
+4. The action runs on that target
+
+There's no timeout. You can read all the labels, decide the first one is what you want, and press `<CR>`.
+
+### Relationship to Other Shortcuts
+
+SmartMotion has three ways to "skip" label selection:
+
+| Method | How | Best for |
+|--------|-----|----------|
+| **Flow state** | Press motion key quickly after a previous motion | Chaining motions (`w` → `w` → `j`) |
+| **Repeat motion key** | Press motion key during labels (`dww`) | Acting on cursor target |
+| **Select first target** | Press `<CR>` during labels | Picking the closest match |
+
+All three coexist. `<CR>` is checked after the motion-key-repeat check, so `dww` still works as expected.
+
+### Configuration
+
+Enabled by default. The `selection_keys` config maps keys to actions:
+
+```lua
+-- Default
+selection_keys = {
+    ["<CR>"] = "select_first",
+}
+
+-- Disable
+selection_keys = false
+```
+
+See **[Configuration: Selection Keys](Configuration.md#selection-keys)** for details.
+
+---
+
 ## Operator-Pending Mode
 
 SmartMotion motions work with **any vim operator**.
