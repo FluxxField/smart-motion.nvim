@@ -469,39 +469,58 @@ selection_keys = {
 
 **How it works:**
 1. A motion triggers and labels appear
-2. Instead of pressing a label, press `<CR>` (Enter)
-3. The first target is selected automatically
+2. Instead of pressing a label, press a configured key
+3. The corresponding handler runs
 
-This is especially useful for search motions where you often want the first match:
+### Built-in Handlers
+
+| Handler | Description | Returns |
+|---------|-------------|---------|
+| `select_first` | Selects the first (closest) target | Exits selection |
+| `select_last` | Selects the last (furthest) target | Exits selection |
+| `toggle_hint_position` | Flips hints between start and end of targets | Stays in selection |
+
+**Default config** only maps `<CR>` to `select_first`. Add others as needed:
+
+```lua
+selection_keys = {
+    ["<CR>"] = "select_first",
+    ["<S-CR>"] = "select_last",
+    ["<M-h>"] = "toggle_hint_position",
+}
+```
+
+### Examples
 
 ```
-fa<CR>    jump to the first "a" (same as vanilla f)
-sa<CR>    jump to the first "a" match
-dw<CR>    delete to the first word target
+fa<CR>      jump to the first "a" (same as vanilla f)
+sa<CR>      jump to the first "a" match
+dw<CR>      delete to the first word target
+w<M-h>      toggle hints to end-of-word, then pick a label
 ```
 
-**Disable entirely:**
+### Handler Return Values
+
+Handlers return a boolean that controls the selection flow:
+
+- **`true`** — accept the selection and exit (like `select_first`, `select_last`)
+- **`false`** — stay in the selection loop and wait for the next keypress (like `toggle_hint_position`)
+
+### Disable
+
 ```lua
 selection_keys = false
 ```
 
-**Custom keys:**
-```lua
-selection_keys = {
-    ["<CR>"] = "select_first",
-    -- map any key to any registered selection handler
-}
-```
+### Custom Handlers
 
-**Register custom handlers:**
-
-Selection handlers are registered modules, just like collectors, extractors, and actions. You can register your own:
+Selection handlers are registered modules, just like collectors, extractors, and actions:
 
 ```lua
 require("smart-motion").selection_handlers.register("my_handler", {
     run = function(ctx, cfg, motion_state)
-        -- Do something with the selection state
-        -- Return true to accept and stop selection, false to continue
+        -- Modify motion_state, re-render hints, etc.
+        -- Return true to exit selection, false to stay
         return true
     end,
 })

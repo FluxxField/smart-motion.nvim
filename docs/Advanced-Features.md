@@ -84,55 +84,73 @@ ds + ... = delete via search    df + .. = delete via 2-char find
 
 ---
 
-## Select First Target
+## Selection Handlers
 
-Press `<CR>` (Enter) during label selection to instantly select the first target. This bridges the gap between SmartMotion's label-based selection and vanilla Vim behavior.
+During label selection, special keys can trigger **selection handlers** — registered actions that modify the selection flow. Three built-in handlers ship with SmartMotion.
 
-### The Problem
+### Select First / Select Last
+
+Press `<CR>` during label selection to instantly select the first target. This bridges the gap between SmartMotion's label-based selection and vanilla Vim behavior.
 
 Search motions like `f`, `t`, and `s` always require reading and pressing a label, even when you want the closest match. Unlike `dww` (repeat the motion key) or flow state (`jj`), there's no quick shortcut for "just give me the first one."
-
-### The Solution
-
-During **any** label selection, press `<CR>` to select the first target:
 
 ```
 fa<CR>    jump to the first "a" (vanilla f behavior)
 ta<CR>    jump to just before the first "a" (vanilla t behavior)
 sa<CR>    jump to the first "a" search match
 dw<CR>    delete to the first word target
-yw<CR>    yank to the first word target
 ```
 
-### How It Works
+`select_last` does the inverse — selects the furthest target. Not mapped by default; add it to your config:
 
-1. Trigger any motion — labels appear
-2. Press `<CR>` instead of a label key
-3. The first target (closest to cursor) is selected
-4. The action runs on that target
+```lua
+selection_keys = {
+    ["<CR>"] = "select_first",
+    ["<S-CR>"] = "select_last",
+}
+```
 
-There's no timeout. You can read all the labels, decide the first one is what you want, and press `<CR>`.
+### Toggle Hint Position
+
+Flips hint labels between the start and end of each target. Useful when a hint overlaps text you're trying to read. Not mapped by default:
+
+```lua
+selection_keys = {
+    ["<CR>"] = "select_first",
+    ["<M-h>"] = "toggle_hint_position",
+}
+```
+
+Press the toggle key during label selection — hints re-render at the opposite end of each target. Press it again to flip back. Then pick your label as usual.
 
 ### Relationship to Other Shortcuts
 
-SmartMotion has three ways to "skip" label selection:
+SmartMotion has several ways to "skip" or modify label selection:
 
 | Method | How | Best for |
 |--------|-----|----------|
 | **Flow state** | Press motion key quickly after a previous motion | Chaining motions (`w` → `w` → `j`) |
 | **Repeat motion key** | Press motion key during labels (`dww`) | Acting on cursor target |
 | **Select first target** | Press `<CR>` during labels | Picking the closest match |
+| **Toggle hint position** | Press configured key during labels | Reading obscured text |
 
-All three coexist. `<CR>` is checked after the motion-key-repeat check, so `dww` still works as expected.
+All coexist. Selection handlers are checked after the motion-key-repeat check, so `dww` still works as expected.
 
 ### Configuration
 
-Enabled by default. The `selection_keys` config maps keys to actions:
+Enabled by default with `<CR>` → `select_first`. The `selection_keys` config maps keys to registered handlers:
 
 ```lua
 -- Default
 selection_keys = {
     ["<CR>"] = "select_first",
+}
+
+-- Full example
+selection_keys = {
+    ["<CR>"] = "select_first",
+    ["<S-CR>"] = "select_last",
+    ["<M-h>"] = "toggle_hint_position",
 }
 
 -- Disable

@@ -50,17 +50,23 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 		end
 	end
 
-	-- Selection action keys (e.g., <CR> = select_first)
+	-- Selection action keys (e.g., <CR> = select_first, <M-h> = toggle_hint_position)
 	-- Handlers are registered in the selection_handlers registry.
+	-- Return true = accept selection and exit. Return false = stay in selection loop.
 	if cfg.selection_keys then
 		local key_name = vim.fn.keytrans(char)
 		local handler_name = cfg.selection_keys[key_name]
 		if handler_name then
 			local registries = require("smart-motion.core.registries"):get()
 			local handler = registries.selection_handlers.get_by_name(handler_name)
-			if handler and handler.run(ctx, cfg, motion_state) then
+			if handler then
+				local result = handler.run(ctx, cfg, motion_state)
 				log.debug("Selection handler '" .. handler_name .. "' triggered via " .. key_name)
-				return
+				if result then
+					return
+				end
+				-- Handler returned false: stay in selection, wait for next key
+				return M.wait_for_hint_selection(ctx, cfg, motion_state)
 			end
 		end
 	end
