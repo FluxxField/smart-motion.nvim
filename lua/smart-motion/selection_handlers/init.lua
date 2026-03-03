@@ -82,12 +82,26 @@ local handler_entries = {
 
 	toggle_direction = {
 		run = function(ctx, cfg, motion_state)
+			-- Flip direction
 			if motion_state.direction == DIRECTION.AFTER_CURSOR then
 				motion_state.direction = DIRECTION.BEFORE_CURSOR
 			else
 				motion_state.direction = DIRECTION.AFTER_CURSOR
 			end
-			log.debug("Toggled direction to " .. motion_state.direction)
+
+			-- Swap the directional filter so the pipeline collects targets
+			-- in the new direction. Filter names follow the pattern:
+			--   *_after_cursor  <->  *_before_cursor
+			local filter = motion_state.motion.filter
+			if filter then
+				if filter:find("after_cursor") then
+					motion_state.motion.filter = filter:gsub("after_cursor", "before_cursor")
+				elseif filter:find("before_cursor") then
+					motion_state.motion.filter = filter:gsub("before_cursor", "after_cursor")
+				end
+			end
+
+			log.debug("Toggled direction to " .. motion_state.direction .. " (filter: " .. tostring(motion_state.motion.filter) .. ")")
 			return "rerun"
 		end,
 		metadata = {
