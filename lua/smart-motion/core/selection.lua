@@ -50,6 +50,16 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 		end
 	end
 
+	-- Selection action keys (e.g., <CR> = select first target)
+	if cfg.selection_keys then
+		local key_name = vim.fn.keytrans(char)
+		local action = cfg.selection_keys[key_name]
+		if action == "select_first" then
+			log.debug("Selection action: select_first via " .. key_name)
+			return
+		end
+	end
+
 	if flow_state.evaluate_flow_at_selection() and motion_state.selection_mode ~= consts.SELECTION_MODE.SECOND then
 		log.debug("Selection is jumping early")
 		return
