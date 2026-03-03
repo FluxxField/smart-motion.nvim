@@ -293,3 +293,32 @@ end
 -- Fuzzy matches are sorted by score (best matches first)
 -- Word boundary matches score higher than mid-word matches
 -- Consecutive matches score higher than spread-out matches
+
+-- ============================================================================
+-- PIPELINE-MODIFYING SELECTION HANDLERS
+-- ============================================================================
+--
+-- TOGGLE DIRECTION (<M-d>):
+-- 1. Press `w` — forward word labels appear
+-- 2. Press `<M-d>` (Alt+D) — labels should flip to backward words
+-- 3. Select a label — cursor should jump backward
+-- 4. Press `s`, type a search — labels appear forward
+-- 5. Press `<M-d>` — labels should flip to backward matches
+--
+-- TOGGLE MULTI-WINDOW (<M-w>):
+-- 1. Open a second window (`:vsplit`)
+-- 2. Press `w` — labels appear in current window only
+-- 3. Press `<M-w>` (Alt+W) — labels should expand to both windows
+-- 4. Select a label in the other window — cursor should jump there
+--
+-- EXPAND SEARCH SCOPE (<M-e>):
+-- 1. Press `j` — line labels appear (limited scope)
+-- 2. Press `<M-e>` (Alt+E) — more line labels should appear (doubled scope)
+-- 3. Press `<M-e>` again — even more labels (doubled again)
+-- 4. Select a label — cursor should jump to that line
+--
+-- EDGE CASES:
+-- 1. Press `w` at end of file → `<M-d>` — should show backward words (non-empty)
+-- 2. Press `w` at start of file → `<M-d>` — no backward words, motion should cancel
+-- 3. Press `<M-e>` many times — scope should cap at buffer line count, not overflow
+-- 4. In operator-pending: `dw` → `<M-d>` → select backward — should delete backward word
