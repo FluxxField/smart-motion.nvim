@@ -70,7 +70,10 @@ Complete guide to configuring SmartMotion.
 
   -- Key-action map for label selection (press key to trigger action)
   selection_keys = {
-    ["<CR>"] = "select_first",  -- Enter selects the first target
+    ["<CR>"]  = "select_first",       -- Enter selects the first target
+    ["<M-d>"] = "toggle_direction",   -- Flip search direction
+    ["<M-w>"] = "toggle_multi_window", -- Toggle single/multi-window
+    ["<M-e>"] = "expand_search_scope", -- Double the search scope
   },
 }
 ```
@@ -463,7 +466,10 @@ Configure special keys that trigger actions during label selection:
 
 ```lua
 selection_keys = {
-    ["<CR>"] = "select_first",  -- default
+    ["<CR>"]  = "select_first",
+    ["<M-d>"] = "toggle_direction",
+    ["<M-w>"] = "toggle_multi_window",
+    ["<M-e>"] = "expand_search_scope",
 }
 ```
 
@@ -474,19 +480,25 @@ selection_keys = {
 
 ### Built-in Handlers
 
-| Handler | Description | Returns |
-|---------|-------------|---------|
-| `select_first` | Selects the first (closest) target | Exits selection |
-| `select_last` | Selects the last (furthest) target | Exits selection |
-| `toggle_hint_position` | Flips hints between start and end of targets | Stays in selection |
+| Handler Name | Default Key | Return | Description |
+|---|---|---|---|
+| `select_first` | `<CR>` | exits | Selects the first (closest) target |
+| `select_last` | (none) | exits | Selects the last (furthest) target |
+| `toggle_hint_position` | (none) | stays | Toggles hint labels between start/end of targets |
+| `toggle_direction` | `<M-d>` | re-runs | Flips search direction (forward/backward) |
+| `toggle_multi_window` | `<M-w>` | re-runs | Toggles single/multi-window target collection |
+| `expand_search_scope` | `<M-e>` | re-runs | Doubles the search scope (max_lines) |
 
-**Default config** only maps `<CR>` to `select_first`. Add others as needed:
+Add others as needed:
 
 ```lua
 selection_keys = {
-    ["<CR>"] = "select_first",
+    ["<CR>"]  = "select_first",
     ["<S-CR>"] = "select_last",
     ["<M-h>"] = "toggle_hint_position",
+    ["<M-d>"] = "toggle_direction",
+    ["<M-w>"] = "toggle_multi_window",
+    ["<M-e>"] = "expand_search_scope",
 }
 ```
 
@@ -497,14 +509,18 @@ fa<CR>      jump to the first "a" (same as vanilla f)
 sa<CR>      jump to the first "a" match
 dw<CR>      delete to the first word target
 w<M-h>      toggle hints to end-of-word, then pick a label
+w<M-d>      flip to backward words, then pick a label
+s<M-w>      toggle multi-window search, then pick a label
+w<M-e>      double the search scope, then pick a label
 ```
 
 ### Handler Return Values
 
-Handlers return a boolean that controls the selection flow:
+Handlers return a value that controls the selection flow:
 
 - **`true`** — accept the selection and exit (like `select_first`, `select_last`)
 - **`false`** — stay in the selection loop and wait for the next keypress (like `toggle_hint_position`)
+- **`"rerun"`** — re-run the full pipeline with modified state, then return to selection (like `toggle_direction`, `toggle_multi_window`, `expand_search_scope`)
 
 ### Disable
 

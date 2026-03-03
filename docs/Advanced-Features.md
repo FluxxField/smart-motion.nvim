@@ -123,6 +123,32 @@ selection_keys = {
 
 Press the toggle key during label selection — hints re-render at the opposite end of each target. Press it again to flip back. Then pick your label as usual.
 
+### Pipeline-Modifying Handlers
+
+Some selection handlers can re-run the entire motion pipeline during label selection.
+This lets you change the search context without cancelling and re-triggering the motion.
+
+**Built-in pipeline-modifying handlers:**
+
+- `toggle_direction` (`<M-d>`) — Flip between forward and backward search. Press during
+  `w` labels to switch to backward words, or during `s` results to search the other direction.
+
+- `toggle_multi_window` (`<M-w>`) — Toggle between single-window and multi-window target
+  collection. Expand a word motion to show targets across all visible windows.
+
+- `expand_search_scope` (`<M-e>`) — Double the search scope (max_lines). Press multiple
+  times to progressively expand. Useful when the target you want is just outside the
+  initial scope.
+
+**How it works:** When these handlers are triggered, the plugin:
+1. Resets targets and labels
+2. Re-runs the pipeline with the modified `motion_state`
+3. Regenerates and renders new hint labels
+4. Returns to the selection loop for your next keypress
+
+If the re-run produces no targets (e.g., toggling direction when nothing is behind the
+cursor), the motion cancels gracefully.
+
 ### Relationship to Other Shortcuts
 
 SmartMotion has several ways to "skip" or modify label selection:
@@ -133,24 +159,33 @@ SmartMotion has several ways to "skip" or modify label selection:
 | **Repeat motion key** | Press motion key during labels (`dww`) | Acting on cursor target |
 | **Select first target** | Press `<CR>` during labels | Picking the closest match |
 | **Toggle hint position** | Press configured key during labels | Reading obscured text |
+| **Toggle direction** | Press `<M-d>` during labels | Flipping search direction |
+| **Toggle multi-window** | Press `<M-w>` during labels | Expanding to all windows |
+| **Expand search scope** | Press `<M-e>` during labels | Reaching further targets |
 
 All coexist. Selection handlers are checked after the motion-key-repeat check, so `dww` still works as expected.
 
 ### Configuration
 
-Enabled by default with `<CR>` → `select_first`. The `selection_keys` config maps keys to registered handlers:
+Enabled by default with four mappings. The `selection_keys` config maps keys to registered handlers:
 
 ```lua
 -- Default
 selection_keys = {
-    ["<CR>"] = "select_first",
+    ["<CR>"]  = "select_first",
+    ["<M-d>"] = "toggle_direction",
+    ["<M-w>"] = "toggle_multi_window",
+    ["<M-e>"] = "expand_search_scope",
 }
 
 -- Full example
 selection_keys = {
-    ["<CR>"] = "select_first",
+    ["<CR>"]  = "select_first",
     ["<S-CR>"] = "select_last",
     ["<M-h>"] = "toggle_hint_position",
+    ["<M-d>"] = "toggle_direction",
+    ["<M-w>"] = "toggle_multi_window",
+    ["<M-e>"] = "expand_search_scope",
 }
 
 -- Disable
