@@ -70,8 +70,9 @@ Complete guide to configuring SmartMotion.
 
   -- Key-action map for label selection (press key to trigger action)
   selection_keys = {
-    ["<CR>"]  = "select_first",       -- Enter selects the first target
-    ["<M-d>"] = "toggle_direction",   -- Flip search direction
+    ["<CR>"]  = "select_first",        -- Enter selects the first target
+    ["<M-h>"] = "toggle_hint_position", -- Flip hints between start/end of targets
+    ["<M-d>"] = "toggle_direction",    -- Flip search direction
     ["<M-w>"] = "toggle_multi_window", -- Toggle single/multi-window
     ["<M-e>"] = "expand_search_scope", -- Double the search scope
   },
@@ -467,6 +468,7 @@ Configure special keys that trigger actions during label selection:
 ```lua
 selection_keys = {
     ["<CR>"]  = "select_first",
+    ["<M-h>"] = "toggle_hint_position",
     ["<M-d>"] = "toggle_direction",
     ["<M-w>"] = "toggle_multi_window",
     ["<M-e>"] = "expand_search_scope",
@@ -484,13 +486,12 @@ selection_keys = {
 |---|---|---|---|
 | `select_first` | `<CR>` | exits | Selects the first (closest) target |
 | `select_last` | (none) | exits | Selects the last (furthest) target |
-| `toggle_hint_position` | (none) | stays | Toggles hint labels between start/end of targets |
+| `toggle_hint_position` | `<M-h>` | stays | Toggles hint labels between start/end of targets |
 | `toggle_direction` | `<M-d>` | re-runs | Flips search direction (forward/backward) |
 | `toggle_multi_window` | `<M-w>` | re-runs | Toggles single/multi-window target collection |
 | `expand_search_scope` | `<M-e>` | re-runs | Doubles the search scope (max_lines) |
 
-> **Tip:** `toggle_hint_position` and `select_last` are available but not mapped by default.
-> `toggle_hint_position` flips hint labels between the start and end of each target — useful when a label obscures the text you're trying to read. Add them to your config if you want them:
+> **Tip:** `select_last` is available but not mapped by default. Add it to your config if you want it:
 
 ```lua
 selection_keys = {

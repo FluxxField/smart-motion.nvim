@@ -167,25 +167,26 @@ All coexist. Selection handlers are checked after the motion-key-repeat check, s
 
 ### Configuration
 
-Enabled by default with four mappings. The `selection_keys` config maps keys to registered handlers:
+Enabled by default with five mappings. The `selection_keys` config maps keys to registered handlers:
 
 ```lua
 -- Default
 selection_keys = {
     ["<CR>"]  = "select_first",
+    ["<M-h>"] = "toggle_hint_position",
     ["<M-d>"] = "toggle_direction",
     ["<M-w>"] = "toggle_multi_window",
     ["<M-e>"] = "expand_search_scope",
 }
 
--- Full example
+-- Full example (with optional extras)
 selection_keys = {
-    ["<CR>"]  = "select_first",
+    ["<CR>"]   = "select_first",
     ["<S-CR>"] = "select_last",
-    ["<M-h>"] = "toggle_hint_position",
-    ["<M-d>"] = "toggle_direction",
-    ["<M-w>"] = "toggle_multi_window",
-    ["<M-e>"] = "expand_search_scope",
+    ["<M-h>"]  = "toggle_hint_position",
+    ["<M-d>"]  = "toggle_direction",
+    ["<M-w>"]  = "toggle_multi_window",
+    ["<M-e>"]  = "expand_search_scope",
 }
 
 -- Disable
