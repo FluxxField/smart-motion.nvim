@@ -63,6 +63,33 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 
 	local char = vim.fn.getcharstr()
 
+	-- Selection action keys MUST be checked before the cancel check.
+	-- Terminals often send <M-d> as ESC+d — the raw ESC byte (\27) would
+	-- trigger cancellation before keytrans() can normalize it to "<M-d>".
+	-- By checking selection_keys first, recognized modifier keys are dispatched
+	-- correctly. Unrecognized keys still fall through to the cancel check.
+	if cfg.selection_keys then
+		local key_name = vim.fn.keytrans(char)
+		local handler_name = cfg.selection_keys[key_name]
+		if handler_name then
+			local registries = require("smart-motion.core.registries"):get()
+			local handler = registries.selection_handlers.get_by_name(handler_name)
+			if handler then
+				local result = handler.run(ctx, cfg, motion_state)
+				log.debug("Selection handler '" .. handler_name .. "' triggered via " .. key_name)
+
+				if result == "rerun" then
+					return M._rerun_pipeline(ctx, cfg, motion_state)
+				elseif result then
+					return
+				end
+
+				-- Handler returned false: stay in selection, wait for next key
+				return M.wait_for_hint_selection(ctx, cfg, motion_state)
+			end
+		end
+	end
+
 	if char == "" or flow_state.should_cancel_on_keypress(char) then
 		log.debug("Selection cancelled by key: " .. char .. " - exiting flow")
 		flow_state.exit_flow()
@@ -90,31 +117,6 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 			-- Refresh the timestamp so chained presses (jjjj) keep the flow window alive.
 			flow_state.refresh_timestamp()
 			return
-		end
-	end
-
-	-- Selection action keys (e.g., <CR> = select_first, <M-h> = toggle_hint_position)
-	-- Handlers are registered in the selection_handlers registry.
-	-- Return true = accept selection and exit. Return false = stay in selection loop.
-	if cfg.selection_keys then
-		local key_name = vim.fn.keytrans(char)
-		local handler_name = cfg.selection_keys[key_name]
-		if handler_name then
-			local registries = require("smart-motion.core.registries"):get()
-			local handler = registries.selection_handlers.get_by_name(handler_name)
-			if handler then
-				local result = handler.run(ctx, cfg, motion_state)
-				log.debug("Selection handler '" .. handler_name .. "' triggered via " .. key_name)
-
-				if result == "rerun" then
-					return M._rerun_pipeline(ctx, cfg, motion_state)
-				elseif result then
-					return
-				end
-
-				-- Handler returned false: stay in selection, wait for next key
-				return M.wait_for_hint_selection(ctx, cfg, motion_state)
-			end
 		end
 	end
 
