@@ -1,17 +1,17 @@
 -- SmartMotion Playground: Operator Motions
--- Presets: d, dt, dT, rdw, rdl, y, yt, yT, ryw, ryl, c, ct, cT, p, P
+-- Presets: d, rdw, rdl, y, ryw, ryl, c, p, P
 --          operator-pending: >w, gUw, =j, gqj, etc.
 --
 -- INSTRUCTIONS:
 --   d   → composable delete: press d, then a second motion (w/e/j/k/]]/etc.)
 --   y   → composable yank: press y, then a second motion
 --   c   → composable change: press c, then a second motion
---   dt  → delete until: type a char, delete from cursor to just before match
---   dT  → delete until backward
---   yt  → yank until: type a char, yank from cursor to just before match
---   yT  → yank until backward
---   ct  → change until: type a char, change from cursor to just before match
---   cT  → change until backward
+--   dt  → composable: d + t motion (delete until char via inference)
+--   dT  → composable: d + T motion (delete until backward via inference)
+--   yt  → composable: y + t motion (yank until char via inference)
+--   yT  → composable: y + T motion (yank until backward via inference)
+--   ct  → composable: c + t motion (change until char via inference)
+--   cT  → composable: c + T motion (change until backward via inference)
 --   rdw → remote delete word: pick a word label anywhere, delete that word
 --   rdl → remote delete line: pick a line label, delete that entire line
 --   ryw → remote yank word: pick a word label, yank it
