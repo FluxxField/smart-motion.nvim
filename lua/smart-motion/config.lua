@@ -230,6 +230,8 @@ function M.validate(user_config)
 			for key, action in pairs(config.selection_keys) do
 				if type(key) == "string" and type(action) == "string" then
 					normalized[vim.fn.keytrans(key)] = action
+				else
+					log.warn("selection_keys: skipping invalid entry (key=" .. tostring(key) .. ", action=" .. tostring(action) .. ")")
 				end
 			end
 			config.selection_keys = normalized
