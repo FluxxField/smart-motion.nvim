@@ -40,6 +40,9 @@ function M.apply(ctx, motion_state)
 	if override.motion_state then
 		motion.metadata.motion_state = vim.tbl_deep_extend("force", ms, override.motion_state)
 	end
+
+	-- Remove consumed overrides so they don't leak through the pipeline
+	motion.metadata.motion_state.filetype_overrides = nil
 end
 
 return M

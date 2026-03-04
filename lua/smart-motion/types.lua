@@ -123,6 +123,7 @@
 --- @field ts_around_separator? boolean -- Expand child ranges to include surrounding separators
 --- @field diagnostic_severity? integer|integer[] -- Filter diagnostics by severity
 --- @field skip_jumplist? boolean -- Skip saving to jumplist (for motions like j/k that match native vim behavior)
+--- @field filetype_overrides? table<string, { collector?: string, extractor?: string, modifier?: string, filter?: string, visualizer?: string, action?: string, motion_state?: table }>
 --- @field motion SmartMotionMotionEntry
 
 ---@class SmartMotionTarget
