@@ -29,6 +29,10 @@ function M.apply(ctx, motion_state)
 
 	log.debug(string.format("filetype_dispatch: applying override for filetype '%s'", filetype))
 
+	-- Deep-copy metadata so mutations don't leak back to the registry entry
+	-- (the shallow copy in setup.run only copies top-level keys, not nested tables)
+	motion.metadata = vim.deepcopy(motion.metadata)
+
 	-- Swap pipeline module references
 	for _, key in ipairs({ "collector", "extractor", "modifier", "filter", "visualizer", "action" }) do
 		if override[key] then
@@ -38,7 +42,7 @@ function M.apply(ctx, motion_state)
 
 	-- Deep-merge motion_state overrides into motion.metadata.motion_state
 	if override.motion_state then
-		motion.metadata.motion_state = vim.tbl_deep_extend("force", ms, override.motion_state)
+		motion.metadata.motion_state = vim.tbl_deep_extend("force", motion.metadata.motion_state, override.motion_state)
 	end
 
 	-- Remove consumed overrides so they don't leak through the pipeline
