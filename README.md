@@ -92,6 +92,18 @@ yaa   yank an argument        =if   indent a function body
 cic   change inside a class   >ac   indent a class
 ```
 
+### Modify the search mid-selection
+
+Other motion plugins lock you in once labels appear. SmartMotion lets you change the search context without cancelling:
+
+```
+w  [labels appear]  <M-d>  → labels flip to backward words
+s  [search, labels] <M-w>  → labels expand to all visible windows
+j  [line labels]    <M-e>  → scope doubles, more labels appear
+```
+
+Toggle direction, toggle multi-window, expand scope, flip hint positions — all while labels are on screen. Pipeline-modifying handlers re-run the entire motion pipeline and regenerate labels in place. Fully configurable via `selection_keys`, and you can register your own handlers.
+
 ### It's a framework, not just a plugin
 
 Every built-in motion uses the same public API:
@@ -424,8 +436,27 @@ SmartMotion wouldn't exist without these plugins. See [Why SmartMotion](https://
   search_idle_timeout_ms = 2000,     -- exit search with no input
   yank_highlight_duration = 150,     -- yank flash duration (ms)
   history_max_age_days = 30,         -- prune history entries older than this
+  selection_keys = {                  -- key-action map during label selection
+    ["<CR>"] = "select_first",       -- Enter picks the first target
+  },
 }
 ```
+
+### Selection Keys
+
+During label selection, special keys can trigger actions instead of picking a label. Only `<CR>` → `select_first` is enabled by default. Enable the others to modify the search mid-selection:
+
+```lua
+selection_keys = {
+    ["<CR>"]   = "select_first",         -- Enter picks the first target
+    ["<M-h>"]  = "toggle_hint_position", -- Flip hints between start/end of targets
+    ["<M-d>"]  = "toggle_direction",     -- Flip search direction (forward/backward)
+    ["<M-w>"]  = "toggle_multi_window",  -- Toggle single/multi-window
+    ["<M-e>"]  = "expand_search_scope",  -- Double the search scope
+}
+```
+
+Disable all selection keys with `selection_keys = false`. Remap to different keys by changing the key string. See [Configuration: Selection Keys](https://github.com/FluxxField/smart-motion.nvim/wiki/Configuration#selection-keys) for custom handlers.
 
 See [Configuration](https://github.com/FluxxField/smart-motion.nvim/wiki/Configuration) for the full reference.
 

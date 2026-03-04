@@ -3,8 +3,49 @@ local highlight = require("smart-motion.core.highlight")
 local consts = require("smart-motion.consts")
 local flow_state = require("smart-motion.core.flow_state")
 local targets = require("smart-motion.core.targets")
+local exit_event = require("smart-motion.core.events.exit")
+local pipeline = require("smart-motion.core.engine.pipeline")
+local module_loader = require("smart-motion.utils.module_loader")
 
 local M = {}
+
+--- Re-runs the full pipeline after a selection handler modified motion_state.
+--- Resets state, clears highlights, runs pipeline + visualizer, then recurses to selection.
+--- Mirrors the search-mode re-run pattern in loop.lua.
+---@param ctx SmartMotionContext
+---@param cfg SmartMotionConfig
+---@param motion_state SmartMotionMotionState
+function M._rerun_pipeline(ctx, cfg, motion_state)
+	local state = require("smart-motion.core.state")
+
+	-- Reset selection state (targets, labels, counts)
+	state.reset(motion_state)
+	highlight.clear(ctx, cfg, motion_state)
+
+	-- Re-run pipeline (wrapped to catch exit events like EARLY_EXIT)
+	local exit_type = exit_event.wrap(function()
+		pipeline.run(ctx, cfg, motion_state)
+	end)
+
+	-- If pipeline threw an exit event (e.g., no targets), cancel gracefully
+	if exit_type then
+		motion_state.selected_jump_target = nil
+		return
+	end
+
+	local targets_list = motion_state.jump_targets or {}
+	if #targets_list == 0 then
+		motion_state.selected_jump_target = nil
+		return
+	end
+
+	-- Re-run visualizer to regenerate and render hint labels
+	local visualizer = module_loader.get_module(ctx, cfg, motion_state, "visualizer")
+	visualizer.run(ctx, cfg, motion_state)
+
+	-- Recurse back into selection
+	return M.wait_for_hint_selection(ctx, cfg, motion_state)
+end
 
 --- Waits for the user to press a hint key and handles both single and double character hints.
 ---@param ctx SmartMotionContext
@@ -19,6 +60,32 @@ function M.wait_for_hint_selection(ctx, cfg, motion_state)
 	end
 
 	local char = vim.fn.getcharstr()
+
+	-- Selection action keys MUST be checked before the cancel check.
+	-- Terminals often send <M-d> as ESC+d — the raw ESC byte (\27) would
+	-- trigger cancellation before keytrans() can normalize it to "<M-d>".
+	-- By checking selection_keys first, recognized modifier keys are dispatched
+	-- correctly. Unrecognized keys still fall through to the cancel check.
+	if cfg.selection_keys then
+		local key_name = vim.fn.keytrans(char)
+		local handler_name = cfg.selection_keys[key_name]
+		if handler_name then
+			local registries = require("smart-motion.core.registries"):get()
+			local handler = registries.selection_handlers.get_by_name(handler_name)
+			if handler then
+				local result = handler.run(ctx, cfg, motion_state)
+
+				if result == "rerun" then
+					return M._rerun_pipeline(ctx, cfg, motion_state)
+				elseif result then
+					return
+				end
+
+				-- Handler returned false: stay in selection, wait for next key
+				return M.wait_for_hint_selection(ctx, cfg, motion_state)
+			end
+		end
+	end
 
 	if char == "" or flow_state.should_cancel_on_keypress(char) then
 		log.debug("Selection cancelled by key: " .. char .. " - exiting flow")

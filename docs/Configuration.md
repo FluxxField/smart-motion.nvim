@@ -67,6 +67,11 @@ Complete guide to configuring SmartMotion.
 
   -- Prune history entries older than this many days
   history_max_age_days = 30,
+
+  -- Key-action map for label selection (press key to trigger action)
+  selection_keys = {
+    ["<CR>"] = "select_first",       -- Enter selects the first target
+  },
 }
 ```
 
@@ -452,6 +457,95 @@ See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)**
 
 ---
 
+## Selection Keys
+
+Configure special keys that trigger actions during label selection. Only `<CR>` → `select_first` is enabled by default:
+
+```lua
+selection_keys = {
+    ["<CR>"] = "select_first",
+}
+```
+
+**How it works:**
+1. A motion triggers and labels appear
+2. Instead of pressing a label, press a configured key
+3. The corresponding handler runs
+
+### Built-in Handlers
+
+| Handler Name | Suggested Key | Return | Description |
+|---|---|---|---|
+| `select_first` | `<CR>` | exits | Selects the first (closest) target |
+| `select_last` | `<S-CR>` | exits | Selects the last (furthest) target |
+| `toggle_hint_position` | `<M-h>` | stays | Toggles hint labels between start/end of targets |
+| `toggle_direction` | `<M-d>` | re-runs | Flips search direction (forward/backward) |
+| `toggle_multi_window` | `<M-w>` | re-runs | Toggles single/multi-window target collection |
+| `expand_search_scope` | `<M-e>` | re-runs | Doubles the search scope (max_lines) |
+
+Enable the ones you want by adding them to your config. Remap to any key you prefer:
+
+```lua
+selection_keys = {
+    ["<CR>"]   = "select_first",
+    ["<S-CR>"] = "select_last",
+    ["<M-h>"]  = "toggle_hint_position",
+    ["<M-d>"]  = "toggle_direction",
+    ["<M-w>"]  = "toggle_multi_window",
+    ["<M-e>"]  = "expand_search_scope",
+}
+```
+
+### Examples
+
+```
+fa<CR>      jump to the first "a" (same as vanilla f)
+sa<CR>      jump to the first "a" match
+dw<CR>      delete to the first word target
+w<M-h>      toggle hints to end-of-word, then pick a label
+w<M-d>      flip to backward words, then pick a label
+s<M-w>      toggle multi-window search, then pick a label
+w<M-e>      double the search scope, then pick a label
+```
+
+### Handler Return Values
+
+Handlers return a value that controls the selection flow:
+
+- **`true`** — accept the selection and exit (like `select_first`, `select_last`)
+- **`false`** — stay in the selection loop and wait for the next keypress (like `toggle_hint_position`)
+- **`"rerun"`** — re-run the full pipeline with modified state, then return to selection (like `toggle_direction`, `toggle_multi_window`, `expand_search_scope`)
+
+### Disable
+
+```lua
+selection_keys = false
+```
+
+### Custom Handlers
+
+Selection handlers are registered modules, just like collectors, extractors, and actions:
+
+```lua
+require("smart-motion").selection_handlers.register("my_handler", {
+    run = function(ctx, cfg, motion_state)
+        -- Modify motion_state, re-render hints, etc.
+        -- Return true to exit selection, false to stay
+        return true
+    end,
+})
+
+-- Then reference it in config:
+selection_keys = {
+    ["<CR>"] = "select_first",
+    ["<Tab>"] = "my_handler",
+}
+```
+
+Keys are normalized via Vim's key notation, so `<CR>`, `<Tab>`, `<M-h>` all work.
+
+---
+
 ## Complete Example
 
 ```lua
@@ -522,6 +616,9 @@ See **[Advanced Features: Motion History](Advanced-Features.md#motion-history)**
 
     -- Keep history for 90 days
     history_max_age_days = 90,
+
+    -- Disable select-first-target (prefer explicit label selection)
+    -- selection_keys = false,
   },
 }
 ```

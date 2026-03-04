@@ -84,6 +84,115 @@ ds + ... = delete via search    df + .. = delete via 2-char find
 
 ---
 
+## Selection Handlers
+
+During label selection, special keys can trigger **selection handlers** — registered actions that modify the selection flow. Three built-in handlers ship with SmartMotion.
+
+### Select First / Select Last
+
+Press `<CR>` during label selection to instantly select the first target. This bridges the gap between SmartMotion's label-based selection and vanilla Vim behavior.
+
+Search motions like `f`, `t`, and `s` always require reading and pressing a label, even when you want the closest match. Unlike `dww` (repeat the motion key) or flow state (`jj`), there's no quick shortcut for "just give me the first one."
+
+```
+fa<CR>    jump to the first "a" (vanilla f behavior)
+ta<CR>    jump to just before the first "a" (vanilla t behavior)
+sa<CR>    jump to the first "a" search match
+dw<CR>    delete to the first word target
+```
+
+`select_last` does the inverse — selects the furthest target. Not mapped by default; add it to your config:
+
+```lua
+selection_keys = {
+    ["<CR>"] = "select_first",
+    ["<S-CR>"] = "select_last",
+}
+```
+
+### Toggle Hint Position
+
+Flips hint labels between the start and end of each target. Useful when a hint overlaps text you're trying to read. Not mapped by default:
+
+```lua
+selection_keys = {
+    ["<CR>"] = "select_first",
+    ["<M-h>"] = "toggle_hint_position",
+}
+```
+
+Press the toggle key during label selection — hints re-render at the opposite end of each target. Press it again to flip back. Then pick your label as usual.
+
+### Pipeline-Modifying Handlers
+
+Some selection handlers can re-run the entire motion pipeline during label selection.
+This lets you change the search context without cancelling and re-triggering the motion.
+
+**Built-in pipeline-modifying handlers:**
+
+- `toggle_direction` (`<M-d>`) — Flip between forward and backward search. Press during
+  `w` labels to switch to backward words, or during `s` results to search the other direction.
+
+- `toggle_multi_window` (`<M-w>`) — Toggle between single-window and multi-window target
+  collection. Expand a word motion to show targets across all visible windows.
+
+- `expand_search_scope` (`<M-e>`) — Double the search scope (max_lines). Press multiple
+  times to progressively expand. Useful when the target you want is just outside the
+  initial scope.
+
+**How it works:** When these handlers are triggered, the plugin:
+1. Resets targets and labels
+2. Re-runs the pipeline with the modified `motion_state`
+3. Regenerates and renders new hint labels
+4. Returns to the selection loop for your next keypress
+
+If the re-run produces no targets (e.g., toggling direction when nothing is behind the
+cursor), the motion cancels gracefully.
+
+### Relationship to Other Shortcuts
+
+SmartMotion has several ways to "skip" or modify label selection:
+
+| Method | How | Best for |
+|--------|-----|----------|
+| **Flow state** | Press motion key quickly after a previous motion | Chaining motions (`w` → `w` → `j`) |
+| **Repeat motion key** | Press motion key during labels (`dww`) | Acting on cursor target |
+| **Select first target** | Press `<CR>` during labels | Picking the closest match |
+| **Toggle hint position** | Press configured key during labels | Reading obscured text |
+| **Toggle direction** | Press `<M-d>` during labels | Flipping search direction |
+| **Toggle multi-window** | Press `<M-w>` during labels | Expanding to all windows |
+| **Expand search scope** | Press `<M-e>` during labels | Reaching further targets |
+
+All coexist. Selection handlers are checked after the motion-key-repeat check, so `dww` still works as expected.
+
+### Configuration
+
+Only `<CR>` → `select_first` is enabled by default. Enable the others by adding them to `selection_keys`:
+
+```lua
+-- Default
+selection_keys = {
+    ["<CR>"] = "select_first",
+}
+
+-- Enable all handlers
+selection_keys = {
+    ["<CR>"]   = "select_first",
+    ["<S-CR>"] = "select_last",
+    ["<M-h>"]  = "toggle_hint_position",
+    ["<M-d>"]  = "toggle_direction",
+    ["<M-w>"]  = "toggle_multi_window",
+    ["<M-e>"]  = "expand_search_scope",
+}
+
+-- Disable
+selection_keys = false
+```
+
+See **[Configuration: Selection Keys](Configuration.md#selection-keys)** for details.
+
+---
+
 ## Operator-Pending Mode
 
 SmartMotion motions work with **any vim operator**.
