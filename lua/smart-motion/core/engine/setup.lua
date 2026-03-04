@@ -4,6 +4,7 @@ local consts = require("smart-motion.consts")
 local state = require("smart-motion.core.state")
 local module_loader = require("smart-motion.utils.module_loader")
 local log = require("smart-motion.core.log")
+local filetype_dispatch = require("smart-motion.core.engine.filetype_dispatch")
 
 local EXIT_TYPE = consts.EXIT_TYPE
 
@@ -18,6 +19,8 @@ function M.run(trigger_key)
 
 	-- Shallow copy so infer mutations don't leak to the registry entry
 	motion_state.motion = vim.tbl_extend("force", {}, motion)
+
+	filetype_dispatch.apply(ctx, motion_state)
 
 	-- Set motion_key to the trigger key for direct motions.
 	-- For operator motions (infer=true), infer.run will override this with the composed key.
