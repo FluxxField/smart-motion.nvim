@@ -58,6 +58,7 @@ Each stage is optional (except collector, extractor, visualizer, action). Each s
 |-----------|------------------|
 | `lines` | All lines in the buffer |
 | `treesitter` | Treesitter syntax nodes |
+| `patterns` | Vim regex matches against buffer lines |
 | `diagnostics` | LSP diagnostics |
 | `git_hunks` | Git changed regions |
 | `quickfix` | Quickfix/location list entries |
@@ -634,6 +635,98 @@ require("smart-motion.core.registries"):get().actions.register("highlight_jump",
 ```
 
 Now `ghw`, `ghj`, `ghs` etc. all work automatically.
+
+---
+
+## Filetype-Aware Motions
+
+A single motion can adapt its entire pipeline based on the current buffer's filetype. This is useful when:
+
+- A filetype has no treesitter parser (e.g., fugitive's `gitcommit`)
+- A language needs a custom treesitter query (e.g., SQL with non-standard node types)
+- You want one keymap that behaves differently in different languages
+
+### How It Works
+
+Add `filetype_overrides` to your motion's `motion_state`. Each key is a filetype, and the value can override any pipeline module or motion_state field:
+
+```lua
+require("smart-motion").register_motion("]]", {
+  collector = "treesitter",          -- default: use treesitter
+  extractor = "pass_through",
+  filter = "filter_visible",
+  visualizer = "hint_start",
+  action = "jump_centered",
+  map = true,
+  modes = { "n" },
+  metadata = {
+    motion_state = {
+      ts_node_types = { "function_declaration", "function_definition" },
+      filetype_overrides = {
+        gitcommit = {                -- no TS parser → use patterns
+          collector = "patterns",
+          motion_state = {
+            patterns = {
+              "\\vmodified:\\s+\\zs\\S.*$",
+              "\\vnew file:\\s+\\zs\\S.*$",
+            },
+          },
+        },
+        sql = {                      -- has TS but needs custom query
+          motion_state = {
+            ts_query = [[(function_definition name: (identifier) @fn)]],
+          },
+        },
+      },
+    },
+  },
+})
+```
+
+**What happens:**
+- In a Lua/Python/JS file → treesitter collector, matches `function_declaration`/`function_definition`
+- In a `gitcommit` buffer → patterns collector, matches modified file paths
+- In a SQL file → treesitter collector, but with a custom query instead of node types
+
+### What You Can Override
+
+An override can swap **any** pipeline module:
+
+| Field | What it swaps |
+|-------|---------------|
+| `collector` | Data source (e.g., `"treesitter"` → `"patterns"`) |
+| `extractor` | Target extraction (e.g., `"words"` → `"pass_through"`) |
+| `filter` | Target filtering |
+| `modifier` | Target enrichment |
+| `visualizer` | Hint display |
+| `action` | What happens on selection |
+| `motion_state` | Deep-merged into motion_state (patterns, ts_query, etc.) |
+
+### Using the Patterns Collector
+
+The `patterns` collector finds targets using vim regex. It reads two fields from `motion_state`:
+
+- **`patterns`** — Array of vim regex strings (required)
+- **`patterns_whole_line`** — If `true`, the entire matching line is the target (default `false`)
+
+```lua
+-- Jump to file paths
+motion_state = {
+  patterns = { "\\v\\f+" },
+}
+
+-- Jump to lines containing TODO (whole-line targets)
+motion_state = {
+  patterns = { "TODO" },
+  patterns_whole_line = true,
+}
+```
+
+Use `pass_through` as the extractor since the patterns collector already produces complete targets. All standard filters, visualizers, and actions work with pattern targets.
+
+### Operator Composition
+
+Filetype dispatch runs before the infer system. If you have a composable operator like `d` and a filetype-overridden motion like `]]`, pressing `d]]` in a gitcommit buffer automatically uses the pattern-based pipeline. No extra configuration needed.
 
 ---
 

@@ -267,6 +267,7 @@ Collectors determine *where targets come from*.
 |------|--------|
 | `lines` | Visible buffer lines (default for most motions) |
 | `treesitter` | Treesitter AST nodes |
+| `patterns` | Vim regex matches against buffer lines |
 | `diagnostics` | LSP diagnostics |
 | `git_hunks` | Git changed regions |
 | `quickfix` | Quickfix or location list entries |

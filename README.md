@@ -354,6 +354,8 @@ Here's a taste of what you can change with a single override:
 | Delete without moving cursor        | action        | `action = "remote_delete"`                   |
 | Make any motion cross-window        | metadata      | `multi_window = true`                        |
 | Auto-jump to closest target         | filter        | `filter = "first_target"`                    |
+| Match by vim regex instead of TS    | collector     | `collector = "patterns"`, `patterns = { "\\v\\f+" }` |
+| Adapt per filetype                  | metadata      | `filetype_overrides = { gitcommit = { ... } }` |
 | Customize labels for a motion       | keys          | `keys = "fdsarewq"`                          |
 | Exclude keys from labels            | exclude_keys  | `exclude_keys = "jk"`                        |
 
