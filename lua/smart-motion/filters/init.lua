@@ -131,6 +131,9 @@ local filter_entries = {
 			description = "Keeps word targets only on the cursor line after the cursor position.",
 			merged = true,
 			module_names = { "filter_words", "cursor_line_only", "after_cursor" },
+			motion_state = {
+				direction = DIRECTION.AFTER_CURSOR,
+			},
 		},
 	},
 	filter_words_on_cursor_line_before_cursor = {
@@ -143,6 +146,9 @@ local filter_entries = {
 			description = "Keeps word targets only on the cursor line before the cursor position.",
 			merged = true,
 			module_names = { "filter_words", "cursor_line_only", "before_cursor" },
+			motion_state = {
+				direction = DIRECTION.BEFORE_CURSOR,
+			},
 		},
 	},
 	first_target = {
