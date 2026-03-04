@@ -40,7 +40,7 @@
 --           lua = {
 --             collector = "patterns",
 --             motion_state = {
---               patterns = { "\\vlocal%s+\\zs\\w+" },
+--               patterns = { "\\vlocal\\s+\\zs\\w+" },
 --             },
 --           },
 --         },
