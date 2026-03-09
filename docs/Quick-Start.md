@@ -178,7 +178,7 @@ opts = {
   native_search = true,
 
   -- Dim non-target text
-  disable_dim_background = false,
+  dim_background = true,
 
   -- Open folds at target position after jumping
   open_folds_on_jump = true,

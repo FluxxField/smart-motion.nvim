@@ -32,8 +32,8 @@ Complete guide to configuring SmartMotion.
   -- Flow state timeout (ms): how long to stay in "flow" between motions
   flow_state_timeout_ms = 300,
 
-  -- Disable dimming of non-target text
-  disable_dim_background = false,
+  -- Dim non-target text for better label visibility
+  dim_background = true,
 
   -- Maximum motions stored in repeat history
   history_max_size = 20,
@@ -344,8 +344,8 @@ count_behavior = "native"
 Dim non-target text for better label visibility:
 
 ```lua
-disable_dim_background = false  -- dimming enabled (default)
-disable_dim_background = true   -- dimming disabled
+dim_background = true   -- dimming enabled (default)
+dim_background = false  -- dimming disabled
 ```
 
 ---

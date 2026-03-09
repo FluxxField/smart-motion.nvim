@@ -36,7 +36,7 @@ function M.run(ctx, cfg, motion_state)
 		exit_event.throw(EXIT_TYPE.CONTINUE_TO_SELECTION)
 	end
 
-	-- Mulit-pass mode
+	-- Multi-pass mode
 	if motion_state.is_searching_mode then
 		while true do
 			local start_time = vim.fn.reltime()
