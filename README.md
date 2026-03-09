@@ -426,7 +426,7 @@ SmartMotion wouldn't exist without these plugins. See [Why SmartMotion](https://
 {
   keys = "fjdksleirughtynm",        -- label characters, home row first
   flow_state_timeout_ms = 300,       -- chaining window, 0 to disable
-  disable_dim_background = false,    -- dim non-target text
+  dim_background = true,              -- dim non-target text
   auto_select_target = false,        -- auto-jump on single target
   native_search = true,              -- labels during / search
   count_behavior = "target",         -- "target" or "native" for j/k counts

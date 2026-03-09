@@ -25,7 +25,7 @@ M.defaults = {
 	highlight = default_highlight_groups,
 	presets = {},
 	flow_state_timeout_ms = FLOW_STATE_TIMEOUT_MS,
-	disable_dim_background = false,
+	dim_background = true,
 	history_max_size = HISTORY_MAX_SIZE,
 	auto_select_target = false,
 	native_search = true,
@@ -141,10 +141,17 @@ function M.validate(user_config)
 	end
 
 	--
-	-- Validate disable_dim_background
+	-- Validate dim_background (supports deprecated disable_dim_background)
 	--
-	if config.disable_dim_background == nil or type(config.disable_dim_background) ~= "boolean" then
-		config.disable_dim_background = false
+	if config.disable_dim_background ~= nil then
+		log.warn("'disable_dim_background' is deprecated, use 'dim_background' instead")
+		if config.dim_background == nil or config.dim_background == M.defaults.dim_background then
+			config.dim_background = not config.disable_dim_background
+		end
+		config.disable_dim_background = nil
+	end
+	if config.dim_background == nil or type(config.dim_background) ~= "boolean" then
+		config.dim_background = true
 	end
 
 	--
@@ -159,6 +166,13 @@ function M.validate(user_config)
 	--
 	if config.auto_select_target == nil or type(config.auto_select_target) ~= "boolean" then
 		config.auto_select_target = false
+	end
+
+	--
+	-- Validate native_search
+	--
+	if config.native_search == nil or type(config.native_search) ~= "boolean" then
+		config.native_search = true
 	end
 
 	--

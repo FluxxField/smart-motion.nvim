@@ -35,6 +35,16 @@ function M.get_modules(ctx, cfg, motion_state, keys)
 				module = registry.get_by_name("default")
 			end
 
+			if not module or not module.run then
+				log.error(
+					"SmartMotion: "
+						.. key
+						.. " '"
+						.. (motion[key] or "default")
+						.. "' not found in registry. Check your motion config for typos."
+				)
+			end
+
 			modules[key] = module
 		end
 	end

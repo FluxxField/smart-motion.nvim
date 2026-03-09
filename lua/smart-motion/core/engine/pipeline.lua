@@ -80,7 +80,7 @@ function M.run(ctx, cfg, motion_state)
 	exit.throw_if(not modifier_generator, EXIT_TYPE.EARLY_EXIT)
 
 	local filter_generator = modules.filter.run(modifier_generator)
-	exit.throw_if(not filter_generator)
+	exit.throw_if(not filter_generator, EXIT_TYPE.EARLY_EXIT)
 
 	targets.get_targets(ctx, cfg, motion_state, filter_generator)
 	state.finalize_motion_state(ctx, cfg, motion_state)

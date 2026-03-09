@@ -7,6 +7,14 @@ local EXIT_TYPE = require("smart-motion.consts").EXIT_TYPE
 local M = {}
 
 function M.run(ctx, cfg, motion_state)
+	if not motion_state.selected_jump_target then
+		local targets = motion_state.jump_targets or {}
+		if #targets > 0 then
+			motion_state.selected_jump_target = targets[1]
+		else
+			exit.throw(EXIT_TYPE.EARLY_EXIT)
+		end
+	end
 	exit.throw(EXIT_TYPE.AUTO_SELECT)
 end
 
