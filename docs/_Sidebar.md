@@ -22,6 +22,9 @@
 - [API Reference](API-Reference)
 - [Debugging](Debugging)
 
+**Contributing**
+- [Testing](Testing)
+
 ---
 
 [GitHub Repository](https://github.com/FluxxField/smart-motion.nvim)
