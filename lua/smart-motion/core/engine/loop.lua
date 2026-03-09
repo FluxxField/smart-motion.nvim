@@ -26,6 +26,7 @@ function M.run(ctx, cfg, motion_state)
 
 		if #targets == 1 then
 			if cfg.auto_select_target then
+				motion_state.selected_jump_target = targets[1]
 				exit_event.throw(EXIT_TYPE.AUTO_SELECT)
 			else
 				exit_event.throw(EXIT_TYPE.CONTINUE_TO_SELECTION)
@@ -36,7 +37,7 @@ function M.run(ctx, cfg, motion_state)
 		exit_event.throw(EXIT_TYPE.CONTINUE_TO_SELECTION)
 	end
 
-	-- Mulit-pass mode
+	-- Multi-pass mode
 	if motion_state.is_searching_mode then
 		while true do
 			local start_time = vim.fn.reltime()

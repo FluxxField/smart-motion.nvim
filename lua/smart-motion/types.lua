@@ -19,7 +19,7 @@
 ---@field highlight table<string, string | table>
 ---@field presets SmartMotionPresets
 ---@field flow_state_timeout_ms number
----@field disable_dim_background boolean
+---@field dim_background boolean
 ---@field native_search? boolean
 ---@field count_behavior? "target" | "native"
 ---@field open_folds_on_jump? boolean
