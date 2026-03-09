@@ -59,7 +59,7 @@ Actions follow a naming pattern:
 | --- | --- | --- |
 | `delete`, `yank`, `change` | Operate on target text, no cursor movement | Explicit presets (`dt`) |
 | `delete_jump`, `yank_jump`, `change_jump` | Jump to target first, then operate | Composable operators (`dw`, `yw`, `cj`) |
-| `remote_delete`, `remote_yank` | Jump, operate, restore cursor | Remote presets (`rdw`, `ryw`) |
+| `remote_delete` | Jump, operate, restore cursor | Remote presets (`rdw`) |
 | `*_line` | Line-wise variant | Double-tap (`dd`, `yy`, `cc`) |
 
 The `*_jump` variants have `keys` registered in the action registry (e.g., `delete_jump` has `keys = { "d" }`). This is how the infer system resolves the correct action when composable operators look up their action by key.
@@ -72,5 +72,5 @@ The `*_jump` variants have `keys` registered in the action registry (e.g., `dele
 | Jump and delete/yank/change | `delete_jump`, `yank_jump`, `change_jump` |
 | Delete/yank/change without moving | `delete`, `yank`, `change` |
 | Paste at a target | `paste_jump`, `paste_line` |
-| Remote operations | `remote_delete`, `remote_yank` |
+| Remote operations | `remote_delete` |
 | Repeat a motion | `run_motion` |

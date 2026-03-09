@@ -116,10 +116,11 @@ local action_entries = {
 		run = merge({
 			require("smart-motion.actions.jump"),
 			require("smart-motion.actions.yank"),
+			require("smart-motion.actions.restore"),
 		}),
 		metadata = {
-			label = "Jump and Yank",
-			description = "Jumps to the target and yanks it",
+			label = "Yank",
+			description = "Yanks the target without moving the cursor",
 		},
 	},
 	yank_line = {
@@ -127,10 +128,11 @@ local action_entries = {
 		run = merge({
 			require("smart-motion.actions.jump"),
 			require("smart-motion.actions.yank_line"),
+			require("smart-motion.actions.restore"),
 		}),
 		metadata = {
 			label = "Yank Line",
-			description = "Yanks the entire line at the target",
+			description = "Yanks the entire line at the target without moving the cursor",
 		},
 	},
 	restore = {
@@ -160,28 +162,6 @@ local action_entries = {
 		metadata = {
 			label = "Remote Delete Line",
 			description = "Deletes the line at the target without moving the cursor",
-		},
-	},
-	remote_yank = {
-		run = merge({
-			require("smart-motion.actions.jump"),
-			require("smart-motion.actions.yank"),
-			require("smart-motion.actions.restore"),
-		}),
-		metadata = {
-			label = "Remote Yank",
-			description = "Yanks the target without moving the cursor",
-		},
-	},
-	remote_yank_line = {
-		run = merge({
-			require("smart-motion.actions.jump"),
-			require("smart-motion.actions.yank_line"),
-			require("smart-motion.actions.restore"),
-		}),
-		metadata = {
-			label = "Remote Yank Line",
-			description = "Yanks the entire line at the target without moving the cursor",
 		},
 	},
 	paste = {

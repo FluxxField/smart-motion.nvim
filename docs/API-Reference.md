@@ -189,8 +189,8 @@ require("smart-motion").map_motion("w")
 | `delete_jump` | Jump to target, then delete (key: `d`) |
 | `delete_line` | Jump to target, delete entire line (key: `D`) |
 | `yank` | Yank target text (no cursor movement) |
-| `yank_jump` | Jump to target, then yank (key: `y`) |
-| `yank_line` | Jump to target, yank entire line (key: `Y`) |
+| `yank_jump` | Jump to target, yank, restore cursor (key: `y`) |
+| `yank_line` | Jump to target, yank entire line, restore cursor (key: `Y`) |
 | `change` | Delete target text, enter insert mode |
 | `change_jump` | Jump to target, delete, enter insert (key: `c`) |
 | `change_line` | Jump to target, change entire line (key: `C`) |
@@ -199,8 +199,6 @@ require("smart-motion").map_motion("w")
 | `paste_line` | Jump to target, paste entire line |
 | `remote_delete` | Jump, delete, restore cursor |
 | `remote_delete_line` | Jump, delete line, restore cursor |
-| `remote_yank` | Jump, yank, restore cursor |
-| `remote_yank_line` | Jump, yank line, restore cursor |
 | `restore` | Restore cursor position |
 | `run_motion` | Re-run from history |
 | `textobject_select` | Set charwise visual selection spanning target range (for text objects) |

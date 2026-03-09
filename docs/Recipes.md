@@ -256,7 +256,7 @@ Actions determine *what happens* when you pick a target.
 | `delete` | Deletes from cursor to the target |
 | `yank` | Yanks from cursor to the target |
 | `remote_delete` | Deletes the target word/line without moving cursor |
-| `remote_yank` | Yanks the target word/line without moving cursor |
+| `yank_jump` | Yanks the target word/line without moving cursor |
 | `merge({ "jump", "yank" })` | Runs multiple actions in sequence (e.g., jump then yank) |
 
 ### Collectors
