@@ -512,8 +512,6 @@ end
 | `paste` | Paste at target |
 | `remote_delete` | Delete without moving cursor |
 | `remote_delete_line` | Delete line without moving |
-| `remote_yank` | Yank without moving cursor |
-| `remote_yank_line` | Yank line without moving |
 | `restore` | Restore cursor to original position |
 
 ### Action Merging

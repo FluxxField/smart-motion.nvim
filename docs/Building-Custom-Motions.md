@@ -117,8 +117,8 @@ Each stage is optional (except collector, extractor, visualizer, action). Each s
 | `delete_jump` | Jump to target, then delete |
 | `delete_line` | Jump to target, delete entire line |
 | `yank` | Yank target text (no cursor movement) |
-| `yank_jump` | Jump to target, then yank |
-| `yank_line` | Jump to target, yank entire line |
+| `yank_jump` | Jump to target, yank, restore cursor |
+| `yank_line` | Jump to target, yank entire line, restore cursor |
 | `change` | Delete target and enter insert mode |
 | `change_jump` | Jump to target, delete, enter insert |
 | `change_line` | Jump to target, change entire line |
@@ -127,15 +127,13 @@ Each stage is optional (except collector, extractor, visualizer, action). Each s
 | `paste_line` | Jump to target, paste entire line |
 | `remote_delete` | Delete target, restore cursor (stays in place) |
 | `remote_delete_line` | Delete line, restore cursor |
-| `remote_yank` | Yank target, restore cursor |
-| `remote_yank_line` | Yank line, restore cursor |
 | `center` | Center screen on cursor |
 | `restore` | Restore cursor to original position |
 
 **Action naming pattern:**
 - `delete`/`yank`/`change`/`paste`: operate on target text without moving cursor
 - `*_jump`: jump to target first, then operate (used by composable operators like `dw`)
-- `remote_*`: jump, operate, restore cursor (cursor stays in place, for `rdw`/`ryw`)
+- `remote_*`: jump, operate, restore cursor (cursor stays in place, for `rdw`)
 - `*_line`: line-wise variants (used by double-tap: `dd`, `yy`, `cc`)
 
 ---

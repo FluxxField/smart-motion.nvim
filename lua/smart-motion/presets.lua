@@ -297,7 +297,7 @@ function presets.yank(exclude)
 			modifier = "weight_distance",
 			filter = "filter_lines_around_cursor",
 			visualizer = "hint_start",
-			action = "remote_yank",
+			action = "yank_jump",
 			map = true,
 			modes = { "n" },
 			metadata = {
@@ -311,7 +311,7 @@ function presets.yank(exclude)
 			modifier = "weight_distance",
 			filter = "filter_lines_around_cursor",
 			visualizer = "hint_start",
-			action = "remote_yank",
+			action = "yank_jump",
 			map = true,
 			modes = { "n" },
 			metadata = {

@@ -107,7 +107,7 @@ sm.motions.register("ry", {
   extractor = "pass_through",
   filter = "filter_visible",
   visualizer = "hint_before",
-  action = "remote_yank",
+  action = "yank_jump",
   metadata = {
     motion_state = {
       patterns = { "\\v\\f+" },

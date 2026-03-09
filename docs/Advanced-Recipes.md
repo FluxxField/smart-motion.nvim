@@ -397,13 +397,15 @@ require("smart-motion").register_motion("gy", {
 
 **How it works:** When you select a target, `merge` runs each action in order: first `jump` moves the cursor to the target, then `yank` yanks the word at the new position. Actions share the same `motion_state`, so the selected target is available to every action in the chain.
 
-### Remote Yank (Yank Without Moving)
+### Customizing Yank Behavior
+
+The default `yank_jump` already restores the cursor (matching native Vim behavior). But you can customize it — for example, if you want a yank that moves the cursor to the target instead:
 
 ```lua
-action = merge({ "yank", "restore" })
+action = merge({ "jump", "yank" })
 ```
 
-**How it works:** The `yank` action yanks text at the target, then `restore` returns the cursor to its original position. The result is a yank that does not move the cursor.
+**How it works:** By composing just `jump` and `yank` (without `restore`), you get a yank that leaves the cursor at the target. This is the power of Smart Motion's composability — you can override any preset's action chain to fit your workflow.
 
 ### Jump, Yank, and Center
 
@@ -444,7 +446,7 @@ require("smart-motion").register_motion("ry", {
   filter = "filter_visible",
   visualizer = "hint_before",
   modifier = "weight_distance",
-  action = "remote_yank",
+  action = "yank_jump",
   map = true,
   trigger_key = "ry",
   modes = { "n" },
