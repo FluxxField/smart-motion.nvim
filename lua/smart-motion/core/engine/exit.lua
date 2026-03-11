@@ -20,6 +20,9 @@ function M.run(ctx, cfg, motion_state, exit_type)
 		-- Re-rendering here would use the full (unfiltered) key pool, which produces
 		-- different label assignments than the conflict-filtered labels the user already saw.
 		if vim.tbl_isempty(motion_state.assigned_hint_labels) then
+			if not modules.visualizer or not modules.visualizer.run then
+				return
+			end
 			modules.visualizer.run(ctx, cfg, motion_state)
 		end
 		selection.wait_for_hint_selection(ctx, cfg, motion_state)
@@ -28,7 +31,7 @@ function M.run(ctx, cfg, motion_state, exit_type)
 	if motion_state.selected_jump_target then
 		if ctx.mode and ctx.mode:find("o") and not motion_state.is_textobject then
 			require("smart-motion.actions.jump").run(ctx, cfg, motion_state)
-		else
+		elseif modules.action and modules.action.run then
 			modules.action.run(ctx, cfg, motion_state)
 		end
 	end

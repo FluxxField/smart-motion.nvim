@@ -236,7 +236,7 @@ require("smart-motion").setup({
     two_char_hint = { fg = "#000000", bg = "#00FF00", bold = true },
     dim = { fg = "#333333" },
   },
-  disable_dim_background = false,
+  dim_background = true,
 })
 ```
 

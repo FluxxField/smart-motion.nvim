@@ -59,11 +59,56 @@ The coroutine design enables:
 |-----------|----------------|
 | `lines` | Each line in the buffer with `text` and `line_number` |
 | `treesitter` | Syntax nodes matching configured types |
+| `patterns` | Targets matching vim regex patterns against buffer lines |
 | `diagnostics` | LSP diagnostic entries |
 | `git_hunks` | Git changed regions (via gitsigns or git diff) |
 | `quickfix` | Quickfix or location list entries |
 | `marks` | Vim marks (a-z local, A-Z global) |
 | `history` | Previous SmartMotion jump targets |
+
+### Patterns Collector
+
+The `patterns` collector finds targets using vim regex. It reads from `motion_state`:
+
+- **`patterns`** (string[]) — Array of vim regex strings to match
+- **`patterns_whole_line`** (boolean) — If `true`, the entire matching line is the target instead of just the match
+
+```lua
+motion_state = {
+  patterns = { "\\v\\f+" },  -- match file paths
+}
+```
+
+Multiple patterns are matched in order. Multiple matches per line are supported (the collector advances past each match). Invalid regex is safely caught via `pcall`.
+
+The patterns collector yields standard targets, so it composes with any extractor, filter, visualizer, and action. Use `pass_through` as the extractor since the collector already produces complete targets.
+
+### Filetype Dispatch
+
+A pre-pipeline middleware that swaps any pipeline module based on the current buffer's filetype. This allows a single motion to adapt its behavior per filetype — e.g., using regex patterns for filetypes without treesitter parsers.
+
+Configure it via `filetype_overrides` in a motion's `motion_state`:
+
+```lua
+motion_state = {
+  ts_node_types = { "function_declaration" },
+  filetype_overrides = {
+    gitcommit = {
+      collector = "patterns",
+      motion_state = {
+        patterns = { "\\vmodified:\\s+\\zs\\S.*$" },
+      },
+    },
+    sql = {
+      motion_state = {
+        ts_query = [[(function_definition name: (identifier) @fn)]],
+      },
+    },
+  },
+}
+```
+
+The override can swap any pipeline module (`collector`, `extractor`, `modifier`, `filter`, `visualizer`, `action`) and/or deep-merge `motion_state` fields. Overrides are per-motion, so different motions can have different filetype behavior. When no override matches the current filetype, the middleware is a no-op.
 
 ### Treesitter Collector Modes
 
@@ -467,8 +512,6 @@ end
 | `paste` | Paste at target |
 | `remote_delete` | Delete without moving cursor |
 | `remote_delete_line` | Delete line without moving |
-| `remote_yank` | Yank without moving cursor |
-| `remote_yank_line` | Yank line without moving |
 | `restore` | Restore cursor to original position |
 
 ### Action Merging

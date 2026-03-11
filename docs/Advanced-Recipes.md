@@ -397,13 +397,15 @@ require("smart-motion").register_motion("gy", {
 
 **How it works:** When you select a target, `merge` runs each action in order: first `jump` moves the cursor to the target, then `yank` yanks the word at the new position. Actions share the same `motion_state`, so the selected target is available to every action in the chain.
 
-### Remote Yank (Yank Without Moving)
+### Customizing Yank Behavior
+
+The default `yank_jump` already restores the cursor (matching native Vim behavior). But you can customize it — for example, if you want a yank that moves the cursor to the target instead:
 
 ```lua
-action = merge({ "yank", "restore" })
+action = merge({ "jump", "yank" })
 ```
 
-**How it works:** The `yank` action yanks text at the target, then `restore` returns the cursor to its original position. The result is a yank that does not move the cursor.
+**How it works:** By composing just `jump` and `yank` (without `restore`), you get a yank that leaves the cursor at the target. This is the power of Smart Motion's composability — you can override any preset's action chain to fit your workflow.
 
 ### Jump, Yank, and Center
 
@@ -426,6 +428,150 @@ action = merge({ "jump", "yank", "center" })
 4. **Debug with logging.** If a motion is not producing the targets you expect, enable debug logging: `vim.g.smart_motion_log_level = "debug"`. This prints each pipeline stage's input and output so you can see where targets are being lost.
 
 5. **Chain recipes from both guides.** The [Recipes guide](Recipes.md) covers filter swaps, extractor changes, and preset overrides. Everything there composes with the techniques in this guide. For example, you can take a treesitter motion from this page and make it bidirectional by applying a filter swap from the Recipes page.
+
+---
+
+## Filetype-Aware Motions
+
+The `filetype_overrides` system lets a single motion adapt its pipeline per filetype. Combined with the `patterns` collector, you can target structured text in any buffer — even without a treesitter parser.
+
+### Remote Yank Across Filetypes
+
+One keymap that yanks the "interesting thing" in any buffer:
+
+```lua
+require("smart-motion").register_motion("ry", {
+  collector = "treesitter",
+  extractor = "pass_through",
+  filter = "filter_visible",
+  visualizer = "hint_before",
+  modifier = "weight_distance",
+  action = "yank_jump",
+  map = true,
+  trigger_key = "ry",
+  modes = { "n" },
+  metadata = {
+    label = "Remote Yank",
+    motion_state = {
+      ts_node_types = { "identifier", "string_content", "constant" },
+      multi_window = true,
+      filetype_overrides = {
+        gitcommit = {
+          collector = "patterns",
+          motion_state = {
+            patterns = {
+              "\\vmodified:\\s+\\zs\\S.*$",
+              "\\vnew file:\\s+\\zs\\S.*$",
+              "\\vdeleted:\\s+\\zs\\S.*$",
+            },
+          },
+        },
+      },
+    },
+  },
+})
+```
+
+**How it works:** In code files, this yanks treesitter identifiers and strings remotely (without moving the cursor). In a fugitive `gitcommit` buffer, it switches to the `patterns` collector and targets modified file paths instead. One keymap, two completely different data sources, same action.
+
+### Jump to Log File Entries
+
+```lua
+require("smart-motion").register_motion("<leader>l", {
+  collector = "treesitter",
+  extractor = "pass_through",
+  filter = "filter_visible",
+  visualizer = "hint_start",
+  action = "jump_centered",
+  map = true,
+  modes = { "n" },
+  metadata = {
+    motion_state = {
+      ts_node_types = { "function_declaration", "function_definition" },
+      filetype_overrides = {
+        log = {
+          collector = "patterns",
+          motion_state = {
+            patterns = {
+              "\\v(ERROR|WARN|FATAL)",
+              "\\v\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}",
+            },
+          },
+        },
+      },
+    },
+  },
+})
+```
+
+**How it works:** In code, this jumps to functions. In `.log` files, it jumps to error keywords and ISO timestamps. The `patterns` collector handles the regex matching; the rest of the pipeline (filter, visualizer, action) stays the same.
+
+### Per-Language Treesitter Customization
+
+You don't need the `patterns` collector to use filetype overrides. You can swap treesitter config per language:
+
+```lua
+require("smart-motion").register_motion("]]", {
+  collector = "treesitter",
+  extractor = "pass_through",
+  filter = "filter_visible",
+  visualizer = "hint_start",
+  action = "jump_centered",
+  map = true,
+  modes = { "n", "o" },
+  metadata = {
+    motion_state = {
+      ts_node_types = { "function_declaration", "function_definition" },
+      filetype_overrides = {
+        python = {
+          motion_state = {
+            ts_node_types = { "function_definition", "class_definition", "decorated_definition" },
+          },
+        },
+        go = {
+          motion_state = {
+            ts_node_types = { "function_declaration", "method_declaration", "type_declaration" },
+          },
+        },
+        sql = {
+          motion_state = {
+            ts_query = [[
+              (function_definition fnc_name: (identifier) @fn)
+              (select_list_element (identifier) @alias)
+            ]],
+          },
+        },
+      },
+    },
+  },
+})
+```
+
+**How it works:** Same treesitter collector everywhere, but each language gets the node types that make sense for it. Python includes `class_definition` and `decorated_definition`. Go includes `type_declaration`. SQL uses a raw query instead of node types. Languages without an override use the default `ts_node_types`.
+
+### Standalone Patterns Motion
+
+The `patterns` collector works independently — no filetype dispatch needed:
+
+```lua
+-- Jump to URLs anywhere in the buffer
+require("smart-motion").register_motion("<leader>u", {
+  collector = "patterns",
+  extractor = "pass_through",
+  filter = "filter_visible",
+  visualizer = "hint_start",
+  action = "jump",
+  map = true,
+  modes = { "n" },
+  metadata = {
+    motion_state = {
+      patterns = { "\\vhttps?://\\S+" },
+    },
+  },
+})
+```
+
+**How it works:** The `patterns` collector matches `https://...` URLs across visible buffer lines. No treesitter, no filetype dispatch — just a regex collector with standard pipeline stages.
 
 ---
 

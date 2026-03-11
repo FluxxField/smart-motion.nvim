@@ -572,13 +572,13 @@ Combine actions with `merge`:
 local merge = require("smart-motion.core.utils").action_utils.merge
 
 -- Jump and yank
-action = merge({ "jump", "yank" })
+action = merge({ "jump", "yank", "restore" })
 
 -- Jump, delete, center
 action = merge({ "jump", "delete", "center" })
 
--- Yank without moving (yank then restore cursor)
-action = merge({ "yank", "restore" })
+-- Yank that moves cursor to target (override default restore behavior)
+action = merge({ "jump", "yank" })
 ```
 
 Actions execute in order. This is how SmartMotion builds compound operations without defining every combination.
