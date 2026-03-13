@@ -88,7 +88,14 @@ function M.run(ctx, cfg, motion_state)
 		end
 	end
 
-	local modules = module_loader.get_modules(ctx, cfg, motion_state, { "extractor", "action", "visualizer", "filter" })
+	-- Only request extractor if a composable motion populated it; otherwise the
+	-- fallback at line 103+ handles non-composable keys (dd, di, da, etc.) and
+	-- requesting it here would log a spurious "extractor 'default' not found" error.
+	local infer_keys = { "action", "visualizer", "filter" }
+	if motion_state.motion.extractor then
+		table.insert(infer_keys, 1, "extractor")
+	end
+	local modules = module_loader.get_modules(ctx, cfg, motion_state, infer_keys)
 
 	-- Merge inferred module metadata into motion_state (setup.run merged metadata for the
 	-- original motion, but infer may have overridden extractor/visualizer/filter/action)
