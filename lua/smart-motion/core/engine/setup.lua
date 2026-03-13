@@ -26,7 +26,13 @@ function M.run(trigger_key)
 	-- For operator motions (infer=true), infer.run will override this with the composed key.
 	motion_state.motion_key = trigger_key
 
-	local modules = module_loader.get_modules(ctx, cfg, motion_state)
+	-- For infer motions (d, y, c), skip loading the extractor here — infer.run()
+	-- will determine the correct extractor from the composable motion (e.g. w, b, e).
+	local load_keys = nil
+	if motion_state.motion.infer then
+		load_keys = { "collector", "modifier", "filter", "visualizer", "action" }
+	end
+	local modules = module_loader.get_modules(ctx, cfg, motion_state, load_keys)
 
 	-- The modules might have motion_state they would like to set
 	-- Use motion_state.motion (the shallow copy, possibly modified by filetype_dispatch)
