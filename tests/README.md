@@ -6,7 +6,7 @@ SmartMotion has two kinds of tests: an **automated test suite** run headlessly v
 
 ## Automated Test Suite
 
-470 tests across 41 files covering pipeline engine, registries, filters, config validation, history persistence, and more.
+548 tests across 43 files covering pipeline engine, registries, filters, config validation, history persistence, textobjects, pairs, surround, and more.
 
 ### Running Tests
 
@@ -109,6 +109,8 @@ The default test config (`helpers.test_config`) sets `flow_state_timeout_ms = 0`
 | `test_text_search.lua` | Literal match extraction, `\V` pattern, registry variants |
 | `test_utils.lua` | Utility functions |
 | `test_visual_select.lua` | `_collect_word_targets`, textobject visual selection |
+| `test_textobjects.lua` | 44 tests for the textobject registry, key resolver, treesitter/pair textobjects, surround operators, backwards compatibility, infer integration |
+| `test_pairs.lua` | 34 tests for pair definitions, pair collector, pair extractor, surround presets |
 
 ### Writing New Tests
 

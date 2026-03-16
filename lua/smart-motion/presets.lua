@@ -1,4 +1,6 @@
-local HINT_POSITION = require("smart-motion.consts").HINT_POSITION
+local consts = require("smart-motion.consts")
+local HINT_POSITION = consts.HINT_POSITION
+local KEYWORD_PATTERN = consts.KEYWORD_PATTERN
 
 ---@type SmartMotionPresetsModule
 local presets = {}
@@ -609,6 +611,227 @@ function presets.misc(exclude)
 	end
 end
 
+--- @param exclude? table
+function presets.surround(exclude)
+	-- Apply surround_pad config to pair_defs
+	local cfg = require("smart-motion.config").validated
+	if cfg then
+		local pair_defs = require("smart-motion.utils.pair_defs")
+		pair_defs.pad_convention = cfg.surround_pad
+	end
+
+	local pair_types = {
+		{ "(", ")" },
+		{ "[", "]" },
+		{ "{", "}" },
+		{ "<", ">" },
+		{ '"', '"' },
+		{ "'", "'" },
+		{ "`", "`" },
+	}
+
+	-- Register pair text objects: accessed via i/a prefix in infer and x/o keymaps.
+	-- For asymmetric pairs, both open and close chars are registered (e.g. "(" and ")").
+	local textobjects = {}
+
+	for _, pair in ipairs(pair_types) do
+		local open = pair[1]
+		local close = pair[2]
+
+		local entry = {
+			collector = "pairs",
+			extractor = "pairs",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			metadata = {
+				label = open .. close .. " pair",
+				description = "Delimiter pair " .. open .. close,
+				motion_state = {
+					pair_chars = { { open, close } },
+					is_textobject = true,
+				},
+			},
+			inside = { pair_scope = "inside" },
+			around = { pair_scope = "around" },
+			surround = { pair_scope = "surround", is_surround = true },
+			default = "around",
+		}
+
+		textobjects[open] = entry
+		if open ~= close then
+			textobjects[close] = vim.deepcopy(entry)
+		end
+	end
+
+	-- HTML/XML tag textobject
+	textobjects["t"] = {
+		collector = "tags",
+		extractor = "pairs",
+		modifier = "weight_distance",
+		filter = "filter_visible",
+		visualizer = "hint_start",
+		metadata = {
+			label = "Tag",
+			description = "HTML/XML tag text object",
+			motion_state = {
+				is_textobject = true,
+			},
+		},
+		inside = { pair_scope = "inside" },
+		around = { pair_scope = "around" },
+		surround = { pair_scope = "surround", is_surround = true },
+		default = "around",
+	}
+
+	-- Quote alias: matches any quote type (", ', `)
+	textobjects["q"] = {
+		collector = "pairs",
+		extractor = "pairs",
+		modifier = "weight_distance",
+		filter = "filter_visible",
+		visualizer = "hint_start",
+		metadata = {
+			label = "Any quote",
+			description = "Nearest quote pair (double, single, or backtick)",
+			motion_state = {
+				pair_chars = { { '"', '"' }, { "'", "'" }, { "`", "`" } },
+				is_textobject = true,
+			},
+		},
+		inside = { pair_scope = "inside" },
+		around = { pair_scope = "around" },
+		surround = { pair_scope = "surround", is_surround = true },
+		default = "around",
+	}
+
+	presets._register_textobjects(textobjects, exclude)
+
+	-- Build excluded table from exclude param
+	local excluded = {}
+	if type(exclude) == "table" then
+		for k, v in pairs(exclude) do
+			if v == false then
+				excluded[k] = true
+			end
+		end
+	end
+
+	-- Surround operators: ds, cs, ys
+	-- ds/cs pre-set textobject_key = "surround" so infer looks up the next char
+	-- directly in the textobject registry and uses the surround overrides.
+	presets._register({
+		ds = {
+			infer = true,
+			action_key = "d",
+			collector = "pairs",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "surround",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Delete Surround",
+				description = "Delete surrounding delimiter pair",
+				motion_state = {
+					textobject_key = "surround",
+					allow_quick_action = false,
+				},
+			},
+		},
+		cs = {
+			infer = true,
+			action_key = "c",
+			collector = "pairs",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "surround",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Change Surround",
+				description = "Change surrounding delimiter pair",
+				motion_state = {
+					textobject_key = "surround",
+					allow_quick_action = false,
+				},
+			},
+		},
+		ys = {
+			infer = true,
+			collector = "lines",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "surround_add",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Surround Add",
+				description = "Add surround: ys{i/a}{motion}{delimiter}",
+				motion_state = {
+					allow_quick_action = false,
+					ia_resolve_composable = true,
+					word_pattern = KEYWORD_PATTERN,
+					expansion_enabled = true,
+				},
+			},
+		},
+	}, exclude)
+
+	-- Register gza (standalone surround add with word hints)
+	presets._register({
+		gza = {
+			collector = "lines",
+			extractor = "words",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "surround_add",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Surround Add (words)",
+				description = "Show word hints, pick target, then type delimiter to wrap",
+				motion_state = {
+					word_pattern = KEYWORD_PATTERN,
+					expansion_enabled = true,
+				},
+			},
+		},
+	}, exclude)
+
+	-- Register gzp (paste surround with word hints)
+	presets._register({
+		gzp = {
+			collector = "lines",
+			extractor = "words",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			action = "surround_paste",
+			map = true,
+			modes = { "n" },
+			metadata = {
+				label = "Surround Paste",
+				description = "Wrap a word target with the previously yanked delimiter pair",
+				motion_state = {
+					word_pattern = KEYWORD_PATTERN,
+				},
+			},
+		},
+	}, exclude)
+
+	-- Register S keymap for visual surround (no conflict: existing S is n/o only)
+	if not excluded["S"] then
+		vim.keymap.set("x", "S", function()
+			require("smart-motion.actions.surround_visual").run()
+		end, { desc = "Surround visual selection", noremap = true, silent = true })
+	end
+end
+
 --- @param exclude? string[]
 function presets.treesitter(exclude)
 	-- Broad list of function-like node types across languages.
@@ -802,121 +1025,75 @@ function presets.treesitter(exclude)
 		"formal_parameters",
 	}
 
-	-- Text objects: registered in x/o modes, compose with any operator via infer fallthrough
+	-- Text objects: registered in the textobject registry, accessed via i/a prefix.
+	-- The i/a keymaps in x/o modes dispatch to the textobject pipeline automatically.
+	-- Operators (d/y/c) access textobjects via i/a prefix handling in infer.
+	presets._register_textobjects({
+		f = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			metadata = {
+				label = "Function",
+				description = "Function text object",
+				motion_state = {
+					ts_node_types = function_node_types,
+					is_textobject = true,
+				},
+			},
+			inside = { ts_inner_body = true },
+			around = {},
+			surround = {
+				_collector_override = "function_calls",
+				_extractor_override = "pairs",
+				pair_scope = "surround",
+				is_surround = true,
+			},
+			default = "around",
+		},
+		c = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			metadata = {
+				label = "Class",
+				description = "Class/struct text object",
+				motion_state = {
+					ts_node_types = class_node_types,
+					is_textobject = true,
+				},
+			},
+			inside = { ts_inner_body = true },
+			around = {},
+			default = "around",
+		},
+		a = {
+			collector = "treesitter",
+			extractor = "pass_through",
+			modifier = "weight_distance",
+			filter = "filter_visible",
+			visualizer = "hint_start",
+			metadata = {
+				label = "Argument",
+				description = "Argument/parameter text object",
+				motion_state = {
+					ts_node_types = arg_container_types,
+					ts_yield_children = true,
+					is_textobject = true,
+				},
+			},
+			inside = {},
+			around = { ts_around_separator = true },
+			default = "inside",
+		},
+	}, exclude)
+
+	-- fn stays as a composable motion (not a textobject — no i/a prefix)
 	presets._register({
-		af = {
-			collector = "treesitter",
-			extractor = "pass_through",
-			modifier = "weight_distance",
-			filter = "filter_visible",
-			visualizer = "hint_start",
-			action = "textobject_select",
-			map = true,
-			modes = { "x", "o" },
-			metadata = {
-				label = "Around Function",
-				description = "Select around a function",
-				motion_state = {
-					ts_node_types = function_node_types,
-					is_textobject = true,
-				},
-			},
-		},
-		["if"] = {
-			collector = "treesitter",
-			extractor = "pass_through",
-			modifier = "weight_distance",
-			filter = "filter_visible",
-			visualizer = "hint_start",
-			action = "textobject_select",
-			map = true,
-			modes = { "x", "o" },
-			metadata = {
-				label = "Inside Function",
-				description = "Select inside a function body",
-				motion_state = {
-					ts_node_types = function_node_types,
-					ts_inner_body = true,
-					is_textobject = true,
-				},
-			},
-		},
-		ac = {
-			collector = "treesitter",
-			extractor = "pass_through",
-			modifier = "weight_distance",
-			filter = "filter_visible",
-			visualizer = "hint_start",
-			action = "textobject_select",
-			map = true,
-			modes = { "x", "o" },
-			metadata = {
-				label = "Around Class",
-				description = "Select around a class/struct",
-				motion_state = {
-					ts_node_types = class_node_types,
-					is_textobject = true,
-				},
-			},
-		},
-		ic = {
-			collector = "treesitter",
-			extractor = "pass_through",
-			modifier = "weight_distance",
-			filter = "filter_visible",
-			visualizer = "hint_start",
-			action = "textobject_select",
-			map = true,
-			modes = { "x", "o" },
-			metadata = {
-				label = "Inside Class",
-				description = "Select inside a class/struct body",
-				motion_state = {
-					ts_node_types = class_node_types,
-					ts_inner_body = true,
-					is_textobject = true,
-				},
-			},
-		},
-		aa = {
-			collector = "treesitter",
-			extractor = "pass_through",
-			modifier = "weight_distance",
-			filter = "filter_visible",
-			visualizer = "hint_start",
-			action = "textobject_select",
-			map = true,
-			modes = { "x", "o" },
-			metadata = {
-				label = "Around Argument",
-				description = "Select around an argument (including separator)",
-				motion_state = {
-					ts_node_types = arg_container_types,
-					ts_yield_children = true,
-					ts_around_separator = true,
-					is_textobject = true,
-				},
-			},
-		},
-		ia = {
-			collector = "treesitter",
-			extractor = "pass_through",
-			modifier = "weight_distance",
-			filter = "filter_visible",
-			visualizer = "hint_start",
-			action = "textobject_select",
-			map = true,
-			modes = { "x", "o" },
-			metadata = {
-				label = "Inside Argument",
-				description = "Select inside an argument (without separator)",
-				motion_state = {
-					ts_node_types = arg_container_types,
-					ts_yield_children = true,
-					is_textobject = true,
-				},
-			},
-		},
 		fn = {
 			composable = true,
 			collector = "treesitter",
@@ -1246,6 +1423,42 @@ function presets._register(motions_list, user_overrides)
 	end
 
 	registries.motions.register_many_motions(final_motions)
+end
+
+--- Internal textobject registration logic with optional filtering.
+--- Same override/exclude pattern as _register for consistency.
+--- @param textobjects_list table<string, SmartMotionTextobjectEntry>
+--- @param user_overrides? table
+function presets._register_textobjects(textobjects_list, user_overrides)
+	local registries = require("smart-motion.core.registries"):get()
+	user_overrides = user_overrides or {}
+
+	if user_overrides == false then
+		return
+	end
+
+	local final = {}
+
+	for key, entry in pairs(textobjects_list) do
+		local override = user_overrides[key]
+
+		if override == false then
+			goto continue
+		end
+
+		if type(override) == "table" then
+			final[key] = vim.tbl_deep_extend("force", entry, override)
+		else
+			final[key] = entry
+		end
+
+		::continue::
+	end
+
+	registries.motions.register_many_textobjects(final)
+
+	-- Register i/a keymaps in x/o modes (idempotent, only registers once)
+	require("smart-motion.core.textobject_keymaps").setup()
 end
 
 return presets

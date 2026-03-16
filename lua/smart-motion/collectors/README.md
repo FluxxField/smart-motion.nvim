@@ -70,6 +70,24 @@ Collects `vim.diagnostic.get()` results as targets with position, message, sever
 
 ---
 
+## Example: `pairs.lua` (Collecting Delimiter Pairs)
+
+Collects matching delimiter pairs in the visible buffer. Tries treesitter first for accuracy, falls back to pattern-based scanning when the tree has errors (common while editing).
+
+---
+
+## Example: `tags.lua` (Collecting HTML/XML Tag Pairs)
+
+Collects matching HTML/XML tag pairs (`<div>...</div>`) in the visible buffer. Uses treesitter for HTML/JSX/TSX files where tag nodes exist in the syntax tree, and falls back to pattern-based scanning (`<tagname ...>...</tagname>`) for other file types.
+
+---
+
+## Example: `function_calls.lua` (Collecting Function Call Expressions)
+
+Collects function call expressions (e.g., `print(foo, bar)`) in the visible buffer. Uses treesitter `call_expression` nodes when available, with a pattern-based fallback that matches `identifier(...)` patterns. Used by the `f` textobject's surround override (`dsf`, `csf`) to target function calls rather than function definitions.
+
+---
+
 ## When to Use a Collector?
 
 | Use Case | Example Collector |
@@ -78,3 +96,6 @@ Collects `vim.diagnostic.get()` results as targets with position, message, sever
 | Getting treesitter nodes (functions, classes, arguments) | `treesitter` |
 | Getting LSP diagnostics | `diagnostics` |
 | Getting jump history entries | `history` |
+| Getting matching delimiter pairs in visible buffer | `pairs` |
+| Getting HTML/XML tag pairs in visible buffer | `tags` |
+| Getting function call expressions in visible buffer | `function_calls` |

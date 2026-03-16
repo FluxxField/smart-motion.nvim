@@ -44,6 +44,12 @@ The `pass_through` extractor returns collector data unchanged. This is used when
 
 ---
 
+## Example: `pairs.lua` (Extracting Pair Targets)
+
+Extracts pair targets with inside/around/surround scoping based on `pair_scope` in `motion_state`.
+
+---
+
 ## When to Use an Extractor?
 
 | Use Case | Example Extractor |
@@ -56,3 +62,4 @@ The `pass_through` extractor returns collector data unchanged. This is used when
 | Live incremental search (literal) | `live_search` |
 | Fuzzy incremental search | `fuzzy_search` |
 | Passing pre-formed targets through | `pass_through` |
+| Extracting pair targets (inside/around/surround) | `pairs` |

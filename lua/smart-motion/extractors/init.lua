@@ -5,6 +5,7 @@ local text_search = require("smart-motion.extractors.text_search")
 local live_search = require("smart-motion.extractors.live_search")
 local fuzzy_search = require("smart-motion.extractors.fuzzy_search")
 local pass_through = require("smart-motion.extractors.pass_through")
+local pairs_extractor = require("smart-motion.extractors.pairs")
 
 ---@type SmartMotionRegistry<SmartMotionExtractorModuleEntry>
 local extractors = require("smart-motion.core.registry")("extractors")
@@ -96,6 +97,41 @@ extractors.register_many({
 	pass_through = {
 		run = utils.module_wrapper(pass_through.run),
 		metadata = pass_through.metadata,
+	},
+	-- Single pairs extractor: reads pair_scope and is_surround from motion_state.
+	-- Used by textobject registrations where inside/around/surround overrides
+	-- set these values before the extractor runs.
+	pairs = {
+		run = utils.module_wrapper(pairs_extractor.run),
+		metadata = pairs_extractor.metadata,
+	},
+	-- Legacy aliases for backwards compatibility with existing motion configs
+	pairs_inside = {
+		run = utils.module_wrapper(pairs_extractor.run),
+		metadata = vim.tbl_deep_extend("force", pairs_extractor.metadata, {
+			motion_state = {
+				pair_scope = "inside",
+				is_surround = false,
+			},
+		}),
+	},
+	pairs_around = {
+		run = utils.module_wrapper(pairs_extractor.run),
+		metadata = vim.tbl_deep_extend("force", pairs_extractor.metadata, {
+			motion_state = {
+				pair_scope = "around",
+				is_surround = false,
+			},
+		}),
+	},
+	pairs_surround = {
+		run = utils.module_wrapper(pairs_extractor.run),
+		metadata = vim.tbl_deep_extend("force", pairs_extractor.metadata, {
+			motion_state = {
+				pair_scope = "inside",
+				is_surround = true,
+			},
+		}),
 	},
 })
 

@@ -7,6 +7,7 @@ Complete reference for SmartMotion modules and data structures.
 ## Table of Contents
 
 - [Motion Registration](#motion-registration)
+- [Textobject Registration](#textobject-registration)
 - [Built-in Modules](#built-in-modules)
 - [Motion State](#motion-state)
 - [Context Object](#context-object)
@@ -113,6 +114,124 @@ require("smart-motion").map_motion("w")
 
 ---
 
+## Textobject Registration
+
+Text objects (`i`/`a` prefix) live in a separate registry from composable motions. The same key can exist in both registries (`f` composable = 2-char find, `f` textobject = function) because they are consulted in different contexts.
+
+### register
+
+```lua
+require("smart-motion").textobjects.register(key, entry)
+```
+
+Register a single textobject.
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `key` | string | Textobject key (e.g., `"("`, `"f"`, `"c"`) |
+| `entry` | table | Textobject entry |
+
+### register_many
+
+```lua
+require("smart-motion").textobjects.register_many(table)
+```
+
+Register multiple textobjects at once:
+
+```lua
+require("smart-motion").textobjects.register_many({
+  ["("] = { ... },
+  ["["] = { ... },
+  f = { ... },
+})
+```
+
+### get
+
+```lua
+require("smart-motion").textobjects.get(key)
+```
+
+Returns the textobject entry for `key`, or `nil` if not registered.
+
+### has
+
+```lua
+require("smart-motion").textobjects.has(key)
+```
+
+Returns `true` if a textobject is registered for `key`.
+
+### Entry Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `collector` | string | Yes | Collector module name |
+| `extractor` | string | Yes | Extractor module name |
+| `modifier` | string | No | Modifier module name |
+| `filter` | string | No | Filter module name |
+| `visualizer` | string | No | Visualizer module name |
+| `metadata` | table | No | Additional metadata |
+| `inside` | table | No | `motion_state` overrides merged when the `i` prefix is used |
+| `around` | table | No | `motion_state` overrides merged when the `a` prefix is used |
+| `surround` | table | No | `motion_state` overrides merged for surround operators (`ds`, `cs`) |
+| `default` | string | No | Which prefix to use when none is specified (`"inside"` or `"around"`) |
+
+The `inside`, `around`, and `surround` fields are plain `motion_state` fragments. When the user types a prefix (`i`, `a`, or a surround operator), the corresponding fragment is merged into `motion_state` before the pipeline runs.
+
+### Prefix Overrides (`_collector_override` / `_extractor_override`)
+
+A textobject's `inside`, `around`, or `surround` fragments can include `_collector_override` and `_extractor_override` fields. When present, these swap the textobject's collector and/or extractor for that prefix only. This allows a single textobject key to use completely different pipeline modules depending on whether it's accessed via `i`/`a` or via surround operators.
+
+**Example:** The `f` textobject uses `treesitter` collector for `dif`/`daf` (function bodies) but swaps to `function_calls` collector for `dsf`/`csf` (function call expressions):
+
+```lua
+f = {
+    collector = "treesitter",       -- default: function definitions
+    extractor = "pass_through",
+    -- ...
+    inside = { ts_inner_body = true },
+    around = {},
+    surround = {
+        _collector_override = "function_calls",  -- swap collector for surround
+        _extractor_override = "pairs",           -- swap extractor for surround
+        pair_scope = "surround",
+        is_surround = true,
+    },
+}
+```
+
+This pattern is useful when the same conceptual textobject key (`f` for "function") should behave differently in different contexts.
+
+### Example
+
+```lua
+-- Register a custom pair textobject
+require("smart-motion").textobjects.register("(", {
+  collector = "pairs",
+  extractor = "pairs",
+  visualizer = "hint_start",
+  inside = { pair_scope = "inside" },
+  around = { pair_scope = "around" },
+  surround = { pair_scope = "surround", is_surround = true },
+  default = "around",
+  metadata = {
+    label = "Parentheses",
+    open = "(",
+    close = ")",
+  },
+})
+
+-- Now di( deletes inside parens, da( deletes around parens,
+-- ds( deletes the surrounding parens, cs( changes the surrounding parens.
+-- All show hint labels so you can pick which pair to act on.
+```
+
+---
+
 ## Built-in Modules
 
 ### Collectors
@@ -121,6 +240,9 @@ require("smart-motion").map_motion("w")
 |------|-------------|
 | `lines` | All buffer lines |
 | `treesitter` | Syntax nodes (see Treesitter modes below) |
+| `pairs` | Matching delimiter pairs (treesitter + pattern fallback) |
+| `tags` | HTML/XML tag pairs (treesitter + pattern fallback) |
+| `function_calls` | Function call expressions (treesitter + pattern fallback) |
 | `diagnostics` | LSP diagnostics |
 | `git_hunks` | Git changed regions |
 | `quickfix` | Quickfix/location list entries |
@@ -145,6 +267,7 @@ require("smart-motion").map_motion("w")
 | `text_search_2_char_until` | Two char, exclude target (till) |
 | `live_search` | Incremental search |
 | `fuzzy_search` | Fuzzy matching |
+| `pairs` | Delimiter pair extraction (open/close ranges) |
 | `pass_through` | Collector output unchanged |
 
 ### Modifiers

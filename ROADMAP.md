@@ -65,3 +65,15 @@
 - Jump to Git Conflicts.
 - Search & Replace with Hints.
 - History review with labels.
+
+---
+
+## Phase 7: Surround & Text Objects (v1.3.0+)
+
+### Completed
+- ✅ Textobject registry (separate from composable motions, same key can exist in both)
+- ✅ Pair text objects (`i`/`a` + delimiter: parentheses, brackets, braces, quotes, tags)
+- ✅ Surround operators (`ds`, `cs`, `ys` — delete, change, add surrounding pairs)
+- ✅ Standalone surround (`gza` add surround, `gzp` paste surround, visual `S`)
+- ✅ Pattern-based pair detection fallback (works without treesitter)
+- ✅ Configurable padding (`surround_pad`)

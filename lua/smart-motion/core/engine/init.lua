@@ -42,4 +42,28 @@ function M.run(trigger_key, opts)
 	utils.reset_motion(ctx, cfg, motion_state)
 end
 
+--- Run the engine with a textobject config directly (no registry lookup).
+--- Used by i/a keymaps in visual and operator-pending modes.
+--- @param textobject SmartMotionTextobjectEntry
+--- @param textobject_key string "inside" or "around"
+function M.run_textobject(textobject, textobject_key)
+	local ctx, cfg, motion_state
+
+	local exit_type = exit_event.wrap(function()
+		ctx, cfg, motion_state = setup.run_with_textobject(textobject, textobject_key)
+
+		if flow_state.evaluate_flow_at_motion_start() then
+			pipeline.run(ctx, cfg, motion_state)
+			exit_event.throw_if(motion_state.selected_jump_target, EXIT_TYPE.AUTO_SELECT)
+		end
+
+		highlight.dim_background(ctx, cfg, motion_state)
+
+		loop.run(ctx, cfg, motion_state)
+	end)
+
+	handle_exit.run(ctx, cfg, motion_state, exit_type)
+	utils.reset_motion(ctx, cfg, motion_state)
+end
+
 return M

@@ -159,7 +159,7 @@ Start without operators (`delete`, `yank`, `change`) if you want to ease in. Add
 
 **Scope.** mini.jump enhances native f/F/t/T. mini.jump2d adds label jumping. SmartMotion replaces both and adds treesitter, operators, text objects, history, and more.
 
-**Ecosystem.** If you use mini.ai for text objects, SmartMotion's `af`/`if`/`ac`/`ic`/`aa`/`ia` can replace it. If you use mini.surround, that's orthogonal and works fine alongside SmartMotion.
+**Ecosystem.** If you use mini.ai for text objects, SmartMotion's `af`/`if`/`ac`/`ic`/`aa`/`ia` can replace it. If you use mini.surround, SmartMotion's `surround = true` preset provides `ds`, `cs`, `ys`, and visual `S` with hint labels on all matching pairs.
 
 ### Recommended Config for mini.jump Users
 
@@ -172,6 +172,54 @@ presets = {
   misc = true,
 }
 ```
+
+---
+
+## From nvim-surround
+
+### Keybinding Map
+
+| nvim-surround | SmartMotion | Notes |
+|---------------|-------------|-------|
+| `ds)` (delete surround) | `ds)` | Same key sequence. SmartMotion shows hint labels on all matching pairs so you pick which one. |
+| `cs)]` (change surround) | `cs)` then type `]` | SmartMotion splits into two steps: pick the pair, then type the replacement. |
+| `dst` (delete tag) | `dst` | Same key sequence. SmartMotion labels all tag pairs on screen. |
+| `cst` (change tag) | `cst` | Pick the tag → name deleted → insert mode with live sync to closing tag. |
+| `dsf` (unwrap function) | `dsf` | Same key sequence. Labels all function calls on screen. |
+| `csf` (change function) | `csf` | Pick the call → name deleted → insert mode at name position. |
+| `ysiw)` (add surround) | `ysaw)` | SmartMotion shows word hints so you pick which target to wrap. |
+| `ysiw t` + tag name | `ysiw t` + tag name | Same flow. Prompts for tag name after typing `t`. |
+| `S` in visual | `S` in visual | Same key. Select text, press `S`, type the delimiter. |
+
+### What's Different
+
+**Hint labels on everything.** nvim-surround acts on the nearest pair. SmartMotion shows hint labels on ALL matching pairs in the viewport and lets you pick which one. No more counting or navigating to get the right pair.
+
+**Two-step change.** nvim-surround's `cs)]` is a single key sequence. SmartMotion's `cs)` shows labeled pairs, you pick one, then type the replacement character. Two steps, but you can target any pair on screen.
+
+**Add surround uses motions.** nvim-surround's `ys{motion}{char}` uses native vim motions. SmartMotion's `ys` reads `i`/`a` prefix + textobject key, shows hint labels, and wraps the selected target. For example, `ysaw)` shows word targets and wraps the one you pick in parentheses.
+
+**Standalone operations.** SmartMotion adds `gza` (add surround to a word target), `gzp` (paste previously yanked pair around a target), and visual `S`. These don't have direct nvim-surround equivalents.
+
+**Tags and function calls.** `dst` and `dsf` work the same way as nvim-surround (with added label-based target picking). However, `cst` and `csf` work differently: nvim-surround uses a command-line prompt to read the new name, while SmartMotion deletes the name and enters insert mode in-place. For `cst`, as you type in the opening tag, the closing tag mirrors your input in real-time (multi-cursor style). For `csf`, the function name is deleted and you type the replacement directly at the name position. SmartMotion also adds `dsq`/`csq` for targeting any quote type (`"`, `'`, `` ` ``) without specifying which one.
+
+**Configurable padding.** SmartMotion's `surround_pad` option controls whether added pairs include inner spaces (e.g., `( foo )` vs `(foo)`).
+
+### Recommended Config for nvim-surround Users
+
+```lua
+presets = {
+  words = true,
+  search = true,
+  delete = true,
+  yank = true,
+  change = true,
+  treesitter = true,
+  surround = true,
+}
+```
+
+This gives you all surround operations plus composable operators and treesitter text objects.
 
 ---
 

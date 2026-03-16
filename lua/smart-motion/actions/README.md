@@ -61,6 +61,10 @@ Actions follow a naming pattern:
 | `delete_jump`, `yank_jump`, `change_jump` | Jump to target first, then operate | Composable operators (`dw`, `yw`, `cj`) |
 | `remote_delete` | Jump, operate, restore cursor | Remote presets (`rdw`) |
 | `*_line` | Line-wise variant | Double-tap (`dd`, `yy`, `cc`) |
+| `surround` | Dispatch surround operations (delete/yank/change delimiters) based on `action_key` | Surround presets (`ds`, `cs`) |
+| `surround_add` | Wrap target with prompted delimiter pair | `ys`, `gza` flows |
+| `surround_paste` | Wrap target with previously yanked delimiter pair | `gzp` |
+| `surround_visual` | Wrap visual selection with prompted delimiter | Visual `S` |
 
 The `*_jump` variants have `keys` registered in the action registry (e.g., `delete_jump` has `keys = { "d" }`). This is how the infer system resolves the correct action when composable operators look up their action by key.
 
@@ -73,4 +77,8 @@ The `*_jump` variants have `keys` registered in the action registry (e.g., `dele
 | Delete/yank/change without moving | `delete`, `yank`, `change` |
 | Paste at a target | `paste_jump`, `paste_line` |
 | Remote operations | `remote_delete` |
+| Surround delete/yank/change | `surround` |
+| Wrap target with delimiter | `surround_add` |
+| Wrap target with yanked delimiter | `surround_paste` |
+| Wrap visual selection with delimiter | `surround_visual` |
 | Repeat a motion | `run_motion` |

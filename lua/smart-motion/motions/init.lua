@@ -223,4 +223,69 @@ function motions.get_composable_by_key(key)
 	return nil
 end
 
+-- =============================================================================
+-- Textobject Registry
+-- =============================================================================
+-- Textobjects are targets that work with i/a prefixes (e.g., "f" for function,
+-- "(" for parens). They live in a separate registry from composable motions so
+-- the same key can mean different things in different contexts:
+--   f composable = 2-char find
+--   f textobject = function (treesitter)
+--
+-- Each textobject declares pipeline components (collector, extractor, etc.) and
+-- motion_state overrides for each prefix via `inside`, `around`, and optionally
+-- `surround` fields. These are plain motion_state fragments.
+-- =============================================================================
+
+--- @type table<string, SmartMotionTextobjectEntry>
+motions.textobjects = {}
+
+--- Register a textobject by key.
+--- @param key string Single character key (e.g., "(", "f", "a")
+--- @param entry SmartMotionTextobjectEntry
+function motions.register_textobject(key, entry)
+	if not utils.is_non_empty_string(key) then
+		log.error("[Textobject Registry] Textobject must have a non-empty key.")
+		return
+	end
+
+	entry.key = key
+	entry.metadata = entry.metadata or {}
+	entry.metadata.label = entry.metadata.label or key
+	entry.metadata.motion_state = entry.metadata.motion_state or {}
+	entry.inside = entry.inside or {}
+	entry.around = entry.around or {}
+	entry.default = entry.default or "around"
+
+	motions.textobjects[key] = entry
+end
+
+--- Register multiple textobjects.
+--- @param tbl table<string, SmartMotionTextobjectEntry>
+--- @param opts? { override?: boolean }
+function motions.register_many_textobjects(tbl, opts)
+	opts = opts or {}
+	for key, entry in pairs(tbl) do
+		if not opts.override and motions.textobjects[key] then
+			log.warn("[Textobject Registry] Skipping already-registered textobject: " .. key)
+		else
+			motions.register_textobject(key, entry)
+		end
+	end
+end
+
+--- Get a textobject by key.
+--- @param key string
+--- @return SmartMotionTextobjectEntry|nil
+function motions.get_textobject(key)
+	return motions.textobjects[key]
+end
+
+--- Check if a textobject is registered for the given key.
+--- @param key string
+--- @return boolean
+function motions.has_textobject(key)
+	return motions.textobjects[key] ~= nil
+end
+
 return motions

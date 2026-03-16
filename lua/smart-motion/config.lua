@@ -40,6 +40,12 @@ M.defaults = {
 	selection_keys = {
 		["<CR>"] = "select_first",
 	},
+	expansion_keys = {
+		["+"] = "expand_forward",
+		["-"] = "expand_backward",
+		["<BS>"] = "shrink",
+	},
+	surround_pad = "opening",
 }
 
 ---@type SmartMotionConfig
@@ -229,6 +235,33 @@ function M.validate(user_config)
 	--
 	if config.history_max_age_days == nil or type(config.history_max_age_days) ~= "number" or config.history_max_age_days < 1 then
 		config.history_max_age_days = 30
+	end
+
+	--
+	-- Validate surround_pad
+	--
+	local valid_pad = { opening = true, closing = true }
+	if config.surround_pad ~= false and not valid_pad[config.surround_pad] then
+		config.surround_pad = "opening"
+	end
+
+	--
+	-- Validate expansion_keys
+	--
+	if config.expansion_keys ~= false then
+		if config.expansion_keys ~= nil and type(config.expansion_keys) ~= "table" then
+			config.expansion_keys = M.defaults.expansion_keys
+		end
+
+		if type(config.expansion_keys) == "table" then
+			local validated_exp = {}
+			for key, action in pairs(config.expansion_keys) do
+				if type(key) == "string" and type(action) == "string" then
+					validated_exp[key] = action
+				end
+			end
+			config.expansion_keys = validated_exp
+		end
 	end
 
 	--

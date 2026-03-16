@@ -199,6 +199,27 @@ local action_entries = {
 			description = "Sets a charwise visual selection spanning the target range",
 		},
 	},
+	surround = {
+		run = require("smart-motion.actions.surround").run,
+		metadata = {
+			label = "Surround",
+			description = "Performs surround operations (delete/yank/change delimiters)",
+		},
+	},
+	surround_add = {
+		run = require("smart-motion.actions.surround_add").run,
+		metadata = {
+			label = "Surround Add",
+			description = "Wraps a target with a prompted delimiter pair",
+		},
+	},
+	surround_paste = {
+		run = require("smart-motion.actions.surround_paste").run,
+		metadata = {
+			label = "Surround Paste",
+			description = "Wraps a target with the previously yanked delimiter pair",
+		},
+	},
 	run_motion = run_motion,
 }
 

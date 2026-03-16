@@ -28,6 +28,11 @@ function M.run(ctx, cfg, motion_state, exit_type)
 		selection.wait_for_hint_selection(ctx, cfg, motion_state)
 	end
 
+	-- Expansion phase: after target selected, allow growing/shrinking the range
+	if motion_state.selected_jump_target and motion_state.expansion_enabled then
+		require("smart-motion.core.expansion").run(ctx, cfg, motion_state)
+	end
+
 	if motion_state.selected_jump_target then
 		if ctx.mode and ctx.mode:find("o") and not motion_state.is_textobject then
 			require("smart-motion.actions.jump").run(ctx, cfg, motion_state)

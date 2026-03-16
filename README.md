@@ -28,6 +28,7 @@ A motion framework for Neovim. Enable a motion, enable an operator. They compose
       yank = true,         -- y + any motion
       change = true,       -- c + any motion
       treesitter = true,   -- ]], [[, af, if, ac, ic, aa, ia, fn, saa, gS, R
+      surround = true,     -- ds, cs, ys, gza, gzp, visual S + i(/a(/di"/dsq/dst/dsf/etc.
       diagnostics = true,  -- ]d, [d, ]e, [e
       misc = true,         -- . g. g1-g9 gp gP gA-gZ gmd gmy (repeat, history, pins, multi-cursor)
     },
@@ -63,7 +64,7 @@ presets = {
 Enable `words` and `delete` as presets. Now `dw`, `db`, `de`, `dge` all work. Enable `search` and `ds`, `dS`, `df`, `dt` work too. Enable `lines` and you get `dj`, `dk`. Every motion preset **multiplies** with every operator preset:
 
 ```
-11 composable motions  ×  5 operators  =  55+ compositions
+11 composable motions  ×  5 operators  =  55+ compositions  (+ surround operators)
          from 16 keys, zero mappings defined
 ```
 
@@ -91,6 +92,39 @@ daf   delete a function       gqaf  format a function
 yaa   yank an argument        =if   indent a function body
 cic   change inside a class   >ac   indent a class
 ```
+
+### Surround with labeled targets
+
+SmartMotion replaces nvim-surround with something better: **every pair on screen gets a label.**
+
+```
+ds(   → labels appear on every () pair → pick one → delimiters deleted
+cs(   → labels appear → pick one → delimiters highlight → type replacement
+ysaw( → word labels appear → pick one → word wrapped with ( )
+dsq   → labels on all quotes ("/'/`) → pick one → quotes deleted
+dst   → labels on all HTML/XML tags → pick one → tags removed
+dsf   → labels on all function calls → pick one → unwrapped
+cst   → labels on tags → pick one → tag name deleted → insert mode with live sync
+csf   → labels on calls → pick one → name deleted → insert mode at name position
+```
+
+`di(`, `da{`, `ci"`, `vi[` all show labels on every matching pair visible. No cursor proximity guessing — you pick exactly which pair you mean. `q` matches any quote type. `t` matches HTML/XML tags. `f` targets function calls for surround operations (while `dif`/`daf` still act on function bodies).
+
+Opening chars add padding (`ysaw(` → `( word )`), closing chars don't (`ysaw)` → `(word)`). Visual mode `S` wraps a selection. `gza` is a quick "wrap this word" shortcut.
+
+### Expand your target with `+` / `-`
+
+After picking a target, press `+` to grow the selection forward or `-` to grow backward. Dim hints show you what's expandable:
+
+```
+ysaw  [word labels] → pick "foo"
+      "foo" highlights, dim + on next word, dim - on previous
+  +   → range grows to "foo bar"
+  +   → range grows to "foo bar baz"
+  (   → wraps as ( foo bar baz )
+```
+
+No other motion plugin does this. `BS` undoes the last expansion. Any non-expansion key (like the delimiter) confirms and executes. Zero friction when you don't need it — just type the delimiter immediately.
 
 ### Modify the search mid-selection
 
@@ -181,7 +215,7 @@ Press an operator, then any motion key. Labels appear, pick a target, action run
 | Combo | What it does |
 |-------|-------------|
 | `dw`  | Labels words after cursor → pick one → delete it |
-| `ds`  | Live search → pick match → delete it |
+| `ds`  | Live search → pick match → delete it (without surround preset) |
 | `df`  | 2-char find → delete from cursor to target (inclusive) |
 | `dt`  | 2-char till → delete from cursor to just before target |
 | `dd`  | Delete current line |
@@ -288,6 +322,59 @@ Works best with [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim). Mul
 </details>
 
 <details>
+<summary><b>Surround</b>: <code>ds</code> <code>cs</code> <code>ys</code> <code>gza</code> <code>gzp</code> <code>S</code> + pair text objects + <code>q</code> <code>t</code> <code>f</code></summary>
+
+**Pair text objects** (work with ANY operator: `di(`, `ya{`, `ci"`, `>a[`):
+
+| Key   | Mode    | Description                          |
+|-------|---------|--------------------------------------|
+| `i(`  | x, o    | Inside parentheses                   |
+| `a(`  | x, o    | Around parentheses                   |
+| `i{`  | x, o    | Inside braces                        |
+| `a{`  | x, o    | Around braces                        |
+| `i[`  | x, o    | Inside brackets                      |
+| `a[`  | x, o    | Around brackets                      |
+| `i<`  | x, o    | Inside angle brackets                |
+| `a<`  | x, o    | Around angle brackets                |
+| `i"`  | x, o    | Inside double quotes                 |
+| `a"`  | x, o    | Around double quotes                 |
+| `i'`  | x, o    | Inside single quotes                 |
+| `a'`  | x, o    | Around single quotes                 |
+| `iq`  | x, o    | Inside nearest quote (any type)      |
+| `aq`  | x, o    | Around nearest quote (any type)      |
+| `it`  | x, o    | Inside HTML/XML tag                  |
+| `at`  | x, o    | Around HTML/XML tag                  |
+
+Closing chars work too: `di)` = `di(`, `da}` = `da{`, etc.
+
+**Surround operators**:
+
+| Key   | Mode | Description                                          |
+|-------|------|------------------------------------------------------|
+| `ds(` | n    | Delete surrounding parens (leaves content)           |
+| `cs(` | n    | Change surrounding parens (prompts for replacement)  |
+| `dsq` | n    | Delete nearest surrounding quote (any type)          |
+| `csq` | n    | Change nearest quote to something else               |
+| `dst` | n    | Delete surrounding HTML/XML tag                      |
+| `cst` | n    | Change surrounding tag (in-place, live multi-cursor) |
+| `dsf` | n    | Unwrap function call: `print(x)` → `x`              |
+| `csf` | n    | Change function name (in-place insert mode)          |
+| `ys`  | n    | Add surround: `ysaw(` = wrap word with parens        |
+| `gza` | n    | Quick surround: word hints → pick → type delimiter   |
+| `gzp` | n    | Paste surround: wrap with previously yanked pair     |
+| `S`   | x    | Surround visual selection (type delimiter to wrap)   |
+
+**Padding**: opening chars add spaces (`ysaw(` → `( word )`), closing chars don't (`ysaw)` → `(word)`). Configure with `surround_pad`.
+
+Unlike native text objects, SmartMotion pair text objects label ALL matching pairs on screen. `di(` shows hints on every `()` pair visible, pick the one you want.
+
+**Special surround types**: `t` prompts for a tag name (`ysiw t` → "Tag: " → type `div` → `<div>word</div>`). `f` prompts for a function name. `q` matches all three quote types at once. `cst` and `csf` use in-place editing instead of prompts -- see below.
+
+**Target expansion**: After picking a target with `ys` or `gza`, press `+` to grow forward, `-` to grow backward, `BS` to shrink. Wrap multiple words in one go: `ysaw` → pick → `++` → `(` → `( three words here )`.
+
+</details>
+
+<details>
 <summary><b>Misc</b>: repeat, history, pins, global pins, multi-cursor</summary>
 
 | Key          | Mode | Description                                          |
@@ -369,6 +456,7 @@ With all presets enabled, SmartMotion consolidates:
 
 ```
 flash.nvim          →  search, treesitter, labels
+nvim-surround       →  ds, cs, ys, visual S + pair text objects + tags + function calls
 harpoon             →  pins (g1-g9, gp) + history (g.)
 nvim-treesitter-    →  af/if/ac/ic/aa/ia text objects
   textobjects
@@ -392,6 +480,9 @@ One plugin, one config. Your pins know about your history. Your text objects wor
 | Fuzzy search | | | | yes |
 | Treesitter navigation | | | yes | yes |
 | Treesitter text objects | | | | yes |
+| Surround (ds/cs/ys) | | | | yes |
+| Pair text objects (di(/a{) | | | | yes |
+| Target expansion (+/-) | | | | yes |
 | Composable d/y/c/p | | | partial | full |
 | Remote operations | | | yes | yes |
 | Multi-window | | via plugin | yes | yes |
@@ -436,6 +527,12 @@ SmartMotion wouldn't exist without these plugins. See [Why SmartMotion](https://
   max_pins = 9,                      -- maximum pin slots
   search_timeout_ms = 500,           -- auto-proceed after typing in search
   search_idle_timeout_ms = 2000,     -- exit search with no input
+  surround_pad = "opening",          -- "opening", "closing", or false
+  expansion_keys = {                  -- keys for target expansion (+ grows, - shrinks)
+    ["+"] = "expand_forward",
+    ["-"] = "expand_backward",
+    ["<BS>"] = "shrink",
+  },
   yank_highlight_duration = 150,     -- yank flash duration (ms)
   history_max_age_days = 30,         -- prune history entries older than this
   selection_keys = {                  -- key-action map during label selection

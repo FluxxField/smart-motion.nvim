@@ -251,6 +251,78 @@ Other plugins offer limited customization: change some options, maybe define a c
 
 ---
 
+### vs. nvim-surround
+
+**nvim-surround** is the standard surround plugin for Neovim. It provides `ds`, `cs`, `ys`, and visual `S` with good defaults and broad delimiter support.
+
+| Aspect | nvim-surround | SmartMotion |
+|--------|---------------|-------------|
+| Delete surround (`ds`) | ✓ (acts on nearest) | ✓ (labels all pairs, you pick) |
+| Change surround (`cs`) | ✓ (acts on nearest) | ✓ (labels all pairs, you pick) |
+| Add surround (`ys`) | ✓ | ✓ |
+| Visual surround (`S`) | ✓ | ✓ |
+| Label-based target picking | | ✓ |
+| Target expansion (+/-) | | ✓ |
+| Visual feedback during prompts | | ✓ |
+| Pair detection fallback | | ✓ (pattern when treesitter fails) |
+| Composes with motion labels | | ✓ (`ysaw` shows word labels) |
+| Composes with textobjects | | ✓ (`ysaf` shows function labels) |
+| Function call surround (`dsf`/`csf`) | ✓ | ✓ |
+| HTML/tag support (`dst`/`cst`) | ✓ | ✓ |
+| Quote alias (`dsq`/`csq`) | | ✓ |
+| Part of a motion system | | ✓ (shared pipeline, history, flow state) |
+| Custom surround definitions | ✓ (functions, callbacks) | Via pair_defs registry |
+| Maturity / edge cases | ✓ (years of fixes) | Newer |
+
+**Where nvim-surround wins**: Extensive custom surround definitions (you can define surround functions that produce arbitrary output) and maturity. nvim-surround has years of edge-case fixes and a large user base. If you need surround functions that call Lua callbacks for arbitrary output, nvim-surround has deeper support for that use case.
+
+**Where SmartMotion wins**:
+
+- **Label-based target picking.** With nvim-surround, `ds(` deletes the nearest `()` pair to your cursor. With SmartMotion, `ds(` labels every `()` pair on screen and you pick which one, even if it's not the one surrounding your cursor. The same applies to `cs`.
+- **Target expansion.** After picking a target with `ys` or `gza`, press `+` to expand forward or `-` to expand backward before typing the delimiter. This lets you wrap multi-word phrases without switching to visual mode. No other surround plugin offers this.
+- **Visual feedback.** SmartMotion highlights selected delimiters during `cs` and highlights the target region during `ys` so you can see exactly what you're about to change or wrap. nvim-surround has no visual feedback during prompts.
+- **Pipeline composability.** `ys` composes with SmartMotion's full motion and textobject systems: `ysaw` shows labeled words, `ysaf` shows labeled functions. Custom collectors, filters, and visualizers work with surround operations too.
+- **Pattern-based fallback.** SmartMotion's pair detection works even when treesitter can't parse the buffer (common while actively editing broken syntax).
+- **Tag and function call support.** SmartMotion now matches nvim-surround on `dst`/`cst` (HTML/XML tags) and `dsf`/`csf` (function calls), plus adds `dsq`/`csq` for targeting any quote type at once.
+- **Live multi-cursor tag rename.** nvim-surround's `cst` uses a command-line prompt to read the new tag name, then replaces both tags. SmartMotion's `cst` deletes the tag name from both opening and closing tags, enters insert mode in the opening tag, and mirrors your keystrokes to the closing tag in real-time. You see both tags update as you type. `csf` similarly uses in-place insert mode instead of a prompt.
+
+---
+
+### vs. mini.surround
+
+**mini.surround** is part of the excellent mini.nvim ecosystem. It provides surround add/delete/change/find/highlight with a consistent interface and minimal configuration.
+
+| Aspect | mini.surround | SmartMotion |
+|--------|---------------|-------------|
+| Delete surround | ✓ (acts on nearest) | ✓ (labels all pairs, you pick) |
+| Change surround | ✓ (acts on nearest) | ✓ (labels all pairs, you pick) |
+| Add surround | ✓ | ✓ |
+| Visual surround | ✓ | ✓ |
+| Find surround | ✓ | |
+| Highlight surround | ✓ | |
+| Label-based target picking | | ✓ |
+| Target expansion (+/-) | | ✓ |
+| Visual feedback during prompts | | ✓ |
+| Composes with motion labels | | ✓ |
+| Part of a motion system | | ✓ |
+| Function call surround (`dsf`/`csf`) | | ✓ |
+| HTML/tag support (`dst`/`cst`) | ✓ | ✓ |
+| Quote alias (`dsq`/`csq`) | | ✓ |
+| Custom surround specs | ✓ (input/output patterns) | Via pair_defs registry |
+| mini.nvim ecosystem | ✓ | |
+
+**Where mini.surround wins**: If you're invested in the mini.nvim ecosystem, mini.surround fits naturally alongside mini.ai, mini.pairs, mini.jump, etc. It has find-surround and highlight-surround features that SmartMotion doesn't replicate. Custom surround specifications via input/output patterns are flexible. It's lightweight and well-tested.
+
+**Where SmartMotion wins**:
+
+- **Label-based target picking.** mini.surround operates on the nearest matching pair. SmartMotion labels all matching pairs and lets you pick any one, regardless of cursor proximity.
+- **Target expansion.** Press `+`/`-` after picking a target to grow or shrink the selection before wrapping. This lets you surround multi-word expressions without pre-selecting in visual mode.
+- **Visual feedback.** SmartMotion highlights delimiters and target regions during surround prompts. mini.surround highlights the nearest surround briefly but doesn't show what you're about to act on during the operation itself.
+- **Pipeline composability.** Surround operations in SmartMotion use the same pipeline as all other motions. Custom collectors, filters, visualizers, and the full textobject system are available to surround operations.
+- **Live multi-cursor tag rename.** `cst` deletes the tag name from both opening and closing tags, enters insert mode, and mirrors keystrokes to the closing tag in real-time. `csf` uses in-place insert mode for function name changes. No command-line prompts.
+
+---
+
 ## What You Consolidate
 
 With all presets enabled, SmartMotion can replace several plugins at once:
@@ -262,9 +334,10 @@ flash.nvim (motions + search)                   smart-motion.nvim
 harpoon (file pins + quick navigation)            with one opts table
 nvim-treesitter-textobjects (af/if/ac/ic)
 mini.ai (around/inside text objects)
+nvim-surround (ds/cs/ys + tags/functions/quotes)
 ```
 
-One plugin, one config, and everything composes with everything else. Your pin system knows about your motion history. Your text objects work with flow state. Your operators compose with motions you haven't even thought of yet.
+One plugin, one config, and everything composes with everything else. Your pin system knows about your motion history. Your text objects work with flow state. Your surround operations compose with your motions and textobjects. Your operators compose with motions you haven't even thought of yet.
 
 This isn't about replacing good plugins for the sake of it. It's about the compound benefits you get when these features share an architecture. A motion recorded in history carries its full context: you can replay it, pin it, or act on it remotely. A text object uses the same labeling system as your search motions. An operator infers its pipeline from any composable motion, including ones you build yourself.
 

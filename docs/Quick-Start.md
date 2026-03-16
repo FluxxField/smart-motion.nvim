@@ -26,6 +26,7 @@ Get SmartMotion running in 60 seconds.
       quickfix = true,
       marks = true,
       misc = true,
+      surround = true,   -- ds, cs, ys, gza, gzp, S + pair text objects + q/t/f
     },
   },
 }
@@ -52,6 +53,7 @@ use {
         quickfix = true,
         marks = true,
         misc = true,
+        surround = true,   -- ds, cs, ys, gza, gzp, S + pair text objects + q/t/f
       },
     })
   end,
@@ -82,11 +84,29 @@ Press `daf` → labels appear on all functions → select one → entire functio
 ### 6. Delete an Argument
 With cursor in a function call, press `daa` → labels appear on arguments → select one → argument deleted (including comma)
 
+### 7. Surround a Word
+Press `ys` → press `iw` → labels appear on words → select one → type `(` → word is wrapped in parentheses
+
+### 8. Delete Surrounding Delimiters
+Press `ds` → type `(` → the nearest parentheses around the cursor are removed, contents preserved
+
+### 9. Delete Surrounding Tags
+In an HTML file: `<div>hello</div>` → press `ds` → type `t` → labels on tags → pick one → tags removed → `hello`
+
+### 10. Unwrap a Function Call
+On `print(foo, bar)` → press `ds` → type `f` → labels on function calls → pick one → `foo, bar`
+
+### 11. Delete Nearest Quote (Any Type)
+Press `ds` → type `q` → labels appear on all `"`, `'`, `` ` `` pairs → pick one → quotes removed
+
+### 12. Expand a Target Before Surrounding
+Press `gza` → labels on words → pick a word → press `+` to expand forward → press `+` again → type `(` → multiple words wrapped in parentheses
+
 ---
 
 ## What You Just Got
 
-With all presets enabled, you have **140+ keybindings**:
+With all presets enabled, you have **160+ keybindings**:
 
 | Preset | Keys |
 |--------|------|
@@ -102,6 +122,7 @@ With all presets enabled, you have **140+ keybindings**:
 | **git** | `]g` `[g` |
 | **quickfix** | `]q` `[q` `]l` `[l` |
 | **marks** | `g'` `gm` |
+| **surround** | `ds` `cs` `ys` `gza` `gzp` `S` + pair text objects `()` `[]` `{}` `<>` `""` `''` `` `` `` + `q` `t` `f` |
 | **misc** | `.` `g.` `g0` `g1`-`g9` `gp` `gp1`-`gp9` `gP` `gA`-`gZ` `gmd` `gmy` |
 
 → See **[Presets Guide](Presets.md)** for detailed explanations of each.
