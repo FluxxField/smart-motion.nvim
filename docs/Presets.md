@@ -1,6 +1,6 @@
 # Presets Guide
 
-SmartMotion ships with **13 presets** containing **140+ keybindings**. Each preset is a logical group of related motions. Enable what you need, disable what you don't.
+SmartMotion ships with **14 presets** containing **160+ keybindings**. Each preset is a logical group of related motions. Enable what you need, disable what you don't.
 
 > **Every preset can be customized.** Want to make `f` single-char? Words bidirectional? Search line-constrained? See the [Recipes](Recipes.md) guide for practical examples.
 
@@ -22,6 +22,7 @@ SmartMotion ships with **13 presets** containing **140+ keybindings**. Each pres
 | `git` | `]g` `[g` | Git hunk navigation |
 | `quickfix` | `]q` `[q` `]l` `[l` | Quickfix/location list |
 | `marks` | `g'` `gm` | Mark navigation and setting |
+| `surround` | `i(`/`a(` `i{`/`a{` `i[`/`a[` `i<`/`a<` `i"`/`a"` `i'`/`a'` `` i` ``/`` a` `` `iq`/`aq` `it`/`at` `ds` `cs` `ys` `gza` `gzp` `S` | Pair text objects, tags, quotes, function calls, and surround operators |
 | `misc` | `.` `g.` `g0` `g1`-`g9` `gp` `gp1`-`gp9` `gP` `gA`-`gZ` `gmd` `gmy` | Repeat, history, pins, global pins, and multi-cursor |
 
 ---
@@ -385,6 +386,247 @@ Press gm → labels appear on words → select target → type 'a' → mark 'a' 
 
 ---
 
+## surround
+
+Pair text objects and surround operators. Adds labeled delimiter navigation that works with any vim operator, plus dedicated surround add/delete/change commands.
+
+### Pair Text Objects
+
+Unlike native vim text objects that act on the nearest pair, SmartMotion labels **all** matching pairs on screen and lets you pick which one.
+
+| Key | Modes | What it does |
+|-----|-------|--------------|
+| `i(`, `i)` | x, o | **Inside parentheses**: select content between `()` |
+| `a(`, `a)` | x, o | **Around parentheses**: select `()` including delimiters |
+| `i{`, `i}` | x, o | **Inside braces**: select content between `{}` |
+| `a{`, `a}` | x, o | **Around braces**: select `{}` including delimiters |
+| `i[`, `i]` | x, o | **Inside brackets**: select content between `[]` |
+| `a[`, `a]` | x, o | **Around brackets**: select `[]` including delimiters |
+| `i<`, `i>` | x, o | **Inside angle brackets**: select content between `<>` |
+| `a<`, `a>` | x, o | **Around angle brackets**: select `<>` including delimiters |
+| `i"` | x, o | **Inside double quotes**: select content between `""` |
+| `a"` | x, o | **Around double quotes**: select `""` including delimiters |
+| `i'` | x, o | **Inside single quotes**: select content between `''` |
+| `a'` | x, o | **Around single quotes**: select `''` including delimiters |
+| `` i` `` | x, o | **Inside backticks**: select content between `` `` `` |
+| `` a` `` | x, o | **Around backticks**: select `` `` `` including delimiters |
+| `iq` | x, o | **Inside nearest quote**: matches `"`, `'`, or `` ` `` |
+| `aq` | x, o | **Around nearest quote**: matches `"`, `'`, or `` ` `` |
+| `it` | x, o | **Inside tag**: select content between HTML/XML tags |
+| `at` | x, o | **Around tag**: select entire tag pair including delimiters |
+
+```
+In: foo(bar(baz), qux(123))
+
+Press di( → labels appear on ALL () pairs → select one → content inside that pair deleted
+Press va{ → labels appear on ALL {} pairs → select one → entire pair visually selected
+```
+
+**Works with any operator** — no explicit mappings needed:
+```
+di(    delete inside parens
+ya{    yank around braces
+ci"    change inside double quotes
+>a[    indent around brackets
+gqa(   format around parens
+=i{    auto-indent inside braces
+```
+
+**Key resolution:** The `i`/`a` prefix triggers a textobject lookup. If the next character is a registered text object key (like `(`, `{`, `"`, or treesitter keys like `f`, `c`, `a`), SmartMotion handles it. Unregistered keys (like `w` in `diw`) fall back to native vim.
+
+### Surround Operators
+
+| Key | Modes | What it does |
+|-----|-------|--------------|
+| `ds` | n | **Delete surround**: type pair char, labels appear on all matching pairs, pick one, delimiters removed |
+| `cs` | n | **Change surround**: type pair char, labels appear, pick pair, delimiters highlight in blue, type replacement char |
+| `dsq` | n | **Delete nearest quote**: labels all `"`, `'`, `` ` `` pairs, pick one, quotes removed |
+| `csq` | n | **Change nearest quote**: labels all quotes, pick one, type replacement char |
+| `dst` | n | **Delete surrounding tag**: `<div>foo</div>` → `foo` |
+| `cst` | n | **Change surrounding tag**: pick tag → name deleted → insert mode with real-time sync to closing tag |
+| `dsf` | n | **Unwrap function call**: `print(foo, bar)` → `foo, bar` |
+| `csf` | n | **Change function name**: pick call → name deleted → insert mode at name position |
+| `ys` | n | **Add surround**: composable — `ys` + `i`/`a` prefix + motion + delimiter char |
+| `gza` | n | **Quick surround add**: shows keyword-only word hints, pick target, type delimiter to wrap |
+| `gzp` | n | **Paste surround**: wrap target with previously yanked delimiter pair (stored from `ds`) |
+| `S` | x | **Visual surround**: select text, press `S`, type delimiter to wrap selection |
+
+### Delete Surround (`ds`)
+
+```
+In: foo(bar, baz)
+
+Press ds( → labels appear on all () pairs → press label → parens removed → foo bar, baz
+Press ds" → labels appear on all "" pairs → press label → quotes removed
+```
+
+Works with all pair types: `()`, `{}`, `[]`, `<>`, `""`, `''`, `` `` ``.
+
+**Special types:**
+
+```
+Press dsq → labels appear on ALL quote pairs (", ', `) → press label → quotes removed
+Press dst → labels appear on ALL HTML/XML tag pairs → press label → tags removed, content kept
+Press dsf → labels appear on ALL function calls → press label → unwrapped: print(foo) → foo
+```
+
+`q` searches all three quote types simultaneously — no need to remember which kind of quote you're targeting. `t` uses treesitter for HTML/JSX/TSX files with a pattern-based fallback for others. `f` targets function call expressions (name + parens), not function definitions.
+
+### Change Surround (`cs`)
+
+```
+In: foo(bar, baz)
+
+Press cs( → labels appear on () pairs → press label → parens highlight blue → type [ → foo[bar, baz]
+Press cs( → pick pair → type ( → foo( bar, baz )  (opening char adds padding)
+```
+
+**Padding convention:** Opening chars (`(`, `{`, `[`, `<`) add padding around content. Closing chars (`)`, `}`, `]`, `>`) don't. Quotes never pad. Configurable via `surround_pad`.
+
+**Special types:**
+
+```
+Press csq → labels on all quotes → pick one → quotes highlight → type replacement char
+```
+
+**`cst` — In-place tag rename with live sync:**
+
+```
+Press cst → labels on all tags → pick one → tag name deleted from BOTH opening and closing tags
+  → cursor enters insert mode in the opening tag, right after <
+  → as you type, the closing tag mirrors your input in real-time (multi-cursor style)
+  → the closing tag name highlights in blue as it syncs
+  → press ESC when done — both tags have the new name
+```
+
+Example: `cst` on `<div>foo</div>` → `<|>foo</>` → type `span` → `<span>foo</span>`
+
+**`csf` — In-place function name change:**
+
+```
+Press csf → labels on all function calls → pick one → function name deleted
+  → cursor enters insert mode at the name position
+  → type the new name directly in-place
+  → press ESC when done
+```
+
+Example: `csf` on `console.log(x)` → `|(x)` in insert mode → type `warn` → `warn(x)`
+
+Unlike `cs(` and `csq` which prompt for a replacement character, `cst` and `csf` use in-place insert mode editing. This is faster and more natural — you see the change happen live in the buffer.
+
+### Add Surround (`ys`)
+
+Fully composable — works with any motion and textobject:
+
+```
+ysaw(    ys + around + word + (  → labels on words → pick one → wraps with ( word )
+ysiw"    ys + inside + word + "  → wraps word under cursor with "word"
+ysaf{    ys + around + function + {  → labels on functions → pick one → wraps with { ... }
+ysab)    ys + around + block + )  → labels on blocks → pick one → wraps with (...)
+```
+
+Works with any composable motion (`w`, `b`, `e`) and textobjects (`f`, `c`, `a`).
+
+**Tag and function wrapping:**
+
+```
+ysiw t   → ys + inside + word + t → prompts "Tag:" → type "div" → <div>word</div>
+ysiw f   → ys + inside + word + f → prompts "Function:" → type "print" → print(word)
+```
+
+Visual `S` then type `t` also prompts for a tag name. `q` wraps with the nearest quote type.
+
+### Quick Surround Add (`gza`)
+
+```
+Press gza → keyword-only word labels appear → pick target → type ( → word becomes ( word )
+Press gza → pick target → type " → word becomes "word"
+```
+
+Faster than `ys` when you just want to wrap a single word.
+
+### Paste Surround (`gzp`)
+
+```
+ds( on foo(bar)  → parens removed, pair stored → bar
+gzp → word labels appear → pick "baz" → baz becomes (baz)
+```
+
+Re-wraps a target with the delimiter pair most recently removed by `ds`.
+
+### Target Expansion (`+`/`-`)
+
+After picking a target with `ys` or `gza`, you can **expand or shrink** the selection before typing the delimiter:
+
+| Key | What it does |
+|-----|--------------|
+| `+` | **Expand forward**: grow selection to include the next adjacent target |
+| `-` | **Expand backward**: grow selection to include the previous adjacent target |
+| `<BS>` | **Shrink**: undo the last expansion |
+| Any other key | **Confirm and execute**: the key is treated as the delimiter character |
+
+Dim `+`/`-` hints appear on adjacent targets so you can see what will be included next.
+
+```
+In: foo bar baz qux
+
+ysaw → labels on words → pick "foo" → "foo" highlights, dim +/- on adjacent words
+  press + → selection grows to "foo bar", dim +/- update
+  press + → selection grows to "foo bar baz"
+  type ( → result: ( foo bar baz )
+```
+
+```
+gza → labels on words → pick "bar" → "bar" highlights
+  press + → "bar baz"
+  press - → "bar baz" expands backward to "foo bar baz"
+  type " → result: "foo bar baz"
+```
+
+This is useful when you want to wrap a phrase or multi-word expression without switching to visual mode first. Just pick any word in the range and expand until the selection covers what you need.
+
+### Visual Surround (`S`)
+
+```
+Select text in visual mode → press S → type ( → selection wrapped with ( text )
+Select text → press S → type " → selection wrapped with "text"
+```
+
+No conflict with search preset `S` — search uses `n`/`o` modes, visual surround uses `x` mode.
+
+### Padding Convention
+
+| Delimiter | Padding | Example |
+|-----------|---------|---------|
+| `(` `{` `[` `<` (opening) | Yes | `( word )`, `{ word }` |
+| `)` `}` `]` `>` (closing) | No | `(word)`, `{word}` |
+| `"` `'` `` ` `` (quotes) | Never | `"word"`, `'word'` |
+
+Configurable via `surround_pad` in your config:
+- `"opening"` (default) — opening chars pad, closing chars don't
+- `"closing"` — reversed: closing chars pad, opening chars don't
+- `false` — no padding ever
+
+### How It Works
+
+Pair text objects use a **separate textobject registry** from composable motions. This means the same key can exist in both registries without conflict:
+
+- `f` as a composable motion = 2-char find
+- `f` as a textobject = function (from treesitter preset)
+
+The **key resolver** buffers input and resolves in priority order:
+1. Pre-set `textobject_key` (used by `ds`/`cs` operators)
+2. `i`/`a` prefix followed by a registered textobject key
+3. Composable motion lookup (existing behavior)
+
+**Pattern-based matching** provides a fallback when treesitter can't parse the buffer (e.g., while editing broken syntax). Pairs are found via pattern matching, so `di(` works even in a plain text file.
+
+**Dual-behavior textobjects:** The `f` textobject demonstrates how the same key can behave differently per prefix. `dif`/`daf` use the treesitter collector to target function bodies. `dsf` uses the `function_calls` collector to target function call expressions. This is achieved via `_collector_override` and `_extractor_override` fields in the surround motion_state, which swap the pipeline modules when the surround prefix is active.
+
+**Native fallback:** When an `i`/`a` key sequence doesn't match a registered textobject (like `w` in `diw`), it falls through to native vim. Your existing muscle memory works unchanged.
+
+---
+
 ## misc
 
 Repeat, history, pins, and multi-cursor operations.
@@ -509,6 +751,7 @@ presets = {
   git = true,
   quickfix = true,
   marks = true,
+  surround = true,
   misc = true,
 }
 ```
@@ -534,6 +777,11 @@ presets = {
   },
   search = {
     s = false,   -- keep native 's' (substitute)
+  },
+  surround = {
+    ds = false,  -- disable delete surround
+    S = false,   -- disable visual surround
+    gza = false, -- disable quick surround add
   },
 }
 ```

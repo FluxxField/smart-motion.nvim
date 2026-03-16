@@ -25,10 +25,18 @@ function M.get_modules(ctx, cfg, motion_state, keys)
 			module = registry.get_by_name(name)
 
 			--
-			-- Special handle for actions
+			-- Special handle for actions:
+			-- If a composable motion explicitly sets an action (e.g. surround),
+			-- use that action by name. Otherwise fall back to key-based lookup
+			-- for infer motions (d→delete_jump, y→yank_jump, etc.).
 			--
 			if key == "action" and motion.infer and action_key then
-				module = registry.get_by_key(action_key)
+				if motion.action and motion.action ~= "default" then
+					module = registry.get_by_name(motion.action)
+				end
+				if not module or not module.run then
+					module = registry.get_by_key(action_key)
+				end
 			end
 
 			if (not module or not module.run) and registry.get_by_name("default") then

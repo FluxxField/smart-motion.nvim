@@ -8,6 +8,8 @@
 **Using SmartMotion**
 - [Presets Guide](Presets)
 - [Advanced Features](Advanced-Features)
+  - [Textobject System](Advanced-Features#textobject-system)
+  - [Surround Operations](Advanced-Features#surround-operations)
 
 **Customizing**
 - [Recipes](Recipes)

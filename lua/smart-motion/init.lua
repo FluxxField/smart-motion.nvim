@@ -80,6 +80,13 @@ function M.setup(user_config)
 		get_by_name = registries.motions.get_by_name,
 	}
 
+	M.textobjects = {
+		register = registries.motions.register_textobject,
+		register_many = registries.motions.register_many_textobjects,
+		get = registries.motions.get_textobject,
+		has = registries.motions.has_textobject,
+	}
+
 	M.collectors = {
 		register = registries.collectors.register,
 		register_many = registries.collectors.register_many,

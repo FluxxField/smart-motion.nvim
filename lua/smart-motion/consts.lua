@@ -34,6 +34,7 @@ M.TARGET_TYPES = {
 	LINES = "lines",
 	SEARCH = "search",
 	TREESITTER = "treesitter",
+	PAIRS = "pairs",
 }
 
 ---@type table<string, TargetType>
@@ -44,6 +45,7 @@ M.TARGET_TYPES_BY_KEY = {
 }
 
 M.WORD_PATTERN = [[\k\+\|\%(\k\@!\S\)\+]]
+M.KEYWORD_PATTERN = [[\k\+]]
 M.BIG_WORD_PATTERN = [[[^ \t]\+]]
 
 ---@type table<string, SelectionMode>

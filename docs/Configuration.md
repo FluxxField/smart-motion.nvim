@@ -68,9 +68,19 @@ Complete guide to configuring SmartMotion.
   -- Prune history entries older than this many days
   history_max_age_days = 30,
 
+  -- Controls spacing when adding or changing surrounds
+  surround_pad = "opening",
+
   -- Key-action map for label selection (press key to trigger action)
   selection_keys = {
     ["<CR>"] = "select_first",       -- Enter selects the first target
+  },
+
+  -- Keys for target expansion during surround (ys, gza)
+  expansion_keys = {
+    ["+"] = "expand_forward",        -- Grow selection forward
+    ["-"] = "expand_backward",       -- Grow selection backward
+    ["<BS>"] = "shrink",             -- Undo last expansion
   },
 }
 ```
@@ -543,6 +553,101 @@ selection_keys = {
 ```
 
 Keys are normalized via Vim's key notation, so `<CR>`, `<Tab>`, `<M-h>` all work.
+
+---
+
+## Expansion Keys
+
+Configure the keys used for target expansion during surround operations (`ys`, `gza`). After picking a target, these keys let you grow or shrink the selection before typing the delimiter:
+
+```lua
+expansion_keys = {
+    ["+"] = "expand_forward",
+    ["-"] = "expand_backward",
+    ["<BS>"] = "shrink",
+}
+```
+
+**Default keys:**
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `+` | `expand_forward` | Grow selection to include the next adjacent target |
+| `-` | `expand_backward` | Grow selection to include the previous adjacent target |
+| `<BS>` | `shrink` | Undo the last expansion step |
+
+Any key that isn't an expansion key confirms the selection and is treated as the delimiter character.
+
+**Disable expansion entirely:**
+
+```lua
+expansion_keys = false
+```
+
+**Remap to different keys:**
+
+```lua
+expansion_keys = {
+    ["<Tab>"] = "expand_forward",
+    ["<S-Tab>"] = "expand_backward",
+    ["<BS>"] = "shrink",
+}
+```
+
+Expansion only activates on motions that have `expansion_enabled = true` in their motion state. Currently this includes `ys` and `gza` from the surround preset.
+
+---
+
+## Surround Padding
+
+Control whether surrounding pairs add inner padding (spaces inside the delimiters):
+
+```lua
+surround_pad = "opening"  -- default
+```
+
+**Setting:** `surround_pad`
+
+**Type:** `"opening"` | `"closing"` | `false`
+
+**Default:** `"opening"`
+
+**Behavior by value:**
+
+- **`"opening"` (default):** Opening characters (`(`, `{`, `[`, `<`) add inner padding. Closing characters do not.
+  - `ysaw(` → `( word )`
+  - `ysaw)` → `(word)`
+
+- **`"closing"`:** Closing characters add padding instead. Opening characters do not.
+  - `ysaw)` → `( word )`
+  - `ysaw(` → `(word)`
+
+- **`false`:** No padding ever. Both opening and closing produce tight wrapping.
+  - `ysaw(` → `(word)`
+  - `ysaw)` → `(word)`
+
+Quotes (`"`, `'`, `` ` ``) never pad regardless of setting.
+
+Tags (`t`) and function calls (`f`) never pad — they use their own formatting (`<tag>content</tag>`, `name(content)`).
+
+```lua
+{
+  surround_pad = "opening",  -- default: ( pads, ) doesn't
+  -- surround_pad = "closing", -- flip: ) pads, ( doesn't
+  -- surround_pad = false,     -- no padding ever
+}
+```
+
+The surround preset includes `q` (any-quote alias), `t` (HTML/XML tags), and `f` (function call surround) by default. These can be disabled individually:
+
+```lua
+presets = {
+  surround = {
+    -- disable tag or function call surround if not needed
+    -- (textobject keys are disabled via the treesitter preset for f)
+  },
+}
+```
 
 ---
 

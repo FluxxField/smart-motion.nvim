@@ -22,6 +22,11 @@ end
 function M.resolve_range(ctx, motion_state)
 	local target = motion_state.selected_jump_target
 
+	-- Expanded range: always use the full synthesized range, skip cursor-based adjustments
+	if motion_state.is_expanded_range then
+		return target.start_pos.row, target.start_pos.col, target.end_pos.row, target.end_pos.col
+	end
+
 	if motion_state.exclude_target then
 		local cursor_before = ctx.cursor_line < target.start_pos.row
 			or (ctx.cursor_line == target.start_pos.row and ctx.cursor_col < target.start_pos.col)

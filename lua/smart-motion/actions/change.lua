@@ -18,8 +18,10 @@ function M.run(ctx, cfg, motion_state)
 		text = table.concat(lines, "\n")
 		regtype = "l"
 		utils.set_register(bufnr, start_row, start_col, end_row, end_col, text, regtype, "c")
-		vim.api.nvim_buf_set_lines(bufnr, start_row, end_row + 1, false, { "" })
-		vim.api.nvim_win_set_cursor(winid, { start_row + 1, 0 })
+		-- Preserve indentation of the first line
+		local indent = lines[1] and lines[1]:match("^(%s*)") or ""
+		vim.api.nvim_buf_set_lines(bufnr, start_row, end_row + 1, false, { indent })
+		vim.api.nvim_win_set_cursor(winid, { start_row + 1, #indent })
 	else
 		local lines = vim.api.nvim_buf_get_text(bufnr, start_row, start_col, end_row, end_col, {})
 		text = table.concat(lines, "\n")

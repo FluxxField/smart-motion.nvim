@@ -564,6 +564,250 @@ d[b   delete to previous block
 
 ---
 
+## Textobject System
+
+SmartMotion has a dedicated textobject registry, separate from the composable motion registry. The same key can exist in both registries because they're consulted in different contexts: `f` as a composable motion is 2-char find, while `f` as a textobject is function.
+
+### How the Registry Works
+
+Each textobject registers once with inside/around/surround overrides. These overrides are `motion_state` fragments that get merged when the textobject resolves:
+
+```lua
+-- How the "(" textobject is defined internally
+["("] = {
+    collector = "pairs",
+    extractor = "pairs",
+    inside  = { pair_scope = "inside" },
+    around  = { pair_scope = "around" },
+    surround = { pair_scope = "surround", is_surround = true },
+    default = "around",
+}
+```
+
+When you type `di(`, the system resolves `(` in the textobject registry, selects the `inside` overrides, and merges them into the motion state. The pipeline then collects all `()` pairs, extracts the content between delimiters, labels them, and the `d` operator deletes your selection.
+
+Treesitter textobjects (`f`, `c`, `a`) and pair textobjects (`(`, `[`, `{`, `<`, `"`, `'`, `` ` ``) share the same registry. Both kinds work with `i`/`a` prefixes, with any vim operator, and in visual mode.
+
+### Key Resolution (`i`/`a` Prefix)
+
+When an infer operator (`d`, `y`, `c`, `ys`, `ds`, `cs`) reads the next key, the **key resolver** buffers input and resolves it in priority order:
+
+1. **Pre-set `textobject_key`**: Some operators (like `ds` and `cs`) pre-set which textobject mode to use (`surround`). The next character is looked up directly in the textobject registry.
+2. **`i`/`a` prefix**: If the first character is `i` or `a`, the resolver reads the next character and checks the textobject registry. `di(` resolves as delete + inside + `(` textobject.
+3. **Composable motion**: Otherwise, multi-char resolution with `timeoutlen` handles composable motions (`dw`, `dfn`, etc.).
+4. **Fallback**: If nothing matches, the key sequence is fed back to vim for native handling (`diW`, `da"` with no registered textobject, etc.).
+
+This means `i` and `a` are **not consumed** when they don't match a registered textobject. Type `diG` and the `i` prefix reads `G`, finds no textobject, and the full sequence `iG` feeds back to vim as a native text object.
+
+### Dual-Level `i`/`a` Handling
+
+The `i`/`a` prefix is handled at two levels:
+
+- **In infer operators** (`d`, `y`, `c`): The key resolver detects the prefix and routes to the textobject registry. This is how `dif` (delete inside function) works.
+- **In native vim operators and visual mode**: The `textobject_keymaps` module registers `i` and `a` in `x` and `o` modes. When you type `vif` or `=af`, the keymap reads the next character, checks the textobject registry, and either runs the SmartMotion pipeline or falls back to native vim.
+
+Both paths converge on the same textobject pipeline. Labels appear, you pick a target, and the operator applies.
+
+---
+
+## Surround Operations
+
+The `surround` preset provides `ds`, `cs`, `ys`, `gza`, `gzp`, and visual `S`.
+
+### Delete Surround (`ds`)
+
+```
+ds(   labels all () pairs → pick one → delimiters removed
+ds"   labels all "" pairs → pick one → quotes removed
+ds{   labels all {} pairs → pick one → braces removed
+```
+
+`ds` pre-sets `textobject_key = "surround"` so the next character is looked up directly in the textobject registry. No `i`/`a` prefix is needed. The textobject's `surround` overrides activate, the pipeline collects all matching pairs, and you pick which one to act on.
+
+### Change Surround (`cs`)
+
+```
+cs(   labels all () pairs → pick one → delimiters highlight → type replacement char
+cs"   labels all "" pairs → pick one → quotes highlight → type replacement char
+```
+
+After you pick a target, SmartMotion **highlights the selected delimiters** so you can see exactly what you're changing. Then it prompts for a replacement character. Opening chars (like `(`) add padding (`( word )`), closing chars (like `)`) don't (`(word)`), controlled by the `surround_pad` config.
+
+### Add Surround (`ys`)
+
+`ys` is an infer operator that composes with both textobjects and composable motions:
+
+```
+ysaw   → around + w composable → labels on words → pick target → type delimiter
+ysaf   → around + f textobject → labels on functions → pick target → type delimiter
+ysiw   → inside + w composable → labels on words → pick target → type delimiter
+ysif   → inside + f textobject → labels on functions → pick target → type delimiter
+```
+
+After you pick a target, SmartMotion **highlights the target region** so you can see what will be wrapped. Then it prompts for a delimiter character.
+
+The `ys` operator opts into `ia_resolve_composable`, which means when `i`/`a` is followed by a character that isn't a registered textobject, the resolver tries composable motion lookup instead of falling back to vim. This is how `ysaw` works: `a` reads `w`, `w` isn't a textobject, so the resolver looks up `w` as a composable motion and carries the `around` scope through.
+
+### Standalone Add (`gza`)
+
+```
+gza   → labels on words → pick target → type delimiter → target wrapped
+```
+
+Skips the `i`/`a` prefix entirely. Labels appear on all words immediately.
+
+### Visual Surround (`S`)
+
+In visual mode, `S` wraps the current selection:
+
+```
+(visually select text) S(   → selection highlighted → type delimiter → text wrapped
+```
+
+The visual selection is highlighted with `SmartMotionSelected` while you choose a delimiter.
+
+### Surround Paste (`gzp`)
+
+Re-applies the last yanked delimiter pair:
+
+```
+ysi(   → yank surround stores "()" in register
+gzp    → labels on words → pick target → target wrapped with ()
+```
+
+### Quote Alias (`q`)
+
+The `q` key matches any quote type (`"`, `'`, `` ` ``) simultaneously:
+
+```
+dsq   → labels appear on ALL quote pairs (double, single, backtick) → pick one → removed
+csq   → labels on all quotes → pick one → type replacement delimiter
+diq   → delete inside nearest quote (any type)
+vaq   → visually select around nearest quote
+```
+
+Internally, `q` reuses the `pairs` collector with `pair_chars` set to all three quote types. Labels appear on every quote pair on screen regardless of type, so you can target a double-quoted string and a backtick-quoted string in the same operation.
+
+### HTML/XML Tags (`t`)
+
+The `t` textobject targets HTML/XML tag pairs:
+
+```
+dst   → labels on all tag pairs → pick one → tags removed: <div>foo</div> → foo
+dit   → delete inside tag: <div>hello world</div> → <div></div>
+vat   → visually select around tag (including delimiters)
+ysiw t → word labels → pick one → prompts "Tag:" → type "span" → <span>word</span>
+Visual S then type t → prompts "Tag:" → wraps selection with tag
+```
+
+Tag detection uses a `tags` collector that tries treesitter first (for HTML, JSX, TSX files where tag nodes exist in the tree) and falls back to pattern-based scanning for other file types. The pattern fallback matches `<tagname ...>...</tagname>` structures.
+
+When used as a surround delimiter in `ys`/`S`, typing `t` triggers a `vim.fn.input` prompt for the tag name.
+
+**`cst` — Live multi-cursor tag rename:**
+
+`cst` does not use a command-line prompt. Instead, it uses in-place editing with real-time synchronization between opening and closing tags:
+
+```
+cst → labels on all tag pairs → pick one
+    → tag name deleted from BOTH opening and closing tags simultaneously
+    → cursor enters insert mode in the opening tag, right after <
+    → as you type, the closing tag mirrors your input in real-time
+    → the closing tag name highlights in blue as it syncs
+    → press ESC when done — both tags have the new name
+```
+
+Example: `cst` on `<div>foo</div>` → `<|>foo</>` → type `span` → both update live → `<span>foo</span>`
+
+This is a unique feature — no other surround plugin does real-time multi-cursor tag rename. Other plugins (like nvim-surround) use a command-line prompt to read the new tag name, then apply it. SmartMotion lets you see both tags update as you type, directly in the buffer.
+
+### Function Calls (`f` surround)
+
+The `f` textobject has dual behavior depending on the prefix:
+
+```
+dif   → delete inside function BODY (treesitter function definition) — unchanged
+daf   → delete around function BODY (treesitter function definition) — unchanged
+dsf   → unwrap function CALL: print(foo, bar) → foo, bar
+csf   → change function name (in-place insert mode, see below)
+```
+
+This is achieved through the `_collector_override` / `_extractor_override` pattern. The `f` textobject is registered once, but its `surround` overrides swap the collector from `treesitter` (for inside/around) to `function_calls` (for surround). The `function_calls` collector finds `call_expression` nodes via treesitter with a pattern-based fallback.
+
+`dsf` specifically targets the function *call* (name + parentheses), not the function *definition*. This means on `print(foo, bar)`, `dsf` removes the `print(` and `)`, leaving `foo, bar`.
+
+**`csf` — In-place function name change:**
+
+`csf` does not use a command-line prompt. Instead, it deletes the function name and enters insert mode at that position:
+
+```
+csf → labels on all function calls → pick one
+    → function name is deleted, cursor enters insert mode at the name position
+    → type the new name directly in-place
+    → press ESC when done
+```
+
+Example: `csf` on `console.log(x)` → cursor at `|(x)` in insert mode → type `warn` → `warn(x)`
+
+This behaves like `ci` — delete the target and enter insert mode for you to type the replacement. It's faster than a prompt because you see the result in the buffer as you type.
+
+### Pattern-Based Pair Detection
+
+The pairs collector uses a two-tier detection strategy:
+
+1. **Treesitter first**: Walks the syntax tree looking for nodes whose first and last children match the delimiter characters. This gives structurally correct results.
+2. **Pattern fallback**: If the treesitter parse tree has errors (common while actively editing), falls back to a stack-based pattern scanner. Asymmetric pairs (`()`, `[]`, `{}`, `<>`) use stack matching. Symmetric pairs (`""`, `''`, `` `` ``) pair adjacent occurrences on the same line.
+
+This means pair textobjects work reliably even in broken syntax, unparsed file types, or mid-edit states where treesitter can't produce a clean tree.
+
+---
+
+## Target Expansion
+
+Target expansion lets you grow or shrink a selection after picking a target, before the surround action executes. It hooks into the exit flow between target selection and action execution.
+
+### How It Works
+
+1. Trigger a surround motion (`ys` or `gza`)
+2. Pick a target from the labeled hints
+3. **Expansion phase begins**: the selected target highlights, and dim `+`/`-` hints appear on adjacent targets
+4. Press `+` to expand forward (include the next target), `-` to expand backward (include the previous target), or `<BS>` to shrink (undo the last expansion)
+5. The range highlight grows or shrinks as you press expansion keys
+6. Press any other key (the delimiter character) to confirm and execute the surround action
+
+### Visual UX
+
+During expansion, three visual cues help you see what's happening:
+
+- **Selected target**: highlighted with `SmartMotionSelected` so you can see the current range
+- **Dim `+`/`-` hints**: appear on the adjacent targets in the forward and backward directions, showing what would be included next
+- **Range highlight**: updates in real time as you expand or shrink, covering the full span from the first to last included target
+
+### Where It Hooks In
+
+Expansion sits between selection and action in the pipeline exit flow:
+
+```
+... → Visualizer → Selection → [Expansion] → Action
+```
+
+After the user picks a target (Selection), the expansion phase optionally activates. Once the user presses a non-expansion key, that key is captured as the delimiter and passed to the surround action.
+
+### Which Motions Support It
+
+Expansion only activates on motions with `expansion_enabled = true` in their motion state. Currently this includes:
+
+- **`ys`** (add surround via composable motion/textobject)
+- **`gza`** (quick surround add)
+
+Other surround operations (`ds`, `cs`, `gzp`, visual `S`) do not use expansion because the target scope is already determined by the delimiter pair or visual selection.
+
+### Configuration
+
+The expansion keys are configurable. See **[Configuration: Expansion Keys](Configuration.md#expansion-keys)** for details on remapping or disabling.
+
+---
+
 ## Action Composition
 
 Combine actions with `merge`:
