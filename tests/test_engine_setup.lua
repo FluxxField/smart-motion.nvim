@@ -9,6 +9,9 @@ local T = MiniTest.new_set({
 				presets = {
 					words = true,
 					lines = true,
+					delete = true,
+					yank = true,
+					change = true,
 				},
 			})
 		end,
@@ -134,6 +137,71 @@ T["setup.run"]["applies per-mode motion state overrides"] = function()
 	-- Normal mode shouldn't have exclude_target
 	-- (exact behavior depends on ctx.mode)
 	expect.no_equality(ms, nil)
+end
+
+T["setup.run"]["does not error for infer motions without an extractor"] = function()
+	helpers.create_buf({ "hello world test" })
+	helpers.set_cursor(1, 0)
+
+	local setup = require("smart-motion.core.engine.setup")
+	local exit = require("smart-motion.core.events.exit")
+
+	-- Capture vim.notify calls to detect error messages
+	local notifications = {}
+	local orig_notify = vim.notify
+	vim.notify = function(msg, level)
+		table.insert(notifications, { msg = msg, level = level })
+	end
+
+	local ctx, cfg, ms
+	local exit_type = exit.wrap(function()
+		ctx, cfg, ms = setup.run("d")
+	end)
+
+	vim.notify = orig_notify
+
+	-- setup.run should succeed without errors
+	expect.equality(exit_type, nil)
+	expect.no_equality(ctx, nil)
+	expect.no_equality(ms, nil)
+	expect.equality(ms.motion.infer, true)
+
+	-- No error notifications about missing extractor
+	for _, n in ipairs(notifications) do
+		if n.level == vim.log.levels.ERROR and n.msg:find("extractor") then
+			error("setup.run emitted extractor error for infer motion: " .. n.msg)
+		end
+	end
+end
+
+T["setup.run"]["does not error for yank and change infer motions"] = function()
+	helpers.create_buf({ "hello world test" })
+	helpers.set_cursor(1, 0)
+
+	local setup = require("smart-motion.core.engine.setup")
+	local exit = require("smart-motion.core.events.exit")
+
+	for _, key in ipairs({ "y", "c" }) do
+		local notifications = {}
+		local orig_notify = vim.notify
+		vim.notify = function(msg, level)
+			table.insert(notifications, { msg = msg, level = level })
+		end
+
+		local exit_type = exit.wrap(function()
+			setup.run(key)
+		end)
+
+		vim.notify = orig_notify
+
+		expect.equality(exit_type, nil)
+
+		for _, n in ipairs(notifications) do
+			if n.level == vim.log.levels.ERROR and n.msg:find("extractor") then
+				error("setup.run emitted extractor error for '" .. key .. "' motion: " .. n.msg)
+			end
+		end
+	end
 end
 
 return T
