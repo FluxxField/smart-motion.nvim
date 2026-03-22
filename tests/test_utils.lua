@@ -84,6 +84,44 @@ T["prepare_motion"]["returns ctx, cfg, and motion_state"] = function()
 end
 
 -- =============================================================================
+-- close_floating_windows
+-- =============================================================================
+
+T["close_floating_windows"] = MiniTest.new_set()
+
+T["close_floating_windows"]["closes only smart-motion owned floating windows"] = function()
+	helpers.create_buf({ "test" })
+
+	local utils = require("smart-motion.utils")
+	local owned_buf = vim.api.nvim_create_buf(false, true)
+	local foreign_buf = vim.api.nvim_create_buf(false, true)
+
+	local owned_win = vim.api.nvim_open_win(owned_buf, false, {
+		relative = "editor",
+		row = 1,
+		col = 1,
+		width = 10,
+		height = 1,
+		style = "minimal",
+	})
+	local foreign_win = vim.api.nvim_open_win(foreign_buf, false, {
+		relative = "editor",
+		row = 3,
+		col = 1,
+		width = 10,
+		height = 1,
+		style = "minimal",
+	})
+
+	vim.api.nvim_win_set_var(owned_win, "smart_motion_owned", true)
+
+	utils.close_floating_windows()
+
+	expect.equality(vim.api.nvim_win_is_valid(owned_win), false)
+	expect.equality(vim.api.nvim_win_is_valid(foreign_win), true)
+end
+
+-- =============================================================================
 -- module_wrapper
 -- =============================================================================
 

@@ -2,6 +2,7 @@
 --- Triggered by `g.`: browse all history entries, pick one to jump back to.
 --- Uses nui.nvim for proper split layout if available, falls back to simple popup.
 local consts = require("smart-motion.consts")
+local utils = require("smart-motion.utils")
 
 local M = {}
 
@@ -656,6 +657,9 @@ function M.run()
 
 	-- Mount layout
 	layout:mount()
+	for _, popup in ipairs({ header_popup, preview_popup, list_popup, hint_popup }) do
+		utils.mark_floating_window(popup.winid)
+	end
 	refresh()
 
 	-- Cleanup
