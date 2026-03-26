@@ -9,12 +9,23 @@ local history = require("smart-motion.core.history")
 local exit = require("smart-motion.core.events.exit")
 
 local EXIT_TYPE = consts.EXIT_TYPE
+local FLOAT_WINDOW_OWNER_VAR = "smart_motion_owned"
 
 local M = {}
 
---- Closes all diagnostic and completion floating windows.
+--- Marks a window as being owned by smart-motion.
+---@param winid integer
+function M.mark_floating_window(winid)
+	if not vim.api.nvim_win_is_valid(winid) then
+		return
+	end
+
+	pcall(vim.api.nvim_win_set_var, winid, FLOAT_WINDOW_OWNER_VAR, true)
+end
+
+--- Closes floating windows created by smart-motion.
 function M.close_floating_windows()
-	log.debug("Closing floating windows (diagnostics & completion)")
+	log.debug("Closing smart-motion floating windows")
 
 	for _, winid in ipairs(vim.api.nvim_list_wins()) do
 		local ok, win_config = pcall(vim.api.nvim_win_get_config, winid)
@@ -25,7 +36,9 @@ function M.close_floating_windows()
 			goto continue
 		end
 
-		if vim.tbl_contains({ "cursor", "win" }, win_config.relative) then
+		local has_owner_var, owned = pcall(vim.api.nvim_win_get_var, winid, FLOAT_WINDOW_OWNER_VAR)
+
+		if has_owner_var and owned and win_config.relative ~= "" then
 			local success, err = pcall(vim.api.nvim_win_close, winid, true)
 
 			if not success then
